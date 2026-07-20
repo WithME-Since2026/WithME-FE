@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,12 +19,13 @@ import { colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
 
+import { KakaoIcon } from '@/domain/auth/components/KakaoIcon';
 import { useLoginMutation } from '@/domain/auth/hooks/useLoginMutation';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 // 아이디/비밀번호 로그인, 카카오 로그인 진입점 화면
-export function LoginScreen(_props: LoginScreenProps) {
+export function LoginScreen({ navigation }: LoginScreenProps) {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
 
@@ -30,6 +39,10 @@ export function LoginScreen(_props: LoginScreenProps) {
 
   const handleKakaoStart = () => {
     // TODO: 카카오 SDK 연동 후 카카오 로그인 플로우 연결 (api/v1/auth/login/kakao)
+  };
+
+  const handleSignUpPress = () => {
+    navigation.navigate('SignUp');
   };
 
   return (
@@ -67,8 +80,19 @@ export function LoginScreen(_props: LoginScreenProps) {
               loading={isPending}
               disabled={isSubmitDisabled}
             />
-            <Button label="카카오로 시작하기" variant="kakao" onPress={handleKakaoStart} />
+            <Button
+              label="카카오로 시작하기"
+              variant="kakao"
+              icon={<KakaoIcon />}
+              onPress={handleKakaoStart}
+            />
           </View>
+
+          <Pressable style={styles.signUpLink} onPress={handleSignUpPress} hitSlop={8}>
+            <Text style={styles.signUpLinkText}>
+              아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
+            </Text>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -98,5 +122,18 @@ const styles = StyleSheet.create({
   },
   buttonGroup: {
     gap: spacing.sm,
+  },
+  signUpLink: {
+    marginTop: spacing.lg,
+    alignItems: 'center',
+  },
+  signUpLinkText: {
+    ...typography.body2,
+    color: colors.text.secondary,
+  },
+  signUpLinkHighlight: {
+    fontWeight: '700',
+    color: colors.text.primary,
+    textDecorationLine: 'underline',
   },
 });
