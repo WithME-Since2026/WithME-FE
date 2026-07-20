@@ -11,6 +11,9 @@ export const colors = {
   error: '#EF4444',
   success: '#10B981',
   border: '#E5E7EB',
+  // 카카오 브랜드 가이드 고정 컬러
+  kakao: '#FEE500',
+  kakaoText: '#191919',
 };
 
 export const spacing = {
