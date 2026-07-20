@@ -1,0 +1,6 @@
+{
+  "icon": "./src/assets/images/icon.png",
+  "ios": {
+    "bundleIdentifier": "com.anonymous.with-me-fe"
+  }
+}

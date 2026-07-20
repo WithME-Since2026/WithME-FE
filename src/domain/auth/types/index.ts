@@ -1,5 +1,5 @@
 export type LoginRequest = {
-  email: string;
+  loginId: string;
   password: string;
 };
 
@@ -16,4 +16,22 @@ export type ReissueRequest = {
 export type ReissueResponse = {
   accessToken: string;
   refreshToken: string;
+};
+
+export type CheckLoginIdRequest = {
+  loginId: string;
+};
+
+export type CheckLoginIdResponse = {
+  isDuplicated: boolean;
+};
+
+export type SignUpRequest = {
+  loginId: string;
+  password: string;
+  agreeMarketing: boolean;
+};
+
+export type SignUpResponse = {
+  userId: number;
 };
