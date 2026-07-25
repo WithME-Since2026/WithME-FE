@@ -19,7 +19,13 @@ export function AgreementCheckbox({
   bold = false,
 }: AgreementCheckboxProps) {
   return (
-    <Pressable style={styles.row} onPress={onToggle} hitSlop={8}>
+    <Pressable
+      style={styles.row}
+      onPress={onToggle}
+      hitSlop={8}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked }}
+    >
       <View style={[styles.box, checked && styles.boxChecked]}>
         {checked && <Text style={styles.checkMark}>✓</Text>}
       </View>

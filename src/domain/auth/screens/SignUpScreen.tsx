@@ -22,13 +22,20 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [isLoginIdAvailable, setIsLoginIdAvailable] = useState(false);
+  // 응답이 도착한 시점의 loginId를 함께 저장해 최신 loginId와 다르면 결과를 무시함
+  const [duplicateCheckResult, setDuplicateCheckResult] = useState<{
+    loginId: string;
+    isDuplicated: boolean;
+  } | null>(null);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [agreeMarketing, setAgreeMarketing] = useState(false);
 
   const checkLoginIdMutation = useCheckLoginIdMutation();
   const signUpMutation = useSignUpMutation();
+
+  const isLoginIdAvailable =
+    duplicateCheckResult?.loginId === loginId && !duplicateCheckResult.isDuplicated;
 
   const isPasswordMismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
   const isAllAgreed = agreeTerms && agreePrivacy && agreeMarketing;
@@ -44,15 +51,18 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const handleLoginIdChange = (value: string) => {
     setLoginId(value);
     // 아이디를 다시 수정하면 이전 중복확인 결과는 무효화
-    setIsLoginIdAvailable(false);
+    // (reset()은 진행 중인 요청을 취소하지 않으므로, 결과 매칭은 loginId 비교로 처리)
+    setDuplicateCheckResult(null);
     checkLoginIdMutation.reset();
   };
 
   const handleCheckDuplicate = () => {
+    const requestedLoginId = loginId;
     checkLoginIdMutation.mutate(
-      { loginId },
+      { loginId: requestedLoginId },
       {
-        onSuccess: (data) => setIsLoginIdAvailable(!data.isDuplicated),
+        onSuccess: (data) =>
+          setDuplicateCheckResult({ loginId: requestedLoginId, isDuplicated: data.isDuplicated }),
       },
     );
   };
@@ -74,9 +84,10 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   };
 
   // 중복확인 API 자체는 성공(200)했지만 isDuplicated: true인 경우도 에러로 취급
-  const loginIdErrorMessage = checkLoginIdMutation.data?.isDuplicated
-    ? '이미 사용 중인 아이디입니다.'
-    : undefined;
+  const loginIdErrorMessage =
+    duplicateCheckResult?.loginId === loginId && duplicateCheckResult.isDuplicated
+      ? '이미 사용 중인 아이디입니다.'
+      : undefined;
 
   return (
     <SafeAreaView style={styles.safeArea}>

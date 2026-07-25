@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { LoginScreen } from '@/domain/auth/screens/LoginScreen';
+import { NameInputScreen } from '@/domain/auth/screens/NameInputScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
 
@@ -9,6 +10,7 @@ export type RootStackParamList = {
   Start: undefined;
   Login: undefined;
   SignUp: undefined;
+  NameInput: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -21,6 +23,7 @@ export function RootNavigator() {
         <Stack.Screen name="Start" component={StartScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="NameInput" component={NameInputScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
