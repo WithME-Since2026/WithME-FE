@@ -11,6 +11,8 @@ import { colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
 
+import { useUpdateProfileMutation } from '@/domain/user/hooks/useUpdateProfileMutation';
+
 const NAME_MAX_LENGTH = 20;
 
 type NameInputScreenProps = NativeStackScreenProps<RootStackParamList, 'NameInput'>;
@@ -19,8 +21,24 @@ type NameInputScreenProps = NativeStackScreenProps<RootStackParamList, 'NameInpu
 export function NameInputScreen({ navigation }: NameInputScreenProps) {
   const [name, setName] = useState('');
 
+  const updateProfileMutation = useUpdateProfileMutation();
+
   const handleComplete = () => {
-    navigation.replace('Login');
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+
+    updateProfileMutation.mutate(
+      {
+        nickname: trimmedName,
+        residence: '', // TODO: 거주지 입력 화면 추가 시 수정
+      },
+      {
+        onSuccess: () => {
+          // TODO: 프로필 업데이트 후 이동할 메인 화면 추가 시 수정 (현재는 임시로 Login으로 이동)
+          navigation.replace('Login');
+        },
+      },
+    );
   };
 
   return (
@@ -48,7 +66,12 @@ export function NameInputScreen({ navigation }: NameInputScreenProps) {
             {name.length}/{NAME_MAX_LENGTH}
           </Text>
 
-          <Button label="완료" onPress={handleComplete} disabled={!name.trim()} />
+          <Button
+            label="완료"
+            onPress={handleComplete}
+            loading={updateProfileMutation.isPending}
+            disabled={!name.trim()}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
