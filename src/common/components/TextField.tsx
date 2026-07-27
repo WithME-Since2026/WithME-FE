@@ -65,7 +65,10 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    ...typography.body1,
+    // lineHeight를 주면 iOS에서 p/y/g 같은 글자의 아래쪽(descender)이 잘려 보이는
+    // 문제가 있어 TextInput에는 fontSize/fontWeight만 적용
+    fontSize: typography.body1.fontSize,
+    fontWeight: typography.body1.fontWeight,
     color: colors.text.primary,
     padding: 0,
   },

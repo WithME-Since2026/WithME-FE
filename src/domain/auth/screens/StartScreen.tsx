@@ -27,11 +27,6 @@ export function StartScreen({ navigation }: StartScreenProps) {
     navigation.navigate('SignUp');
   };
 
-  // TODO: 프로필 저장 API 연동 후 정식 플로우에 연결되면 이 임시 진입 버튼은 제거
-  const handleNameInputTestPress = () => {
-    navigation.navigate('NameInput');
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
@@ -60,13 +55,6 @@ export function StartScreen({ navigation }: StartScreenProps) {
           <Pressable style={styles.signUpLink} onPress={handleSignUpPress} hitSlop={8}>
             <Text style={styles.signUpLinkText}>
               아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
-            </Text>
-          </Pressable>
-
-          {/* TODO: 임시 QA 진입 버튼, 정식 플로우 연결 후 제거 */}
-          <Pressable style={styles.signUpLink} onPress={handleNameInputTestPress} hitSlop={8}>
-            <Text style={styles.signUpLinkText}>
-              <Text style={styles.signUpLinkHighlight}>이름입력 화면 테스트</Text>
             </Text>
           </Pressable>
         </View>
