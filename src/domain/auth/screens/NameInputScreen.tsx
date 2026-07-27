@@ -21,15 +21,13 @@ type NameInputScreenProps = NativeStackScreenProps<RootStackParamList, 'NameInpu
 export function NameInputScreen({ navigation }: NameInputScreenProps) {
   const [name, setName] = useState('');
 
-<<<<<<< HEAD
   const updateProfileMutation = useUpdateProfileMutation();
-=======
+
   // "value"로 완전히 controlled하면 매 keystroke마다 네이티브 입력 버퍼를 React가
   // 다시 덮어써서, iOS에서는 빠른 타이핑 시 글자가 씹히고 안드로이드에서는 한글 조합
   // 중인 텍스트가 끊겨 입력이 막힘. defaultValue로 두고 onChangeText만 구독해
   // 네이티브 버퍼를 그대로 두는 방식으로 회피
   const isNameTooLong = name.length > NAME_MAX_LENGTH;
->>>>>>> 5d7cc96 (키보드 입력 짤림 문제 해결)
 
   const handleComplete = () => {
     const trimmedName = name.trim();
@@ -79,22 +77,14 @@ export function NameInputScreen({ navigation }: NameInputScreenProps) {
             {name.length}/{NAME_MAX_LENGTH}
           </Text>
 
-<<<<<<< HEAD
-          <Button
-            label="완료"
-            onPress={handleComplete}
-            loading={updateProfileMutation.isPending}
-            disabled={!name.trim()}
-          />
-=======
-          <View style={styles.footer}>
-            <Button
-              label="완료"
-              onPress={handleComplete}
-              disabled={!name.trim() || isNameTooLong}
-            />
-          </View>
->>>>>>> 5d7cc96 (키보드 입력 짤림 문제 해결)
+<View style={styles.footer}>
+  <Button
+    label="완료"
+    onPress={handleComplete}
+    loading={updateProfileMutation.isPending}
+    disabled={!name.trim() || isNameTooLong}
+  />
+</View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
