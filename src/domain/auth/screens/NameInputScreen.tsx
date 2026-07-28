@@ -17,9 +17,9 @@ const NAME_MAX_LENGTH = 20;
 
 type NameInputScreenProps = NativeStackScreenProps<RootStackParamList, 'NameInput'>;
 
-// 최초 로그인 후 프로필 이름을 확인/입력하는 화면
-export function NameInputScreen({ navigation }: NameInputScreenProps) {
-  const [name, setName] = useState('');
+// 최초 로그인 후 카카오 프로필 이름을 확인/입력하는 화면
+export function NameInputScreen({ navigation, route }: NameInputScreenProps) {
+  const [name, setName] = useState(route.params?.nickname ?? '');
 
   const updateProfileMutation = useUpdateProfileMutation();
 
@@ -57,7 +57,7 @@ export function NameInputScreen({ navigation }: NameInputScreenProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>반가워요! 이름을 입력해주세요</Text>
+          <Text style={styles.title}>반가워요! 카카오 프로필을{'\n'}확인해주세요</Text>
           <Text style={styles.helperText}>나중에 마이페이지에서 언제든 수정할 수 있어요</Text>
 
           <View style={styles.avatar}>
@@ -76,15 +76,18 @@ export function NameInputScreen({ navigation }: NameInputScreenProps) {
           <Text style={[styles.counter, isNameTooLong && styles.counterError]}>
             {name.length}/{NAME_MAX_LENGTH}
           </Text>
+          <Text style={styles.autoFillNotice}>
+            카카오 닉네임으로 자동 입력했어요. 원하는 이름으로 수정하세요.
+          </Text>
 
-<View style={styles.footer}>
-  <Button
-    label="완료"
-    onPress={handleComplete}
-    loading={updateProfileMutation.isPending}
-    disabled={!name.trim() || isNameTooLong}
-  />
-</View>
+          <View style={styles.footer}>
+            <Button
+              label="완료"
+              onPress={handleComplete}
+              loading={updateProfileMutation.isPending}
+              disabled={!name.trim() || isNameTooLong}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -120,13 +123,11 @@ const styles = StyleSheet.create({
   title: {
     ...typography.heading3,
     color: colors.text.primary,
-    textAlign: 'center',
     marginBottom: spacing.xs,
   },
   helperText: {
     ...typography.caption,
     color: colors.text.secondary,
-    textAlign: 'center',
     marginBottom: spacing.xl,
   },
   avatar: {
@@ -150,24 +151,29 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.background,
+    backgroundColor: colors.primary,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarBadgeIcon: {
     fontSize: 14,
-    color: colors.text.secondary,
+    color: colors.background,
   },
   counter: {
     ...typography.caption,
     color: colors.text.disabled,
     textAlign: 'right',
     marginTop: -spacing.sm,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.xs,
   },
   counterError: {
     color: colors.error,
+  },
+  autoFillNotice: {
+    ...typography.caption,
+    color: colors.text.secondary,
+    marginBottom: spacing.xl,
   },
 });

@@ -27,23 +27,7 @@ export function StartScreen({ navigation }: StartScreenProps) {
     navigation.navigate('SignUp');
   };
 
-  // TODO: 계정 찾기 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거
-  const handleDevFindAccountPress = () => {
-    navigation.navigate('FindAccount');
-  };
-
-  const handleDevFindIdResultPress = () => {
-    navigation.navigate('FindIdResult', { loginId: 'withme_test' });
-  };
-
-  const handleDevResetPasswordPress = () => {
-    navigation.navigate('ResetPassword', {
-      loginId: 'withme_test',
-      email: 'test@withme.com',
-      code: '123456',
-    });
-  };
-
+  // TODO: 온보딩 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거
   const handleDevOnboardingPress = () => {
     navigation.navigate('Onboarding');
   };
@@ -79,25 +63,10 @@ export function StartScreen({ navigation }: StartScreenProps) {
             </Text>
           </Pressable>
 
-          {/* TODO: 계정 찾기 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거 */}
+          {/* TODO: 온보딩 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거 */}
           {__DEV__ && (
             <View style={styles.devSection}>
               <Text style={styles.devLabel}>DEV ONLY</Text>
-              <Button
-                label="[dev] 계정 찾기"
-                variant="outline"
-                onPress={handleDevFindAccountPress}
-              />
-              <Button
-                label="[dev] 아이디 찾기 결과"
-                variant="outline"
-                onPress={handleDevFindIdResultPress}
-              />
-              <Button
-                label="[dev] 비밀번호 재설정"
-                variant="outline"
-                onPress={handleDevResetPasswordPress}
-              />
               <Button label="[dev] 온보딩" variant="outline" onPress={handleDevOnboardingPress} />
             </View>
           )}

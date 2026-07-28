@@ -6,7 +6,6 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
-import { DevResetLink } from '@/common/components/DevResetLink';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { SegmentedTabs } from '@/common/components/SegmentedTabs';
 import { TextField } from '@/common/components/TextField';
@@ -175,7 +174,6 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
               loading={checkEmailCodeMutation.isPending || findLoginIdMutation.isPending}
               disabled={isNextDisabled}
             />
-            <DevResetLink navigation={navigation} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

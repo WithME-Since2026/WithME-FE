@@ -4,7 +4,6 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
-import { DevResetLink } from '@/common/components/DevResetLink';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
@@ -39,7 +38,6 @@ export function FindIdResultScreen({ navigation, route }: FindIdResultScreenProp
           <Pressable style={styles.findPasswordLink} onPress={handleFindPasswordPress} hitSlop={8}>
             <Text style={styles.findPasswordLinkText}>비밀번호 찾기</Text>
           </Pressable>
-          <DevResetLink navigation={navigation} />
         </View>
       </View>
     </SafeAreaView>

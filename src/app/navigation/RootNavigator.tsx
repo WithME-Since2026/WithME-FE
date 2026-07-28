@@ -14,7 +14,7 @@ export type RootStackParamList = {
   Start: undefined;
   Login: undefined;
   SignUp: undefined;
-  NameInput: undefined;
+  NameInput: { nickname?: string } | undefined;
   FindAccount: { initialTab?: 'ID' | 'PASSWORD' } | undefined;
   FindIdResult: { loginId: string };
   ResetPassword: { loginId: string; email: string; code: string };

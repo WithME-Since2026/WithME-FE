@@ -6,7 +6,6 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
-import { DevResetLink } from '@/common/components/DevResetLink';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
 import { colors, spacing, typography } from '@/common/styles/theme';
@@ -62,7 +61,6 @@ export function ResetPasswordScreen({ navigation, route }: ResetPasswordScreenPr
             autoComplete="password-new"
             secureToggle
           />
-          <PasswordRequirementList status={passwordRuleStatus} />
 
           <TextField
             label="비밀번호 확인"
@@ -73,6 +71,8 @@ export function ResetPasswordScreen({ navigation, route }: ResetPasswordScreenPr
             secureToggle
             errorMessage={isPasswordMismatch ? '비밀번호가 일치하지 않습니다.' : undefined}
           />
+
+          <PasswordRequirementList status={passwordRuleStatus} />
 
           {resetPasswordMutation.isError && (
             <Text style={styles.submitError}>
@@ -87,7 +87,6 @@ export function ResetPasswordScreen({ navigation, route }: ResetPasswordScreenPr
               loading={resetPasswordMutation.isPending}
               disabled={isSubmitDisabled}
             />
-            <DevResetLink navigation={navigation} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

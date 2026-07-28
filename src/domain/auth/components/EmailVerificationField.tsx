@@ -84,15 +84,17 @@ export function EmailVerificationField({
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     gap: spacing.sm,
   },
   emailInput: {
     flex: 1,
   },
-  // TextField 컨테이너 하단 marginBottom(spacing.md)만큼 맞춰 idRow와 동일하게 바닥 정렬
+  // 이메일 형식 에러 메시지가 뜨면 TextField 전체 높이가 늘어나 flex-end 정렬 시
+  // 버튼이 입력창과 어긋나므로, label 높이(lineHeight+marginBottom)만큼 marginTop을
+  // 줘서 입력창 상단에 버튼 상단을 고정 정렬한다.
   sendButton: {
-    marginBottom: spacing.md,
+    marginTop: typography.body2.lineHeight + spacing.xs,
   },
   timerText: {
     ...typography.body2,
