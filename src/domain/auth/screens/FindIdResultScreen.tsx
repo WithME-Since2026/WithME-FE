@@ -4,11 +4,10 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
+import { DevResetLink } from '@/common/components/DevResetLink';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
-
-import { DevResetLink } from '@/domain/auth/components/DevResetLink';
 
 type FindIdResultScreenProps = NativeStackScreenProps<RootStackParamList, 'FindIdResult'>;
 

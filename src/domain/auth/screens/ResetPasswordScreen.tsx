@@ -6,6 +6,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
+import { DevResetLink } from '@/common/components/DevResetLink';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
 import { colors, spacing, typography } from '@/common/styles/theme';
@@ -13,7 +14,6 @@ import { getPasswordRuleStatus, isPasswordValid } from '@/common/utils/validator
 
 import type { RootStackParamList } from '@/app/navigation';
 
-import { DevResetLink } from '@/domain/auth/components/DevResetLink';
 import { PasswordRequirementList } from '@/domain/auth/components/PasswordRequirementList';
 import { useResetPasswordMutation } from '@/domain/auth/hooks/useResetPasswordMutation';
 

@@ -11,7 +11,7 @@ type DevResetLinkProps = {
   navigation: Pick<NativeStackNavigationProp<RootStackParamList>, 'popToTop'>;
 };
 
-// TODO: 계정 찾기 플로우 테스트용 임시 컴포넌트. 실기기/시뮬레이터에서 확인 후 PR 전 제거
+// TODO: 계정 찾기/온보딩 플로우 테스트용 임시 컴포넌트. 실기기/시뮬레이터에서 확인 후 PR 전 제거
 export function DevResetLink({ navigation }: DevResetLinkProps) {
   if (!__DEV__) {
     return null;

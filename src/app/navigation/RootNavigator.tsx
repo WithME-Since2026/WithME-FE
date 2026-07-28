@@ -8,6 +8,7 @@ import { NameInputScreen } from '@/domain/auth/screens/NameInputScreen';
 import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
+import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
 
 export type RootStackParamList = {
   Start: undefined;
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   FindAccount: { initialTab?: 'ID' | 'PASSWORD' } | undefined;
   FindIdResult: { loginId: string };
   ResetPassword: { loginId: string; email: string; code: string };
+  Onboarding: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -33,6 +35,7 @@ export function RootNavigator() {
         <Stack.Screen name="FindAccount" component={FindAccountScreen} />
         <Stack.Screen name="FindIdResult" component={FindIdResultScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

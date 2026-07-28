@@ -44,6 +44,10 @@ export function StartScreen({ navigation }: StartScreenProps) {
     });
   };
 
+  const handleDevOnboardingPress = () => {
+    navigation.navigate('Onboarding');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
@@ -94,6 +98,7 @@ export function StartScreen({ navigation }: StartScreenProps) {
                 variant="outline"
                 onPress={handleDevResetPasswordPress}
               />
+              <Button label="[dev] 온보딩" variant="outline" onPress={handleDevOnboardingPress} />
             </View>
           )}
         </View>

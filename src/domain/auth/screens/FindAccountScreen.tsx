@@ -6,6 +6,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
+import { DevResetLink } from '@/common/components/DevResetLink';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { SegmentedTabs } from '@/common/components/SegmentedTabs';
 import { TextField } from '@/common/components/TextField';
@@ -15,7 +16,6 @@ import { isValidEmail } from '@/common/utils/validators';
 
 import type { RootStackParamList } from '@/app/navigation';
 
-import { DevResetLink } from '@/domain/auth/components/DevResetLink';
 import { EmailVerificationField } from '@/domain/auth/components/EmailVerificationField';
 import { useCheckEmailCodeMutation } from '@/domain/auth/hooks/useCheckEmailCodeMutation';
 import { useFindLoginIdMutation } from '@/domain/auth/hooks/useFindLoginIdMutation';

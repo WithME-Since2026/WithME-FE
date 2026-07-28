@@ -14,6 +14,12 @@ export const colors = {
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
+  // 온보딩 카드처럼 넓은 면적의 연한 배경이 필요할 때 사용하는 파스텔 팔레트
+  pastel: {
+    blue: '#EAEDFC',
+    green: '#E2F8E9',
+    pink: '#FCE4E7',
+  },
 };
 
 export const spacing = {
