@@ -5,11 +5,13 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 import { ChatBubbleIcon } from '@/domain/onboarding/components/icons/ChatBubbleIcon';
 import { CheckCircleIcon } from '@/domain/onboarding/components/icons/CheckCircleIcon';
 import { LinkIcon } from '@/domain/onboarding/components/icons/LinkIcon';
+import { OnboardingCard } from '@/domain/onboarding/components/OnboardingCard';
+import { ONBOARDING_PASTEL, cardShadow } from '@/domain/onboarding/constants/cardStyle';
 
 // "링크 하나로 앱 없이 참여할 수 있어요" 페이지의 카드 일러스트
 export function LinkShareCard() {
   return (
-    <View style={styles.card}>
+    <OnboardingCard backgroundColor={ONBOARDING_PASTEL.green}>
       <View style={styles.linkRow}>
         <LinkIcon />
         <Text style={styles.linkText}>withme.app/join/abc123</Text>
@@ -24,19 +26,11 @@ export function LinkShareCard() {
         <CheckCircleIcon />
         <Text style={styles.pillText}>앱 설치 없이 참여 가능</Text>
       </View>
-    </View>
+    </OnboardingCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    alignSelf: 'center',
-    width: '65%',
-    backgroundColor: colors.pastel.green,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    gap: spacing.md,
-  },
   linkRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -44,10 +38,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderRadius: borderRadius.md,
     paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.sm,
+    ...cardShadow,
   },
   linkText: {
-    ...typography.body2,
+    ...typography.caption,
     color: colors.text.primary,
   },
   shareButton: {
@@ -60,7 +55,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   shareButtonText: {
-    ...typography.body2,
+    ...typography.caption,
     fontWeight: '700',
     color: colors.text.primary,
   },
@@ -69,7 +64,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: colors.background,
+    backgroundColor: colors.success + '1A',
     borderRadius: borderRadius.full,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,

@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.success,
+    backgroundColor: colors.success + '1A',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.lg,
@@ -74,11 +74,11 @@ const styles = StyleSheet.create({
   checkMark: {
     fontSize: 32,
     fontWeight: '700',
-    color: colors.background,
+    color: colors.success,
   },
   title: {
     ...typography.heading3,
-    color: colors.text.primary,
+    color: colors.success,
     marginBottom: spacing.xs,
   },
   loginId: {

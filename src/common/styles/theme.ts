@@ -1,25 +1,19 @@
 export const colors = {
-  primary: '#4F46E5',
+  primary: '#4A90FA',
   secondary: '#7C3AED',
   background: '#FFFFFF',
   surface: '#F9FAFB',
   text: {
     primary: '#111827',
-    secondary: '#6B7280',
-    disabled: '#9CA3AF',
+    secondary: '#99999E',
+    disabled: '#BFBFC4',
   },
-  error: '#EF4444',
-  success: '#10B981',
+  error: '#EB4747',
+  success: '#33B96B',
   border: '#E5E7EB',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
-  // 온보딩 카드처럼 넓은 면적의 연한 배경이 필요할 때 사용하는 파스텔 팔레트
-  pastel: {
-    blue: '#EAEDFC',
-    green: '#E2F8E9',
-    pink: '#FCE4E7',
-  },
 };
 
 export const spacing = {

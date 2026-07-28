@@ -3,7 +3,6 @@ import { useRef, useState } from 'react';
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -62,17 +61,6 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
     navigation.replace('Login');
   };
 
-  const handleNextPress = () => {
-    if (isLastPage) {
-      handleFinish();
-      return;
-    }
-
-    const nextIndex = activeIndex + 1;
-    scrollRef.current?.scrollTo({ x: nextIndex * width, animated: true });
-    setActiveIndex(nextIndex);
-  };
-
   const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setActiveIndex(index);
@@ -88,19 +76,9 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
         onMomentumScrollEnd={handleScrollEnd}
         style={styles.pager}
       >
-        {ONBOARDING_PAGES.map((page, index) => (
+        {ONBOARDING_PAGES.map((page) => (
           <View key={page.key} style={[styles.page, { width }]}>
             {page.card}
-
-            <View style={styles.dots}>
-              {ONBOARDING_PAGES.map((dotPage, dotIndex) => (
-                <View
-                  key={dotPage.key}
-                  style={[styles.dot, dotIndex === index && styles.dotActive]}
-                />
-              ))}
-            </View>
-
             <Text style={styles.title}>{page.title}</Text>
             <Text style={styles.description}>{page.description}</Text>
           </View>
@@ -108,17 +86,15 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button label={isLastPage ? '시작하기' : '다음'} onPress={handleNextPress} />
-        {/* 마지막 페이지에서도 자리는 유지해 "시작하기" 버튼 위치가 흔들리지 않도록 opacity로만 숨김 */}
-        <Pressable
-          style={[styles.skipLink, isLastPage && styles.skipLinkHidden]}
-          onPress={handleFinish}
-          disabled={isLastPage}
-          pointerEvents={isLastPage ? 'none' : 'auto'}
-          hitSlop={8}
-        >
-          <Text style={styles.skipLinkText}>건너뛰기</Text>
-        </Pressable>
+        {/* TODO: 온보딩 종료 후 이동 플로우 확정 전까지 임시로 비활성화 */}
+        {isLastPage && <Button label="시작하기" onPress={handleFinish} disabled />}
+
+        <View style={styles.dots}>
+          {ONBOARDING_PAGES.map((page, index) => (
+            <View key={page.key} style={[styles.dot, index === activeIndex && styles.dotActive]} />
+          ))}
+        </View>
+
         <DevResetLink navigation={navigation} />
       </View>
     </SafeAreaView>
@@ -133,15 +109,17 @@ const styles = StyleSheet.create({
   pager: {
     flex: 1,
   },
+  // 페이지마다 제목/설명 줄 수가 달라 justifyContent: 'center'를 쓰면 카드 위치가 페이지별로
+  // 어긋나므로, 모든 페이지에서 카드가 같은 위치에 오도록 고정 paddingTop으로 앵커링
   page: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.xxl + spacing.xl,
   },
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: spacing.xs,
-    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   dot: {
     width: 6,
@@ -164,17 +142,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.xs,
     gap: spacing.sm,
-  },
-  skipLink: {
-    alignItems: 'center',
-  },
-  skipLinkHidden: {
-    opacity: 0,
-  },
-  skipLinkText: {
-    ...typography.caption,
-    color: colors.text.disabled,
   },
 });
