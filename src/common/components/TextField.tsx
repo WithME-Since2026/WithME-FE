@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 
 import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 
@@ -8,33 +8,53 @@ type TextFieldProps = {
   label: string;
   // true이면 비밀번호 표시/숨김 토글을 함께 렌더링
   secureToggle?: boolean;
+  // 인증코드 만료 타이머처럼 입력창 오른쪽에 추가 요소가 필요할 때 사용 (secureToggle과 동시 사용 X)
+  rightElement?: ReactNode;
   errorMessage?: string;
 } & Omit<TextInputProps, 'secureTextEntry'>;
 
 export function TextField({
   label,
   secureToggle = false,
+  rightElement,
   errorMessage,
   ...inputProps
 }: TextFieldProps) {
   // secureToggle이 true인 필드(비밀번호)만 초기값을 가려진 상태로 시작
   const [isSecure, setIsSecure] = useState(secureToggle);
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <View style={[styles.inputRow, errorMessage && styles.inputRowError]}>
+      <View
+        style={[
+          styles.inputRow,
+          isFocused && styles.inputRowFocused,
+          errorMessage && styles.inputRowError,
+        ]}
+      >
         <TextInput
           style={styles.input}
           placeholderTextColor={colors.text.disabled}
           autoCapitalize="none"
           {...inputProps}
           secureTextEntry={isSecure}
+          onFocus={(event) => {
+            setIsFocused(true);
+            inputProps.onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            inputProps.onBlur?.(event);
+          }}
         />
-        {secureToggle && (
+        {secureToggle ? (
           <Pressable onPress={() => setIsSecure((prev) => !prev)} hitSlop={8}>
             <Text style={styles.toggleText}>{isSecure ? '표시' : '숨김'}</Text>
           </Pressable>
+        ) : (
+          rightElement
         )}
       </View>
       {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
@@ -54,11 +74,15 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.surface,
     borderRadius: borderRadius.md,
     paddingHorizontal: spacing.md,
     height: 52,
+  },
+  inputRowFocused: {
+    borderColor: colors.primary,
   },
   inputRowError: {
     borderColor: colors.error,

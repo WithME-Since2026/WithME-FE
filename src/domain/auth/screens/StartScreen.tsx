@@ -27,6 +27,23 @@ export function StartScreen({ navigation }: StartScreenProps) {
     navigation.navigate('SignUp');
   };
 
+  // TODO: 계정 찾기 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거
+  const handleDevFindAccountPress = () => {
+    navigation.navigate('FindAccount');
+  };
+
+  const handleDevFindIdResultPress = () => {
+    navigation.navigate('FindIdResult', { loginId: 'withme_test' });
+  };
+
+  const handleDevResetPasswordPress = () => {
+    navigation.navigate('ResetPassword', {
+      loginId: 'withme_test',
+      email: 'test@withme.com',
+      code: '123456',
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
@@ -57,6 +74,28 @@ export function StartScreen({ navigation }: StartScreenProps) {
               아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
             </Text>
           </Pressable>
+
+          {/* TODO: 계정 찾기 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거 */}
+          {__DEV__ && (
+            <View style={styles.devSection}>
+              <Text style={styles.devLabel}>DEV ONLY</Text>
+              <Button
+                label="[dev] 계정 찾기"
+                variant="outline"
+                onPress={handleDevFindAccountPress}
+              />
+              <Button
+                label="[dev] 아이디 찾기 결과"
+                variant="outline"
+                onPress={handleDevFindIdResultPress}
+              />
+              <Button
+                label="[dev] 비밀번호 재설정"
+                variant="outline"
+                onPress={handleDevResetPasswordPress}
+              />
+            </View>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -124,5 +163,19 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text.primary,
     textDecorationLine: 'underline',
+  },
+  devSection: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    borderStyle: 'dashed',
+    gap: spacing.sm,
+  },
+  devLabel: {
+    ...typography.caption,
+    color: colors.error,
+    textAlign: 'center',
+    fontWeight: '700',
   },
 });

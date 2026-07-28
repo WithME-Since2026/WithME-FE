@@ -1,8 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { FindAccountScreen } from '@/domain/auth/screens/FindAccountScreen';
+import { FindIdResultScreen } from '@/domain/auth/screens/FindIdResultScreen';
 import { LoginScreen } from '@/domain/auth/screens/LoginScreen';
 import { NameInputScreen } from '@/domain/auth/screens/NameInputScreen';
+import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
 
@@ -11,6 +14,9 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   NameInput: undefined;
+  FindAccount: { initialTab?: 'ID' | 'PASSWORD' } | undefined;
+  FindIdResult: { loginId: string };
+  ResetPassword: { loginId: string; email: string; code: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -24,6 +30,9 @@ export function RootNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="NameInput" component={NameInputScreen} />
+        <Stack.Screen name="FindAccount" component={FindAccountScreen} />
+        <Stack.Screen name="FindIdResult" component={FindIdResultScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
