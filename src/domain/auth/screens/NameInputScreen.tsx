@@ -31,7 +31,9 @@ export function NameInputScreen({ navigation, route }: NameInputScreenProps) {
 
   const handleComplete = () => {
     const trimmedName = name.trim();
-    if (!trimmedName) return;
+    if (!trimmedName) {
+      return;
+    }
 
     updateProfileMutation.mutate(
       {

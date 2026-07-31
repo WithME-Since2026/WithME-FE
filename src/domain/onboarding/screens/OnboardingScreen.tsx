@@ -4,7 +4,6 @@ import {
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,8 +20,8 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 import type { RootStackParamList } from '@/app/navigation';
 import onboarding1 from '@/assets/images/onboarding1.png';
 import onboarding2 from '@/assets/images/onboarding2.png';
+import onboarding3 from '@/assets/images/onboarding3.png';
 
-// TODO: 3번째 페이지 일러스트는 아직 준비되지 않아 일단 비워둠. 시안 나오면 image 추가
 const ONBOARDING_PAGES = [
   {
     key: 'schedule',
@@ -39,7 +38,7 @@ const ONBOARDING_PAGES = [
   },
   {
     key: 'todo',
-    image: undefined,
+    image: onboarding3,
     title: 'Todo로 준비 완벽하게',
     description: '모임 준비 할 일을 Todo로 등록하고\n기한 안에 완료해 보세요.',
   },
@@ -76,16 +75,8 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
         onMomentumScrollEnd={handleScrollEnd}
         style={styles.pager}
       >
-        {ONBOARDING_PAGES.map((page, index) => (
+        {ONBOARDING_PAGES.map((page) => (
           <View key={page.key} style={[styles.page, { width }]}>
-            <View style={styles.skipRow}>
-              {index !== LAST_PAGE_INDEX && (
-                <Pressable onPress={handleFinish} hitSlop={8}>
-                  <Text style={styles.skipText}>건너뛰기</Text>
-                </Pressable>
-              )}
-            </View>
-
             <View style={styles.illustrationContainer}>
               {page.image && (
                 <Image source={page.image} style={styles.illustration} resizeMode="contain" />
@@ -122,37 +113,27 @@ const styles = StyleSheet.create({
   },
   page: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xxl,
-  },
-  skipRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    height: 24,
-    marginBottom: spacing.md,
-  },
-  skipText: {
-    ...typography.body2,
-    color: colors.text.secondary,
+    paddingTop: spacing.xxl + spacing.xxl,
   },
   illustrationContainer: {
-    height: 320,
+    height: 400,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.xxl,
   },
   illustration: {
-    width: '95%',
+    width: '150%',
     height: '100%',
   },
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: spacing.xs,
+    gap: spacing.sm,
     marginBottom: spacing.sm,
   },
   dot: {
-    width: 6,
-    height: 6,
+    width: 9,
+    height: 9,
     borderRadius: borderRadius.full,
     backgroundColor: colors.border,
   },
@@ -170,7 +151,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xs,
+    paddingBottom: spacing.xl,
     gap: spacing.sm,
   },
 });

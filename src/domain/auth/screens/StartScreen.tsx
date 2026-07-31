@@ -27,11 +27,6 @@ export function StartScreen({ navigation }: StartScreenProps) {
     navigation.navigate('SignUp');
   };
 
-  // TODO: 온보딩 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거
-  const handleDevOnboardingPress = () => {
-    navigation.navigate('Onboarding');
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
@@ -62,14 +57,6 @@ export function StartScreen({ navigation }: StartScreenProps) {
               아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
             </Text>
           </Pressable>
-
-          {/* TODO: 온보딩 플로우 확인용 임시 버튼. 실기기/시뮬레이터에서 확인 후 PR 전 제거 */}
-          {__DEV__ && (
-            <View style={styles.devSection}>
-              <Text style={styles.devLabel}>DEV ONLY</Text>
-              <Button label="[dev] 온보딩" variant="outline" onPress={handleDevOnboardingPress} />
-            </View>
-          )}
         </View>
       </View>
     </SafeAreaView>
@@ -137,19 +124,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text.primary,
     textDecorationLine: 'underline',
-  },
-  devSection: {
-    marginTop: spacing.lg,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    borderStyle: 'dashed',
-    gap: spacing.sm,
-  },
-  devLabel: {
-    ...typography.caption,
-    color: colors.error,
-    textAlign: 'center',
-    fontWeight: '700',
   },
 });
