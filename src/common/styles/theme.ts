@@ -1,15 +1,15 @@
 export const colors = {
-  primary: '#4F46E5',
+  primary: '#4A90FA',
   secondary: '#7C3AED',
   background: '#FFFFFF',
   surface: '#F9FAFB',
   text: {
     primary: '#111827',
-    secondary: '#6B7280',
-    disabled: '#9CA3AF',
+    secondary: '#99999E',
+    disabled: '#BFBFC4',
   },
-  error: '#EF4444',
-  success: '#10B981',
+  error: '#EB4747',
+  success: '#33B96B',
   border: '#E5E7EB',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, typography } from '@/common/styles/theme';
+import { colors, spacing, typography } from '@/common/styles/theme';
 
 type EmptyViewProps = {
   message?: string;
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: spacing.md,
   },
   message: {
     ...typography.body1,

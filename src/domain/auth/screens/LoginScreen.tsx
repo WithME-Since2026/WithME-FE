@@ -45,6 +45,10 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     navigation.navigate('SignUp');
   };
 
+  const handleFindAccountPress = () => {
+    navigation.navigate('FindAccount');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -72,6 +76,10 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
               errorMessage={isError ? '아이디 또는 비밀번호를 확인해주세요.' : undefined}
             />
           </View>
+
+          <Pressable style={styles.findAccountLink} onPress={handleFindAccountPress} hitSlop={8}>
+            <Text style={styles.findAccountLinkText}>아이디 · 비밀번호 찾기</Text>
+          </Pressable>
 
           <View style={styles.buttonGroup}>
             <Button
@@ -119,6 +127,15 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: spacing.lg,
+  },
+  findAccountLink: {
+    alignSelf: 'flex-end',
+    marginTop: -spacing.md,
+    marginBottom: spacing.md,
+  },
+  findAccountLinkText: {
+    ...typography.caption,
+    color: colors.text.secondary,
   },
   buttonGroup: {
     gap: spacing.sm,

@@ -78,7 +78,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
     signUpMutation.mutate(
       { loginId, password, agreeMarketing },
       {
-        onSuccess: () => navigation.replace('Login'),
+        onSuccess: () => navigation.replace('Onboarding'),
       },
     );
   };
