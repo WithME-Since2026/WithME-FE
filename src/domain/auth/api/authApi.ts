@@ -66,10 +66,10 @@ export async function checkEmailVerificationCode(request: CheckEmailCodeRequest)
 }
 
 export async function findLoginId(request: FindLoginIdRequest) {
-  // GET 요청이지만 아이디 찾기 특성상 조회 결과가 캐시될 필요가 없어 params로 전달
-  const response = await apiClient.get<ApiResponse<FindLoginIdResponse>>('/api/v1/auth/id', {
-    params: request,
-  });
+  const response = await apiClient.post<ApiResponse<FindLoginIdResponse>>(
+    '/api/v1/auth/id',
+    request,
+  );
 
   return response.data.data;
 }
