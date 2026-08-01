@@ -58,7 +58,7 @@ export function ResetPasswordScreen({ navigation, route }: ResetPasswordScreenPr
             placeholder="새 비밀번호 입력"
             value={newPassword}
             onChangeText={setNewPassword}
-            autoComplete="password-new"
+            autoComplete="new-password"
             secureToggle
           />
 
@@ -67,7 +67,7 @@ export function ResetPasswordScreen({ navigation, route }: ResetPasswordScreenPr
             placeholder="비밀번호를 다시 입력해주세요"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            autoComplete="password-new"
+            autoComplete="new-password"
             secureToggle
             errorMessage={isPasswordMismatch ? '비밀번호가 일치하지 않습니다.' : undefined}
           />

@@ -91,10 +91,15 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
   };
 
   const handleNextPress = () => {
+    const tabAtRequest = activeTab;
     checkEmailCodeMutation.mutate(
       { email, code },
       {
         onSuccess: (data) => {
+          if (activeTab !== tabAtRequest) {
+            return;
+          }
+
           if (!data.verified) {
             setCodeErrorMessage('인증번호가 일치하지 않습니다.');
             return;
@@ -104,8 +109,13 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
             findLoginIdMutation.mutate(
               { name, email, code },
               {
-                onSuccess: (result) =>
-                  navigation.navigate('FindIdResult', { loginId: result.loginId }),
+                onSuccess: (result) => {
+                  if (activeTab !== tabAtRequest) {
+                    return;
+                  }
+
+                  navigation.navigate('FindIdResult', { loginId: result.loginId });
+                },
               },
             );
             return;
