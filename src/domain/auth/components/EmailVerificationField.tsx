@@ -4,6 +4,7 @@ import { Button } from '@/common/components/Button';
 import { TextField } from '@/common/components/TextField';
 import { colors, spacing, typography } from '@/common/styles/theme';
 import { formatCountdown } from '@/common/utils/format';
+import { EMAIL_CODE_LENGTH } from '@/common/utils/validators';
 
 type EmailVerificationFieldProps = {
   email: string;
@@ -66,6 +67,7 @@ export function EmailVerificationField({
           value={code}
           onChangeText={onCodeChange}
           keyboardType="number-pad"
+          maxLength={EMAIL_CODE_LENGTH}
           errorMessage={
             codeErrorMessage ??
             (isCodeExpired ? '인증번호가 만료되었습니다. 재전송해주세요.' : undefined)

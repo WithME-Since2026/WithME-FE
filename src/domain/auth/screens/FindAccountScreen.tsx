@@ -11,7 +11,7 @@ import { SegmentedTabs } from '@/common/components/SegmentedTabs';
 import { TextField } from '@/common/components/TextField';
 import { useCountdown } from '@/common/hooks/useCountdown';
 import { colors, spacing } from '@/common/styles/theme';
-import { isValidEmail } from '@/common/utils/validators';
+import { isValidEmail, isValidEmailCode } from '@/common/utils/validators';
 
 import type { RootStackParamList } from '@/app/navigation';
 
@@ -53,7 +53,7 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
   const identifierValue = activeTab === 'ID' ? name : loginId;
   const isNextDisabled =
     !hasSentCode ||
-    !code ||
+    !isValidEmailCode(code) ||
     !identifierValue ||
     isCodeExpired ||
     checkEmailCodeMutation.isPending ||

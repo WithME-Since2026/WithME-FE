@@ -90,8 +90,7 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
       </ScrollView>
 
       <View style={styles.footer}>
-        {/* TODO: 온보딩 종료 후 이동 플로우 확정 전까지 임시로 비활성화 */}
-        {isLastPage && <Button label="시작하기" onPress={handleFinish} disabled />}
+        {isLastPage && <Button label="시작하기" onPress={handleFinish} />}
 
         <View style={styles.dots}>
           {ONBOARDING_PAGES.map((page, index) => (

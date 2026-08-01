@@ -1,5 +1,5 @@
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const EMAIL_CODE_LENGTH = 6;
+export const EMAIL_CODE_LENGTH = 6;
 
 export function isValidEmail(email: string) {
   return EMAIL_REGEX.test(email);
