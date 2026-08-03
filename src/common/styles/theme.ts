@@ -11,6 +11,7 @@ export const colors = {
   error: '#EB4747',
   success: '#33B96B',
   border: '#E5E7EB',
+  borderStrong: '#9CA3AF',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
