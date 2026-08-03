@@ -15,6 +15,7 @@ export const colors = {
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
+  overlay: 'rgba(0, 0, 0, 0.4)',
 };
 
 export const spacing = {

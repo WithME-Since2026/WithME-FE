@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/common/components/Button';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
-import { colors, spacing, typography } from '@/common/styles/theme';
+import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
 import appIcon from '@/assets/images/icon.png';
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   logoWrapper: {
     width: 64,
     height: 64,
-    borderRadius: 32,
+    borderRadius: borderRadius.full,
     overflow: 'hidden',
     alignSelf: 'center',
     alignItems: 'center',
