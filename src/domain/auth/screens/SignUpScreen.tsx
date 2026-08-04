@@ -109,7 +109,11 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.form}>
             <View style={styles.idRow}>
               <View style={styles.idInput}>
