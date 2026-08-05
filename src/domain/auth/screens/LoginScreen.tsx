@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xxl * 1.5,
+    paddingTop: spacing.xxl * 2,
   },
   logoWrapper: {
     alignSelf: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.xxl * 1.5,
   },
   logoText: {
     fontFamily: 'FredokaOne_400Regular',
