@@ -14,6 +14,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
+import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
 import { colors, spacing, typography } from '@/common/styles/theme';
 
@@ -37,7 +38,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     login({ loginId, password });
   };
 
-  const handleKakaoStart = () => {
+  const handleKakaoLogin = () => {
     // TODO: 카카오 SDK 연동 후 카카오 로그인 플로우 연결 (api/v1/auth/login/kakao)
   };
 
@@ -45,18 +46,27 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     navigation.navigate('SignUp');
   };
 
-  const handleFindAccountPress = () => {
-    navigation.navigate('FindAccount');
+  const handleFindIdPress = () => {
+    navigation.navigate('FindAccount', { initialTab: 'ID' });
+  };
+
+  const handleFindPasswordPress = () => {
+    navigation.navigate('FindAccount', { initialTab: 'PASSWORD' });
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ScreenHeader title="로그인" />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>로그인</Text>
+          <View style={styles.logoWrapper}>
+            <Text style={styles.logoText}>
+              With<Text style={styles.logoTextAccent}>ME</Text>
+            </Text>
+          </View>
 
           <View style={styles.form}>
             <TextField
@@ -77,24 +87,36 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
             />
           </View>
 
-          <Pressable style={styles.findAccountLink} onPress={handleFindAccountPress} hitSlop={8}>
-            <Text style={styles.findAccountLinkText}>아이디 · 비밀번호 찾기</Text>
-          </Pressable>
+          <Button
+            label="로그인"
+            onPress={handleLoginPress}
+            loading={isPending}
+            disabled={isSubmitDisabled}
+            style={styles.loginButton}
+          />
 
-          <View style={styles.buttonGroup}>
-            <Button
-              label="로그인"
-              onPress={handleLoginPress}
-              loading={isPending}
-              disabled={isSubmitDisabled}
-            />
-            <Button
-              label="카카오로 시작하기"
-              variant="kakao"
-              icon={<KakaoIcon />}
-              onPress={handleKakaoStart}
-            />
+          <View style={styles.findAccountRow}>
+            <Pressable onPress={handleFindIdPress} hitSlop={8}>
+              <Text style={styles.findAccountLinkText}>아이디 찾기</Text>
+            </Pressable>
+            <Text style={styles.findAccountDivider}>|</Text>
+            <Pressable onPress={handleFindPasswordPress} hitSlop={8}>
+              <Text style={styles.findAccountLinkText}>비밀번호 찾기</Text>
+            </Pressable>
           </View>
+
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>또는</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <Button
+            label="카카오로 로그인"
+            variant="kakao"
+            icon={<KakaoIcon />}
+            onPress={handleKakaoLogin}
+          />
 
           <Pressable style={styles.signUpLink} onPress={handleSignUpPress} hitSlop={8}>
             <Text style={styles.signUpLinkText}>
@@ -117,28 +139,57 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xxl * 2,
   },
-  title: {
-    ...typography.heading2,
+  logoWrapper: {
+    alignSelf: 'center',
+    marginBottom: spacing.xxl * 1.5,
+  },
+  logoText: {
+    fontFamily: 'FredokaOne_400Regular',
+    fontSize: 42,
+    lineHeight: 42,
     color: colors.text.primary,
-    marginBottom: spacing.xl,
+  },
+  logoTextAccent: {
+    color: colors.primary,
   },
   form: {
     marginBottom: spacing.lg,
   },
-  findAccountLink: {
-    alignSelf: 'flex-end',
-    marginTop: -spacing.md,
+  loginButton: {
     marginBottom: spacing.md,
+  },
+  findAccountRow: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
   findAccountLinkText: {
     ...typography.caption,
     color: colors.text.secondary,
   },
-  buttonGroup: {
+  findAccountDivider: {
+    ...typography.caption,
+    color: colors.border,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    ...typography.caption,
+    color: colors.text.disabled,
   },
   signUpLink: {
     marginTop: spacing.lg,

@@ -6,12 +6,17 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/common/components/Button';
+import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
 import { colors, spacing, typography } from '@/common/styles/theme';
+import { getPasswordRuleStatus, isPasswordValid, isValidEmail } from '@/common/utils/validators';
 
 import type { RootStackParamList } from '@/app/navigation';
 
 import { AgreementCheckbox } from '@/domain/auth/components/AgreementCheckbox';
+import { EmailDomainField } from '@/domain/auth/components/EmailDomainField';
+import { PasswordRequirementList } from '@/domain/auth/components/PasswordRequirementList';
+import { SignUpStepIndicator } from '@/domain/auth/components/SignUpStepIndicator';
 import { useCheckLoginIdMutation } from '@/domain/auth/hooks/useCheckLoginIdMutation';
 import { useSignUpMutation } from '@/domain/auth/hooks/useSignUpMutation';
 
@@ -22,6 +27,8 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [emailLocal, setEmailLocal] = useState('');
+  const [emailDomain, setEmailDomain] = useState('');
   // 응답이 도착한 시점의 loginId를 함께 저장해 최신 loginId와 다르면 결과를 무시함
   const [duplicateCheckResult, setDuplicateCheckResult] = useState<{
     loginId: string;
@@ -38,13 +45,19 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
     duplicateCheckResult?.loginId === loginId && !duplicateCheckResult.isDuplicated;
 
   const isPasswordMismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
+  const passwordRuleStatus = getPasswordRuleStatus(password);
+  const email = emailLocal && emailDomain ? `${emailLocal}@${emailDomain}` : '';
+  const isEmailFormatValid = email.length === 0 || isValidEmail(email);
   const isAllAgreed = agreeTerms && agreePrivacy && agreeMarketing;
   const isRequiredAgreed = agreeTerms && agreePrivacy;
 
   const isSignUpDisabled =
     !isLoginIdAvailable ||
-    !password ||
+    !isPasswordValid(password) ||
     isPasswordMismatch ||
+    password !== passwordConfirm ||
+    !email ||
+    !isEmailFormatValid ||
     !isRequiredAgreed ||
     signUpMutation.isPending;
 
@@ -76,7 +89,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
 
   const handleSignUpPress = () => {
     signUpMutation.mutate(
-      { loginId, password, agreeMarketing },
+      { loginId, password, email, agreeMarketing },
       {
         onSuccess: () => navigation.replace('Onboarding'),
       },
@@ -91,13 +104,17 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ScreenHeader title="회원가입" />
+      <SignUpStepIndicator label="계정 정보 입력" progress={0.45} />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>회원가입</Text>
-
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.form}>
             <View style={styles.idRow}>
               <View style={styles.idInput}>
@@ -112,7 +129,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
               </View>
               <Button
                 label="중복확인"
-                variant="outline"
+                variant="primary"
                 onPress={handleCheckDuplicate}
                 loading={checkLoginIdMutation.isPending}
                 disabled={!loginId}
@@ -131,6 +148,9 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
               autoComplete="password-new"
               secureToggle
             />
+
+            <PasswordRequirementList status={passwordRuleStatus} />
+
             <TextField
               label="비밀번호 확인"
               placeholder="비밀번호를 다시 입력해주세요"
@@ -139,6 +159,14 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
               autoComplete="password-new"
               secureToggle
               errorMessage={isPasswordMismatch ? '비밀번호가 일치하지 않습니다.' : undefined}
+            />
+
+            <EmailDomainField
+              local={emailLocal}
+              onLocalChange={setEmailLocal}
+              domain={emailDomain}
+              onDomainChange={setEmailDomain}
+              errorMessage={!isEmailFormatValid ? '올바른 이메일 형식이 아닙니다.' : undefined}
             />
           </View>
 
@@ -168,14 +196,16 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
               onToggle={() => setAgreeMarketing((prev) => !prev)}
             />
           </View>
+        </ScrollView>
 
+        <View style={styles.footer}>
           <Button
             label="가입하기"
             onPress={handleSignUpPress}
             loading={signUpMutation.isPending}
             disabled={isSignUpDisabled}
           />
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -191,14 +221,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-  },
-  title: {
-    ...typography.heading2,
-    color: colors.text.primary,
-    marginBottom: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
   },
   form: {
     marginBottom: spacing.md,
@@ -224,5 +249,9 @@ const styles = StyleSheet.create({
   },
   agreements: {
     marginBottom: spacing.xl,
+  },
+  footer: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
   },
 });

@@ -32,8 +32,12 @@ export function StartScreen({ navigation }: StartScreenProps) {
       <View style={styles.content}>
         <View style={styles.brand}>
           <Image source={appIcon} style={styles.logoImage} />
-          <Text style={styles.logo}>WithME</Text>
-          <Text style={styles.tagline}>우리 모임, 더 쉽게</Text>
+          <View style={styles.logoTextGroup}>
+            <Text style={styles.logo}>
+              With<Text style={styles.logoAccent}>ME</Text>
+            </Text>
+            <Text style={styles.tagline}>우리 모임, 더 쉽게</Text>
+          </View>
         </View>
 
         <View style={styles.buttonGroup}>
@@ -80,20 +84,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoImage: {
-    width: 96,
-    height: 96,
+    width: 160,
+    height: 160,
     borderRadius: borderRadius.lg,
-    marginBottom: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  logoTextGroup: {
+    alignItems: 'flex-start',
   },
   logo: {
-    ...typography.heading1,
+    fontFamily: 'FredokaOne_400Regular',
+    fontSize: 46,
+    lineHeight: 45,
     color: colors.text.primary,
   },
+  logoAccent: {
+    color: colors.primary,
+  },
   tagline: {
-    ...typography.body2,
+    ...typography.caption,
+    lineHeight: 14,
     color: colors.text.secondary,
-    textAlign: 'center',
-    marginTop: spacing.sm,
+    marginTop: 2,
   },
   buttonGroup: {
     gap: spacing.sm,
