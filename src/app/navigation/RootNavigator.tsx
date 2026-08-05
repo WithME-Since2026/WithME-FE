@@ -1,6 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { MainTabNavigator } from './MainTabNavigator';
+
 import { FindAccountScreen } from '@/domain/auth/screens/FindAccountScreen';
 import { FindIdResultScreen } from '@/domain/auth/screens/FindIdResultScreen';
 import { LoginScreen } from '@/domain/auth/screens/LoginScreen';
@@ -19,6 +21,7 @@ export type RootStackParamList = {
   FindIdResult: { loginId: string };
   ResetPassword: { loginId: string; email: string; code: string };
   Onboarding: undefined;
+  Main: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -36,6 +39,7 @@ export function RootNavigator() {
         <Stack.Screen name="FindIdResult" component={FindIdResultScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="Main" component={MainTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
