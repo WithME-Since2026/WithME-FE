@@ -5,9 +5,15 @@ import { TextField } from '@/common/components/TextField';
 import { colors, spacing, typography } from '@/common/styles/theme';
 import { formatCountdown } from '@/common/utils/format';
 
+import { EmailDomainField } from '@/domain/auth/components/EmailDomainField';
+
 type EmailVerificationFieldProps = {
+  emailLocal: string;
+  onEmailLocalChange: (value: string) => void;
+  emailDomain: string;
+  onEmailDomainChange: (value: string) => void;
+  // 코드발송 버튼 활성화 조건 판단에 사용하는, local@domain으로 조합된 전체 이메일
   email: string;
-  onEmailChange: (value: string) => void;
   emailErrorMessage?: string;
   hasSentCode: boolean;
   isSendingCode: boolean;
@@ -22,8 +28,11 @@ type EmailVerificationFieldProps = {
 
 // 이메일 입력 + 인증코드 전송 + 인증코드 입력 + 만료 타이머를 묶은 계정 찾기/가입 공용 인증 UI
 export function EmailVerificationField({
+  emailLocal,
+  onEmailLocalChange,
+  emailDomain,
+  onEmailDomainChange,
   email,
-  onEmailChange,
   emailErrorMessage,
   hasSentCode,
   isSendingCode,
@@ -38,26 +47,23 @@ export function EmailVerificationField({
 
   return (
     <View>
-      <View style={styles.row}>
-        <View style={styles.emailInput}>
-          <TextField
-            label="이메일"
-            placeholder="이메일 주소 입력"
-            value={email}
-            onChangeText={onEmailChange}
-            keyboardType="email-address"
-            autoComplete="email"
-            errorMessage={emailErrorMessage}
+      <EmailDomainField
+        label="이메일"
+        local={emailLocal}
+        onLocalChange={onEmailLocalChange}
+        domain={emailDomain}
+        onDomainChange={onEmailDomainChange}
+        errorMessage={emailErrorMessage}
+        actionElement={
+          <Button
+            label={hasSentCode ? '재전송' : '코드발송'}
+            onPress={onSendCode}
+            loading={isSendingCode}
+            disabled={!email || isSendDisabled}
+            style={styles.sendButton}
           />
-        </View>
-        <Button
-          label={hasSentCode ? '재전송' : '코드발송'}
-          onPress={onSendCode}
-          loading={isSendingCode}
-          disabled={!email || isSendDisabled}
-          style={styles.sendButton}
-        />
-      </View>
+        }
+      />
 
       {hasSentCode && (
         <TextField
@@ -82,19 +88,9 @@ export function EmailVerificationField({
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-  },
-  emailInput: {
-    flex: 1,
-  },
-  // 이메일 형식 에러 메시지가 뜨면 TextField 전체 높이가 늘어나 flex-end 정렬 시
-  // 버튼이 입력창과 어긋나므로, label 높이(lineHeight+marginBottom)만큼 marginTop을
-  // 줘서 입력창 상단에 버튼 상단을 고정 정렬한다.
+  // 이메일 박스들과 한 줄에 나란히 배치되므로 기본 버튼보다 좁게 조정
   sendButton: {
-    marginTop: typography.body2.lineHeight + spacing.xs,
+    paddingHorizontal: spacing.sm,
   },
   timerText: {
     ...typography.body2,

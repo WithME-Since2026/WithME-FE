@@ -1,12 +1,21 @@
-import { useState } from 'react';
+import type { ReactNode } from 'react';
+import { useRef, useState } from 'react';
 
-import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
-const DOMAIN_OPTIONS = ['naver.com', 'gmail.com', 'daum.net', 'kakao.com', 'nate.com', '직접입력'];
+const PLACEHOLDER_OPTION = '선택';
+const DIRECT_INPUT_OPTION = '직접입력';
+const DOMAIN_OPTIONS = [
+  PLACEHOLDER_OPTION,
+  'naver.com',
+  'gmail.com',
+  'daum.net',
+  DIRECT_INPUT_OPTION,
+];
 
 type EmailDomainFieldProps = {
   local: string;
@@ -14,37 +23,76 @@ type EmailDomainFieldProps = {
   domain: string;
   onDomainChange: (value: string) => void;
   errorMessage?: string;
+  label?: string;
+  // 계정 찾기 화면의 코드발송 버튼처럼, 같은 줄에 이어 붙여야 하는 요소가 있을 때 사용
+  actionElement?: ReactNode;
 };
 
-// 회원가입 이메일 입력: [아이디 박스] @ [도메인 박스] [선택 박스] 3개의 분리된 박스로 구성
+// 이메일 입력: [아이디 박스] @ [도메인 선택 박스] (+ 선택적 actionElement) 한 줄에 나란히 배치
+// 도메인 박스는 선택된 값을 보여주는 선택 버튼이며, "직접입력" 선택 시에만 텍스트 입력으로 전환됨
 export function EmailDomainField({
   local,
   onLocalChange,
   domain,
   onDomainChange,
   errorMessage,
+  label = '이메일 입력',
+  actionElement,
 }: EmailDomainFieldProps) {
   const [isLocalFocused, setIsLocalFocused] = useState(false);
   const [isDomainFocused, setIsDomainFocused] = useState(false);
+  const [isManualDomain, setIsManualDomain] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  // 팝업을 도메인 박스 바로 아래에 붙이기 위해 박스의 화면상 위치를 측정해 저장
+  const [pickerPosition, setPickerPosition] = useState<{ top: number; right: number } | null>(null);
+  // 계정 찾기 화면처럼 같은 줄에 코드발송 버튼이 붙는 경우, 박스 폭을 좁혀 버튼과 함께 한 줄에 들어가게 함
+  const isCompact = Boolean(actionElement);
+
+  const domainBoxRef = useRef<View>(null);
+
+  const openPicker = () => {
+    domainBoxRef.current?.measureInWindow((x, y, width, height) => {
+      setPickerPosition({
+        top: y + height + spacing.xs,
+        right: Dimensions.get('window').width - (x + width),
+      });
+      setIsPickerOpen(true);
+    });
+  };
 
   const handleSelectDomain = (option: string) => {
-    if (option !== '직접입력') {
-      onDomainChange(option);
-    } else {
+    if (option === DIRECT_INPUT_OPTION) {
+      setIsManualDomain(true);
       onDomainChange('');
+    } else if (option === PLACEHOLDER_OPTION) {
+      setIsManualDomain(false);
+      onDomainChange('');
+    } else {
+      setIsManualDomain(false);
+      onDomainChange(option);
     }
     setIsPickerOpen(false);
   };
 
+  const isOptionChecked = (option: string) => {
+    if (option === DIRECT_INPUT_OPTION) {
+      return isManualDomain;
+    }
+    if (option === PLACEHOLDER_OPTION) {
+      return !isManualDomain && domain === '';
+    }
+    return !isManualDomain && domain === option;
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>이메일 입력</Text>
+      <Text style={styles.label}>{label}</Text>
       <View style={styles.row}>
         <View
           style={[
             styles.box,
             styles.localBox,
+            isCompact && styles.localBoxCompact,
             isLocalFocused && styles.boxFocused,
             errorMessage && styles.boxError,
           ]}
@@ -65,48 +113,77 @@ export function EmailDomainField({
         <Text style={styles.at}>@</Text>
 
         <View
+          ref={domainBoxRef}
           style={[
             styles.box,
             styles.domainBox,
+            isCompact && styles.domainBoxCompact,
             isDomainFocused && styles.boxFocused,
             errorMessage && styles.boxError,
           ]}
         >
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={colors.text.disabled}
-            value={domain}
-            onChangeText={onDomainChange}
-            autoCapitalize="none"
-            onFocus={() => setIsDomainFocused(true)}
-            onBlur={() => setIsDomainFocused(false)}
-          />
+          {isManualDomain ? (
+            <TextInput
+              style={[styles.input, styles.domainInput]}
+              placeholder=" 도메인 입력"
+              placeholderTextColor={colors.text.disabled}
+              value={domain}
+              onChangeText={onDomainChange}
+              autoCapitalize="none"
+              onFocus={() => setIsDomainFocused(true)}
+              onBlur={() => setIsDomainFocused(false)}
+            />
+          ) : (
+            <Pressable style={styles.domainValueArea} onPress={openPicker} hitSlop={8}>
+              <Text
+                style={[
+                  styles.domainValueText,
+                  styles.domainInput,
+                  !domain && styles.domainPlaceholderText,
+                ]}
+                numberOfLines={1}
+              >
+                {domain || PLACEHOLDER_OPTION}
+              </Text>
+            </Pressable>
+          )}
+
+          <Pressable onPress={openPicker} hitSlop={8}>
+            <Ionicons name="chevron-down" size={14} color={colors.text.secondary} />
+          </Pressable>
         </View>
 
-        <Pressable
-          style={[styles.box, styles.selectBox]}
-          onPress={() => setIsPickerOpen(true)}
-          hitSlop={8}
-        >
-          <Text style={styles.selectButtonText}>선택</Text>
-          <Ionicons name="chevron-down" size={14} color={colors.text.secondary} />
-        </Pressable>
+        {actionElement}
       </View>
       {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
 
       <Modal visible={isPickerOpen} transparent animationType="fade">
         <Pressable style={styles.backdrop} onPress={() => setIsPickerOpen(false)}>
-          <View style={styles.sheet}>
-            {DOMAIN_OPTIONS.map((option) => (
-              <Pressable
-                key={option}
-                style={styles.option}
-                onPress={() => handleSelectDomain(option)}
-              >
-                <Text style={styles.optionText}>{option}</Text>
-              </Pressable>
-            ))}
-          </View>
+          {pickerPosition && (
+            <View
+              style={[styles.dropdown, { top: pickerPosition.top, right: pickerPosition.right }]}
+            >
+              {DOMAIN_OPTIONS.map((option, index) => {
+                const checked = isOptionChecked(option);
+                return (
+                  <Pressable
+                    key={option}
+                    style={[
+                      styles.dropdownOption,
+                      index === DOMAIN_OPTIONS.length - 1 && styles.dropdownOptionLast,
+                    ]}
+                    onPress={() => handleSelectDomain(option)}
+                  >
+                    <Text
+                      style={[styles.dropdownOptionText, checked && styles.dropdownOptionChecked]}
+                    >
+                      {checked ? `✓ ${option}` : option}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
         </Pressable>
       </Modal>
     </View>
@@ -140,14 +217,33 @@ const styles = StyleSheet.create({
   localBox: {
     flex: 1.4,
   },
-  domainBox: {
+  localBoxCompact: {
     flex: 1,
   },
-  selectBox: {
-    width: 76,
+  domainBox: {
+    flex: 1,
     flexDirection: 'row',
     gap: spacing.xs / 2,
     borderColor: colors.border,
+  },
+  domainBoxCompact: {
+    flex: 1,
+  },
+  domainValueArea: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'center',
+  },
+  domainValueText: {
+    ...typography.body2,
+    color: colors.text.primary,
+  },
+  domainPlaceholderText: {
+    color: colors.text.secondary,
+  },
+  // 도메인 박스 텍스트를 살짝 오른쪽으로 밀어 좌측 여백을 더 줌
+  domainInput: {
+    marginLeft: spacing.xs,
   },
   boxFocused: {
     borderColor: colors.primary,
@@ -166,10 +262,6 @@ const styles = StyleSheet.create({
     ...typography.body1,
     color: colors.text.secondary,
   },
-  selectButtonText: {
-    ...typography.body2,
-    color: colors.text.secondary,
-  },
   error: {
     ...typography.caption,
     color: colors.error,
@@ -177,23 +269,30 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     flex: 1,
-    backgroundColor: colors.overlay,
-    justifyContent: 'flex-end',
   },
-  sheet: {
-    backgroundColor: colors.background,
-    borderTopLeftRadius: borderRadius.lg,
-    borderTopRightRadius: borderRadius.lg,
+  // 사진 속 도메인 옵션 목록처럼 반투명 검정색 팝업으로 도메인 박스 아래에 고정
+  dropdown: {
+    position: 'absolute',
+    minWidth: 132,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: borderRadius.md,
+    overflow: 'hidden',
+  },
+  dropdownOption: {
     paddingVertical: spacing.sm,
-    paddingBottom: spacing.xl,
+    paddingHorizontal: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255, 255, 255, 0.16)',
   },
-  option: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
+  dropdownOptionLast: {
+    borderBottomWidth: 0,
   },
-  optionText: {
-    ...typography.body1,
-    color: colors.text.primary,
-    textAlign: 'center',
+  dropdownOptionText: {
+    ...typography.body2,
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  dropdownOptionChecked: {
+    color: colors.background,
+    fontWeight: '600',
   },
 });
