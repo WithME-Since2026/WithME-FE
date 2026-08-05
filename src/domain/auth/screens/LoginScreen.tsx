@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -17,10 +16,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/common/components/Button';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
-import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
+import { colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
-import appIcon from '@/assets/images/icon.png';
 
 import { KakaoIcon } from '@/domain/auth/components/KakaoIcon';
 import { useLoginMutation } from '@/domain/auth/hooks/useLoginMutation';
@@ -65,7 +63,9 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.logoWrapper}>
-            <Image source={appIcon} style={styles.logoImage} />
+            <Text style={styles.logoText}>
+              With<Text style={styles.logoTextAccent}>ME</Text>
+            </Text>
           </View>
 
           <View style={styles.form}>
@@ -140,23 +140,20 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.xxl * 1.5,
   },
   logoWrapper: {
-    width: 64,
-    height: 64,
-    borderRadius: borderRadius.full,
-    overflow: 'hidden',
     alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: spacing.xl,
   },
-  // 원본 아이콘 이미지 안에 여백이 있어 그대로 자르면 사각형이 그대로 보이므로,
-  // 컨테이너보다 크게 키워서 여백이 원 밖으로 밀려나가도록 함
-  logoImage: {
-    width: 88,
-    height: 88,
+  logoText: {
+    fontFamily: 'FredokaOne_400Regular',
+    fontSize: 42,
+    lineHeight: 42,
+    color: colors.text.primary,
+  },
+  logoTextAccent: {
+    color: colors.primary,
   },
   form: {
     marginBottom: spacing.lg,

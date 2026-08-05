@@ -33,7 +33,9 @@ export function StartScreen({ navigation }: StartScreenProps) {
         <View style={styles.brand}>
           <Image source={appIcon} style={styles.logoImage} />
           <View style={styles.logoTextGroup}>
-            <Text style={styles.logo}>WithME</Text>
+            <Text style={styles.logo}>
+              With<Text style={styles.logoAccent}>ME</Text>
+            </Text>
             <Text style={styles.tagline}>우리 모임, 더 쉽게</Text>
           </View>
         </View>
@@ -91,10 +93,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   logo: {
-    ...typography.heading1,
-    fontSize: 42,
-    lineHeight: 44,
+    fontFamily: 'FredokaOne_400Regular',
+    fontSize: 46,
+    lineHeight: 45,
     color: colors.text.primary,
+  },
+  logoAccent: {
+    color: colors.primary,
   },
   tagline: {
     ...typography.caption,
