@@ -14,6 +14,25 @@ export const colors = {
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
+  // 모임 홈/상세/생성 플로우 전용 다크 카드 팔레트 (Figma "모임" 섹션 고정 컬러)
+  meeting: {
+    cardBackground: '#2B2F42',
+    cardDivider: '#333361',
+    mutedText: '#9E9ECC',
+    operatorBadge: '#4A90FA',
+    participantBadge: '#0A705C',
+    dDayBackground: 'rgba(128, 153, 255, 0.35)',
+    dDayBorder: '#C9CCE0',
+    filterTabBackground: '#E8E8EC',
+    attending: '#33D496',
+    attendingBackground: '#D0F5E4',
+    notAttending: '#FB7190',
+    pending: '#858CA6',
+    waiting: '#D97706',
+    waitingBackground: '#FFF0CC',
+    inProgress: '#4A90FA',
+    inProgressBackground: '#DBEAFF',
+  },
 };
 
 export const spacing = {
