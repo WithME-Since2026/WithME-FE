@@ -55,6 +55,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
     !isLoginIdAvailable ||
     !isPasswordValid(password) ||
     isPasswordMismatch ||
+    password !== passwordConfirm ||
     !email ||
     !isEmailFormatValid ||
     !isRequiredAgreed ||

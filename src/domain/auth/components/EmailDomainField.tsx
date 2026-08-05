@@ -31,6 +31,8 @@ export function EmailDomainField({
   const handleSelectDomain = (option: string) => {
     if (option !== '직접입력') {
       onDomainChange(option);
+    } else {
+      onDomainChange('');
     }
     setIsPickerOpen(false);
   };
