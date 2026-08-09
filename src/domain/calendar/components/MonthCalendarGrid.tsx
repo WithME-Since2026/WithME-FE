@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, spacing, typography } from '@/common/styles/theme';
+import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 import { formatDateKey, getMonthGrid, WEEKDAY_LABELS_KO } from '@/common/utils/date';
 
 import { CALENDAR_LAYERS } from '@/domain/calendar/constants/calendarLayers';
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     marginBottom: spacing.xs,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.08)',
+    borderTopColor: colors.divider,
     borderBottomWidth: 1,
     borderBottomColor: `${colors.primary}33`,
   },
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   dayBadge: {
     width: 32,
     height: 32,
-    borderRadius: 999,
+    borderRadius: borderRadius.full,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
@@ -155,10 +155,10 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   saturdayLabel: {
-    color: '#cc4d4da3',
+    color: colors.weekend,
   },
   sundayLabel: {
-    color: '#cc4d4da3',
+    color: colors.weekend,
     fontWeight: '700',
   },
   todayLabel: {

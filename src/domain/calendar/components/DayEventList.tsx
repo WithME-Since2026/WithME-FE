@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(0, 0, 0, 0.08)',
+    borderTopColor: colors.divider,
   },
   dateLabel: {
     ...typography.body1,

@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   sectionDivider: {
     height: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    backgroundColor: colors.divider,
     // 요일 박스처럼 화면 좌우 끝까지 닿도록 부모(content)의 paddingHorizontal만큼 음수 마진으로 확장
     marginHorizontal: -spacing.lg,
     marginTop: spacing.md,
