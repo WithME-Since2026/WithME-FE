@@ -97,6 +97,7 @@ export function CalendarMonthPickerModal({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalRoot}>
+        {/* sheet를 backdrop Pressable의 자식으로 두면 iOS에서 터치 시작 시 Pressable이 responder를 선점해 안쪽 FlatList 스크롤이 막히므로 형제 요소로 분리함 */}
         <Pressable style={styles.backdrop} onPress={onClose} />
 
         <View style={styles.sheetPositioner} pointerEvents="box-none">
