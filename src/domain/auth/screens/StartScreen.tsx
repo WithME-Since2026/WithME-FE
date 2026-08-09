@@ -27,11 +27,6 @@ export function StartScreen({ navigation }: StartScreenProps) {
     navigation.navigate('SignUp');
   };
 
-  // TODO: 통합 캘린더뷰 백엔드 연동 전까지 디자인 확인용으로 노출하는 dev 전용 진입 버튼, PR 전 제거
-  const handleDevCalendarPress = () => {
-    navigation.navigate('Calendar');
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
@@ -66,12 +61,6 @@ export function StartScreen({ navigation }: StartScreenProps) {
               아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
             </Text>
           </Pressable>
-
-          {__DEV__ && (
-            <Pressable style={styles.devButton} onPress={handleDevCalendarPress} hitSlop={8}>
-              <Text style={styles.devButtonText}>[dev] 통합 캘린더뷰 보기</Text>
-            </Pressable>
-          )}
         </View>
       </View>
     </SafeAreaView>
@@ -147,13 +136,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text.primary,
     textDecorationLine: 'underline',
-  },
-  devButton: {
-    marginTop: spacing.sm,
-    alignItems: 'center',
-  },
-  devButtonText: {
-    ...typography.caption,
-    color: colors.text.disabled,
   },
 });

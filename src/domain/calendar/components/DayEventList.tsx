@@ -48,7 +48,6 @@ export function DayEventList({ dateLabel, events }: DayEventListProps) {
 const styles = StyleSheet.create({
   container: {
     marginTop: spacing.md,
-    // 요일 박스처럼 화면 좌우 끝까지 닿도록 부모(content)의 paddingHorizontal만큼 음수 마진으로 확장
     marginHorizontal: -spacing.lg,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,

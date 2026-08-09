@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
   },
   viewToggleLabel: {
     ...typography.body2,
+    fontSize: typography.caption.fontSize,
     fontWeight: '600',
     color: colors.text.secondary,
   },
@@ -262,7 +263,6 @@ const styles = StyleSheet.create({
   sectionDivider: {
     height: 1,
     backgroundColor: colors.divider,
-    // 요일 박스처럼 화면 좌우 끝까지 닿도록 부모(content)의 paddingHorizontal만큼 음수 마진으로 확장
     marginHorizontal: -spacing.lg,
     marginTop: spacing.md,
   },
@@ -293,6 +293,7 @@ const styles = StyleSheet.create({
   },
   legendLabel: {
     ...typography.caption,
+    fontSize: 10,
     fontWeight: '600',
   },
   selectHint: {

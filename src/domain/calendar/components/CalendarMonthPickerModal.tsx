@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type { GestureResponderEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
@@ -89,10 +89,6 @@ export function CalendarMonthPickerModal({
 
   const years = Array.from({ length: YEAR_RANGE * 2 + 1 }, (_, index) => year - YEAR_RANGE + index);
 
-  const stopPropagation = (event: GestureResponderEvent) => {
-    event.stopPropagation();
-  };
-
   const handleConfirm = () => {
     onSelect(pickerYear, pickerMonth);
     onClose();
@@ -100,40 +96,50 @@ export function CalendarMonthPickerModal({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={stopPropagation}>
-          <View style={styles.header}>
-            <Text style={styles.title}>연/월 선택</Text>
-            <Pressable onPress={handleConfirm} hitSlop={8}>
-              <Text style={styles.doneText}>완료</Text>
-            </Pressable>
-          </View>
+      <View style={styles.modalRoot}>
+        <Pressable style={styles.backdrop} onPress={onClose} />
 
-          <View style={styles.wheelContainer}>
-            <View pointerEvents="none" style={styles.wheelHighlight} />
-            <WheelColumn
-              values={years}
-              selectedValue={pickerYear}
-              onChange={setPickerYear}
-              formatLabel={(value) => `${value}년`}
-            />
-            <WheelColumn
-              values={MONTHS}
-              selectedValue={pickerMonth}
-              onChange={setPickerMonth}
-              formatLabel={(value) => `${value}월`}
-            />
+        <View style={styles.sheetPositioner} pointerEvents="box-none">
+          <View style={styles.sheet}>
+            <View style={styles.header}>
+              <Text style={styles.title}>연/월 선택</Text>
+              <Pressable onPress={handleConfirm} hitSlop={8}>
+                <Text style={styles.doneText}>완료</Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.wheelContainer}>
+              <View pointerEvents="none" style={styles.wheelHighlight} />
+              <WheelColumn
+                values={years}
+                selectedValue={pickerYear}
+                onChange={setPickerYear}
+                formatLabel={(value) => `${value}년`}
+              />
+              <WheelColumn
+                values={MONTHS}
+                selectedValue={pickerMonth}
+                onChange={setPickerMonth}
+                formatLabel={(value) => `${value}월`}
+              />
+            </View>
           </View>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
+  modalRoot: {
     flex: 1,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.overlay,
+  },
+  sheetPositioner: {
+    flex: 1,
     alignItems: 'stretch',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xxl * 1.5,
