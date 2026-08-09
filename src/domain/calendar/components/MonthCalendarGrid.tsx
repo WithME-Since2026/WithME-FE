@@ -61,6 +61,7 @@ export function MonthCalendarGrid({
             );
             const isToday = cell.dateKey === todayKey;
             const isSelected = cell.dateKey === selectedDateKey;
+            const isHoliday = dayEvents.some((event) => event.type === 'HOLIDAY');
 
             return (
               <Pressable
@@ -74,6 +75,7 @@ export function MonthCalendarGrid({
                       styles.dayLabel,
                       columnIndex === 0 && styles.sundayLabel,
                       columnIndex === 6 && styles.saturdayLabel,
+                      isHoliday && styles.holidayLabel,
                       isToday && !isSelected && styles.todayLabel,
                       isSelected && styles.selectedLabel,
                     ]}
@@ -112,7 +114,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: `${colors.primary}14`,
     marginHorizontal: -spacing.lg,
-    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     marginBottom: spacing.xs,
     borderTopWidth: 1,
@@ -129,6 +130,7 @@ const styles = StyleSheet.create({
   },
   weekRow: {
     flexDirection: 'row',
+    marginHorizontal: -spacing.lg,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
@@ -158,6 +160,10 @@ const styles = StyleSheet.create({
     color: colors.weekend,
   },
   sundayLabel: {
+    color: colors.weekend,
+    fontWeight: '700',
+  },
+  holidayLabel: {
     color: colors.weekend,
     fontWeight: '700',
   },

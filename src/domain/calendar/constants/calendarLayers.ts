@@ -5,7 +5,7 @@ import type { CalendarLayerConfig } from '@/domain/calendar/types';
 export const CALENDAR_LAYER_COLORS = {
   GROUP: colors.primary,
   TODO: '#477ae7',
-  HOLIDAY: colors.text.disabled,
+  HOLIDAY: colors.weekend,
 } as const;
 
 export const CALENDAR_LAYERS: CalendarLayerConfig[] = [
