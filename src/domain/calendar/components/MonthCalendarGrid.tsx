@@ -68,6 +68,9 @@ export function MonthCalendarGrid({
                 key={cell.dateKey}
                 style={styles.cell}
                 onPress={() => onSelectDate(cell.dateKey)}
+                accessibilityRole="button"
+                accessibilityLabel={`${cell.date.getFullYear()}년 ${cell.date.getMonth() + 1}월 ${cell.date.getDate()}일`}
+                accessibilityState={{ selected: isSelected }}
               >
                 <View style={[styles.dayBadge, isSelected && styles.selectedBadge]}>
                   <Text

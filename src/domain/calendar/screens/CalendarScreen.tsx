@@ -9,7 +9,12 @@ import { EmptyView } from '@/common/components/EmptyView';
 import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
-import { formatDateKey, formatDayDetailLabel, formatMonthLabel } from '@/common/utils/date';
+import {
+  formatDateKey,
+  formatDayDetailLabel,
+  formatMonthLabel,
+  parseDateKey,
+} from '@/common/utils/date';
 
 import { CalendarLayerModal } from '@/domain/calendar/components/CalendarLayerModal';
 import { CalendarMonthPickerModal } from '@/domain/calendar/components/CalendarMonthPickerModal';
@@ -177,7 +182,7 @@ export function CalendarScreen() {
 
                 {selectedDateKey ? (
                   <DayEventList
-                    dateLabel={formatDayDetailLabel(new Date(selectedDateKey))}
+                    dateLabel={formatDayDetailLabel(parseDateKey(selectedDateKey))}
                     events={selectedDayEvents}
                   />
                 ) : (

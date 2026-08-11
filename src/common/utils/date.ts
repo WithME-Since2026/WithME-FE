@@ -15,6 +15,13 @@ export function formatDateKey(date: Date) {
   return toDateKey(date.getFullYear(), date.getMonth() + 1, date.getDate());
 }
 
+// 'YYYY-MM-DD' → 로컬 Date (new Date(string) 사용 시 UTC로 해석되는 문제 방지)
+export function parseDateKey(dateKey: string): Date {
+  const [year, month, day] = dateKey.split('-').map(Number);
+
+  return new Date(year, month - 1, day);
+}
+
 export function isSameDateKey(a: Date, b: Date) {
   return formatDateKey(a) === formatDateKey(b);
 }
