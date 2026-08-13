@@ -12,6 +12,8 @@ export const colors = {
   success: '#33B96B',
   border: '#E5E7EB',
   borderStrong: '#9CA3AF',
+  divider: 'rgba(0, 0, 0, 0.08)',
+  weekend: '#cc4d4da3',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
