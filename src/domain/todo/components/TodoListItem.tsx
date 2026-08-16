@@ -10,25 +10,39 @@ type TodoListItemProps = {
   todo: TodoResponse;
   category: TodoCategoryResponse | null;
   isOverdue: boolean;
+  // 롱프레스 퀵 액션 패널이 열려 있는 항목인지 (Figma 6b 롱프레스 퀵 액션)
+  isSelected?: boolean;
   onToggleComplete: (todoId: number) => void;
+  onLongPress?: (todoId: number) => void;
 };
 
-export function TodoListItem({ todo, category, isOverdue, onToggleComplete }: TodoListItemProps) {
+export function TodoListItem({
+  todo,
+  category,
+  isOverdue,
+  isSelected = false,
+  onToggleComplete,
+  onLongPress,
+}: TodoListItemProps) {
   const categoryColor = category?.categoryColor ?? colors.text.secondary;
   const titleColor = todo.completed
     ? colors.text.disabled
     : isOverdue
       ? colors.error
       : colors.text.primary;
-  const checkboxColor = todo.completed ? categoryColor : isOverdue ? colors.error : colors.border;
+  const checkboxColor = todo.completed ? colors.primary : isOverdue ? colors.error : colors.border;
 
   return (
-    <View style={styles.row}>
+    <Pressable
+      style={[styles.row, isSelected && styles.rowSelected]}
+      onLongPress={onLongPress ? () => onLongPress(todo.todoId) : undefined}
+      delayLongPress={400}
+    >
       <Pressable
         style={[
           styles.checkbox,
           { borderColor: checkboxColor },
-          todo.completed && { backgroundColor: categoryColor, borderColor: categoryColor },
+          todo.completed && { backgroundColor: colors.primary, borderColor: colors.primary },
         ]}
         onPress={() => onToggleComplete(todo.todoId)}
         hitSlop={8}
@@ -54,7 +68,7 @@ export function TodoListItem({ todo, category, isOverdue, onToggleComplete }: To
           </View>
         )}
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -67,6 +81,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: colors.divider,
+  },
+  rowSelected: {
+    backgroundColor: `${colors.primary}0D`,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderRadius: borderRadius.md,
+    borderBottomWidth: 2,
   },
   checkbox: {
     width: 24,

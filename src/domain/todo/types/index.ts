@@ -31,6 +31,15 @@ export type CreateTodoRequest = {
   notificationStatus: boolean;
 };
 
+// yooze.withme.domain.todo.entity.Todo.update(title, dueDate, notificationStatus) 기준.
+// BE에 아직 이 필드들을 노출하는 PATCH 엔드포인트가 없음 (백엔드 API 추천 참고)
+export type UpdateTodoRequest = {
+  todoId: number;
+  title?: string;
+  dueDate?: string;
+  notificationStatus?: boolean;
+};
+
 // yooze.withme.domain.todo.dto.request.CreateCategoryRequest 기준 (POST /api/v1/todo/category)
 export type CreateCategoryRequest = {
   categoryName: string;

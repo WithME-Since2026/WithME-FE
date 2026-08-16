@@ -1,6 +1,11 @@
 import { formatDateKey } from '@/common/utils/date';
 
-import type { CreateTodoRequest, TodoListResponse, TodoResponse } from '@/domain/todo/types';
+import type {
+  CreateTodoRequest,
+  TodoListResponse,
+  TodoResponse,
+  UpdateTodoRequest,
+} from '@/domain/todo/types';
 
 // GET /api/v1/todo/list 연동 전까지 Todo 화면을 확인할 수 있도록 오늘 기준 상대 날짜로 생성하는 mock 데이터
 // categoryId는 mockCategoryData.ts의 카테고리(1 업무 / 2 개인 / 3 운동 / 4 학습)를 참조
@@ -108,4 +113,28 @@ export function clearMockTodosCategory(categoryId: number): void {
   mockTodos = mockTodos.map((todo) =>
     todo.categoryId === categoryId ? { ...todo, categoryId: null } : todo,
   );
+}
+
+// BE의 Todo.update와 동일하게 undefined인 필드는 기존 값을 유지한다
+export function updateMockTodo(request: UpdateTodoRequest): TodoResponse {
+  const target = mockTodos.find((todo) => todo.todoId === request.todoId);
+  if (!target) {
+    throw new Error('할 일을 찾을 수 없습니다.');
+  }
+
+  const updated: TodoResponse = {
+    ...target,
+    title: request.title ?? target.title,
+    dueDate: request.dueDate ?? target.dueDate,
+    notificationStatus: request.notificationStatus ?? target.notificationStatus,
+  };
+
+  mockTodos = mockTodos.map((todo) => (todo.todoId === request.todoId ? updated : todo));
+
+  return updated;
+}
+
+// BE의 Todo.delete()와 동일하게 소프트 삭제 대상이므로 목록에서 제외한다
+export function deleteMockTodo(todoId: number): void {
+  mockTodos = mockTodos.filter((todo) => todo.todoId !== todoId);
 }

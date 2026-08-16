@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -11,18 +11,39 @@ import { EmptyView } from '@/common/components/EmptyView';
 import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
-import { formatDateKey, formatDayDetailLabel, isSameDateKey } from '@/common/utils/date';
+import {
+  formatDateKey,
+  formatDayDetailLabel,
+  isSameDateKey,
+  parseDateKey,
+} from '@/common/utils/date';
 
 import type { RootStackParamList } from '@/app/navigation';
 
 import { TodoCategoryFilterChips } from '@/domain/todo/components/TodoCategoryFilterChips';
 import { TodoCreateSheet } from '@/domain/todo/components/TodoCreateSheet';
+import { TodoDatePickerSheet } from '@/domain/todo/components/TodoDatePickerSheet';
+import { TodoEditSheet } from '@/domain/todo/components/TodoEditSheet';
 import { TodoListItem } from '@/domain/todo/components/TodoListItem';
+import { TodoQuickActionPanel } from '@/domain/todo/components/TodoQuickActionPanel';
+import type { TodoPostponeTarget } from '@/domain/todo/components/TodoQuickActionPanel';
 import { TodoQuickDateStrip } from '@/domain/todo/components/TodoQuickDateStrip';
 import { TodoSpeedDialMenu } from '@/domain/todo/components/TodoSpeedDialMenu';
+import { TodoUndoToast } from '@/domain/todo/components/TodoUndoToast';
+import { useDeleteTodoMutation } from '@/domain/todo/hooks/useDeleteTodoMutation';
 import { useTodoCategoriesQuery } from '@/domain/todo/hooks/useTodoCategoriesQuery';
 import { useTodoListQuery } from '@/domain/todo/hooks/useTodoListQuery';
+import { useUpdateTodoMutation } from '@/domain/todo/hooks/useUpdateTodoMutation';
 import type { TodoCategoryFilter, TodoResponse } from '@/domain/todo/types';
+
+const UNDO_WINDOW_SECONDS = 5;
+
+type UndoToastState = {
+  todoId: number;
+  previousDueDate: string;
+  label: string;
+  secondsLeft: number;
+};
 
 type TodoScreenProps = NativeStackScreenProps<RootStackParamList, 'Todo'>;
 
@@ -41,6 +62,10 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
   const [completedOverrides, setCompletedOverrides] = useState<Record<number, boolean>>({});
   const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
+  const [longPressedTodoId, setLongPressedTodoId] = useState<number | null>(null);
+  const [isPostponeDatePickerOpen, setIsPostponeDatePickerOpen] = useState(false);
+  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
+  const [undoToast, setUndoToast] = useState<UndoToastState | null>(null);
 
   const {
     data: todoListData,
@@ -52,6 +77,8 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
     isLoading: isCategoriesLoading,
     isError: isCategoriesError,
   } = useTodoCategoriesQuery();
+  const { mutate: updateTodo } = useUpdateTodoMutation();
+  const { mutate: deleteTodo } = useDeleteTodoMutation();
 
   const isLoading = isTodosLoading || isCategoriesLoading;
   const isError = isTodosError || isCategoriesError;
@@ -112,16 +139,139 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
       });
     }
 
+    // 오늘을 보고 있을 때는 내일 할 일도 바로 이어서 보여준다
+    if (isSameDateKey(selectedDate, new Date())) {
+      const tomorrowDate = new Date();
+      tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+      const tomorrowKey = formatDateKey(tomorrowDate);
+
+      const tomorrowTodos = todos.filter(
+        (todo) => todo.dueDate === tomorrowKey && matchesCategory(todo),
+      );
+
+      if (tomorrowTodos.length > 0) {
+        result.push({
+          key: 'tomorrow',
+          title: '내일',
+          titleColor: colors.text.secondary,
+          isOverdue: false,
+          data: tomorrowTodos,
+        });
+      }
+    }
+
     return result;
   }, [todos, selectedDateKey, selectedDate, categoryFilter]);
 
+  const longPressedTodo = todos.find((todo) => todo.todoId === longPressedTodoId) ?? null;
+  const editingTodo = todos.find((todo) => todo.todoId === editingTodoId) ?? null;
+
+  // Undo 토스트의 초 카운트다운. 0이 되면 토스트를 닫고 되돌릴 수 없게 한다
+  useEffect(() => {
+    if (!undoToast) {
+      return;
+    }
+    if (undoToast.secondsLeft <= 0) {
+      setUndoToast(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setUndoToast((prev) => (prev ? { ...prev, secondsLeft: prev.secondsLeft - 1 } : prev));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [undoToast]);
+
   const handleToggleComplete = (todoId: number) => {
+    setLongPressedTodoId(null);
     setCompletedOverrides((prev) => {
       const base = todoListData?.todos.find((todo) => todo.todoId === todoId)?.completed ?? false;
       const current = prev[todoId] ?? base;
 
       return { ...prev, [todoId]: !current };
     });
+  };
+
+  const commitPostpone = (todo: TodoResponse, newDueDate: string, label: string) => {
+    const previousDueDate = todo.dueDate;
+    updateTodo({ todoId: todo.todoId, dueDate: newDueDate });
+    setLongPressedTodoId(null);
+    setUndoToast({
+      todoId: todo.todoId,
+      previousDueDate,
+      label,
+      secondsLeft: UNDO_WINDOW_SECONDS,
+    });
+  };
+
+  const handlePostpone = (target: TodoPostponeTarget) => {
+    if (!longPressedTodo) {
+      return;
+    }
+
+    const targetDate = new Date();
+    if (target === 'TOMORROW') {
+      targetDate.setDate(targetDate.getDate() + 1);
+    } else if (target === 'NEXT_WEEK') {
+      targetDate.setDate(targetDate.getDate() + 7);
+    }
+
+    const labelByTarget: Record<TodoPostponeTarget, string> = {
+      TODAY: '오늘',
+      TOMORROW: '내일',
+      NEXT_WEEK: '다음 주',
+    };
+
+    commitPostpone(
+      longPressedTodo,
+      formatDateKey(targetDate),
+      `${labelByTarget[target]}로 미뤘습니다`,
+    );
+  };
+
+  const handleConfirmPostponeDate = (dateKey: string) => {
+    if (!longPressedTodo) {
+      return;
+    }
+
+    const date = parseDateKey(dateKey);
+    commitPostpone(
+      longPressedTodo,
+      dateKey,
+      `${date.getMonth() + 1}월 ${date.getDate()}일로 미뤘습니다`,
+    );
+  };
+
+  const handleEdit = () => {
+    if (!longPressedTodo) {
+      return;
+    }
+
+    setEditingTodoId(longPressedTodo.todoId);
+    setLongPressedTodoId(null);
+  };
+
+  const handleDelete = () => {
+    if (!longPressedTodo) {
+      return;
+    }
+
+    const { todoId, title } = longPressedTodo;
+    setLongPressedTodoId(null);
+    Alert.alert('할 일을 삭제할까요?', `"${title}"을(를) 삭제하면 되돌릴 수 없어요.`, [
+      { text: '취소', style: 'cancel' },
+      { text: '삭제', style: 'destructive', onPress: () => deleteTodo(todoId) },
+    ]);
+  };
+
+  const handleUndo = () => {
+    if (!undoToast) {
+      return;
+    }
+
+    updateTodo({ todoId: undoToast.todoId, dueDate: undoToast.previousDueDate });
+    setUndoToast(null);
   };
 
   return (
@@ -171,12 +321,26 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
           sections={sections}
           keyExtractor={(item) => String(item.todoId)}
           renderItem={({ item, section }) => (
-            <TodoListItem
-              todo={item}
-              category={item.categoryId ? (categoriesById.get(item.categoryId) ?? null) : null}
-              isOverdue={section.isOverdue}
-              onToggleComplete={handleToggleComplete}
-            />
+            <>
+              <TodoListItem
+                todo={item}
+                category={item.categoryId ? (categoriesById.get(item.categoryId) ?? null) : null}
+                isOverdue={section.isOverdue}
+                isSelected={item.todoId === longPressedTodoId}
+                onToggleComplete={handleToggleComplete}
+                onLongPress={(todoId) =>
+                  setLongPressedTodoId((prev) => (prev === todoId ? null : todoId))
+                }
+              />
+              {item.todoId === longPressedTodoId && (
+                <TodoQuickActionPanel
+                  onPostpone={handlePostpone}
+                  onPickDate={() => setIsPostponeDatePickerOpen(true)}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              )}
+            </>
           )}
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
@@ -215,17 +379,41 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
         onClose={() => setIsCreateSheetOpen(false)}
       />
 
-      <Pressable
-        style={styles.fab}
-        onPress={() => setIsSpeedDialOpen((prev) => !prev)}
-        accessibilityLabel={isSpeedDialOpen ? '메뉴 닫기' : 'Todo 추가 메뉴 열기'}
-      >
-        {isSpeedDialOpen ? (
-          <Ionicons name="close" size={28} color={colors.background} />
-        ) : (
-          <Text style={styles.fabIcon}>+</Text>
-        )}
-      </Pressable>
+      <TodoDatePickerSheet
+        visible={isPostponeDatePickerOpen}
+        selectedDateKey={longPressedTodo?.dueDate ?? formatDateKey(new Date())}
+        onConfirm={handleConfirmPostponeDate}
+        onClose={() => setIsPostponeDatePickerOpen(false)}
+      />
+
+      <TodoEditSheet
+        visible={editingTodoId !== null}
+        todo={editingTodo}
+        categories={categories}
+        onClose={() => setEditingTodoId(null)}
+      />
+
+      {undoToast && (
+        <TodoUndoToast
+          message={undoToast.label}
+          secondsLeft={undoToast.secondsLeft}
+          onUndo={handleUndo}
+        />
+      )}
+
+      {!undoToast && (
+        <Pressable
+          style={styles.fab}
+          onPress={() => setIsSpeedDialOpen((prev) => !prev)}
+          accessibilityLabel={isSpeedDialOpen ? '메뉴 닫기' : 'Todo 추가 메뉴 열기'}
+        >
+          {isSpeedDialOpen ? (
+            <Ionicons name="close" size={28} color={colors.background} />
+          ) : (
+            <Text style={styles.fabIcon}>+</Text>
+          )}
+        </Pressable>
+      )}
     </SafeAreaView>
   );
 }
