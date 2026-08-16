@@ -61,6 +61,15 @@ export function StartScreen({ navigation }: StartScreenProps) {
               아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
             </Text>
           </Pressable>
+
+          {__DEV__ && (
+            <View style={styles.devSection}>
+              <Text style={styles.devLabel}>[dev] 로그인 없이 화면 바로가기</Text>
+              <Pressable onPress={() => navigation.navigate('Todo')} hitSlop={8}>
+                <Text style={styles.devLink}>[dev] Todo 화면 바로가기</Text>
+              </Pressable>
+            </View>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -135,6 +144,21 @@ const styles = StyleSheet.create({
   signUpLinkHighlight: {
     fontWeight: '700',
     color: colors.text.primary,
+    textDecorationLine: 'underline',
+  },
+  devSection: {
+    marginTop: spacing.lg,
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  devLabel: {
+    ...typography.caption,
+    color: colors.text.disabled,
+  },
+  devLink: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: colors.primary,
     textDecorationLine: 'underline',
   },
 });
