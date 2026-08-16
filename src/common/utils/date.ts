@@ -56,3 +56,16 @@ export function formatDayDetailLabel(date: Date) {
 
   return isSameDateKey(date, new Date()) ? `${label} 오늘` : label;
 }
+
+// 오전/오후 시각 표기를 분 단위로 변환해 같은 날짜 안에서 시간순 정렬하기 위한 helper
+export function parseKoreanTimeToMinutes(time: string | null) {
+  const match = time?.match(/(오전|오후)\s*(\d{1,2}):(\d{2})/);
+  if (!match) {
+    return -1;
+  }
+
+  const [, period, hourText, minuteText] = match;
+  const hour = (Number(hourText) % 12) + (period === '오후' ? 12 : 0);
+
+  return hour * 60 + Number(minuteText);
+}

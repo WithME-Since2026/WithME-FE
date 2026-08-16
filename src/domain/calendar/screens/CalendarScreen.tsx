@@ -3,9 +3,10 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { EmptyView } from '@/common/components/EmptyView';
+import { CalendarViewToggle } from '@/common/components/CalendarViewToggle';
 import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
@@ -14,7 +15,10 @@ import {
   formatDayDetailLabel,
   formatMonthLabel,
   parseDateKey,
+  parseKoreanTimeToMinutes,
 } from '@/common/utils/date';
+
+import type { RootStackParamList } from '@/app/navigation';
 
 import { CalendarLayerModal } from '@/domain/calendar/components/CalendarLayerModal';
 import { CalendarMonthPickerModal } from '@/domain/calendar/components/CalendarMonthPickerModal';
@@ -24,7 +28,7 @@ import { CALENDAR_LAYERS } from '@/domain/calendar/constants/calendarLayers';
 import { useCalendarMonthQuery } from '@/domain/calendar/hooks/useCalendarMonthQuery';
 import type { CalendarEventResponse, CalendarLayerKey } from '@/domain/calendar/types';
 
-type CalendarView = 'CALENDAR' | 'TODO';
+type CalendarScreenProps = NativeStackScreenProps<RootStackParamList, 'Calendar'>;
 
 const DEFAULT_ENABLED_LAYERS: Record<CalendarLayerKey, boolean> = {
   GROUP: true,
@@ -32,24 +36,10 @@ const DEFAULT_ENABLED_LAYERS: Record<CalendarLayerKey, boolean> = {
   HOLIDAY: false,
 };
 
-// 오전/오후 시각 표기를 분 단위로 변환해 하루 일정 목록을 시간순으로 정렬하기 위한 helper
-function parseTimeToMinutes(time: string | null) {
-  const match = time?.match(/(오전|오후)\s*(\d{1,2}):(\d{2})/);
-  if (!match) {
-    return -1;
-  }
-
-  const [, period, hourText, minuteText] = match;
-  const hour = (Number(hourText) % 12) + (period === '오후' ? 12 : 0);
-
-  return hour * 60 + Number(minuteText);
-}
-
 const today = new Date();
 
 // 모임 일정 + 할 일 마감을 한 화면에서 보여주는 통합 캘린더뷰. 레이어 토글로 항목별 표시 여부를 제어함
-export function CalendarScreen() {
-  const [activeView, setActiveView] = useState<CalendarView>('CALENDAR');
+export function CalendarScreen({ navigation }: CalendarScreenProps) {
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(formatDateKey(today));
@@ -78,15 +68,8 @@ export function CalendarScreen() {
 
     return (eventsByDateKey.get(selectedDateKey) ?? [])
       .filter((event) => enabledLayers[event.type])
-      .sort((a, b) => parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time));
+      .sort((a, b) => parseKoreanTimeToMinutes(a.time) - parseKoreanTimeToMinutes(b.time));
   }, [eventsByDateKey, selectedDateKey, enabledLayers]);
-
-  const handleChangeMonth = (offset: number) => {
-    const nextDate = new Date(currentYear, currentMonth - 1 + offset, 1);
-    setCurrentYear(nextDate.getFullYear());
-    setCurrentMonth(nextDate.getMonth() + 1);
-    setSelectedDateKey(null);
-  };
 
   const handleToggleLayer = (key: CalendarLayerKey) => {
     setEnabledLayers((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -103,8 +86,9 @@ export function CalendarScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.headerRow}>
           <View style={styles.monthNavGroup}>
-            <Pressable onPress={() => handleChangeMonth(-1)} hitSlop={8}>
-              <Ionicons name="chevron-back" size={20} color={colors.text.primary} />
+            {/* TODO: 홈 화면 추가되면 홈으로 이동하는 버튼으로 교체 예정, 그 전까지 비활성화 */}
+            <Pressable disabled hitSlop={8}>
+              <Ionicons name="chevron-back" size={20} color={colors.text.disabled} />
             </Pressable>
             <Pressable
               style={styles.monthLabelButton}
@@ -116,79 +100,60 @@ export function CalendarScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.viewToggle}>
-            {(['CALENDAR', 'TODO'] as const).map((view) => {
-              const isActive = view === activeView;
-
-              return (
-                <Pressable
-                  key={view}
-                  style={[styles.viewToggleOption, isActive && styles.viewToggleOptionActive]}
-                  onPress={() => setActiveView(view)}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: isActive }}
-                >
-                  <Text style={[styles.viewToggleLabel, isActive && styles.viewToggleLabelActive]}>
-                    {view === 'CALENDAR' ? '캘린더' : 'Todo'}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          <CalendarViewToggle
+            value="CALENDAR"
+            onChange={(view) => {
+              if (view === 'TODO') {
+                navigation.navigate('Todo');
+              }
+            }}
+          />
         </View>
 
         <View style={styles.sectionDivider} />
 
-        {activeView === 'TODO' ? (
-          <EmptyView message="Todo 목록은 준비 중입니다." />
-        ) : (
-          <>
-            <View style={styles.legendRow}>
-              <View style={styles.legendChips}>
-                {CALENDAR_LAYERS.filter((layer) => layer.key !== 'HOLIDAY').map((layer) => (
-                  <View
-                    key={layer.key}
-                    style={[styles.legendChip, { backgroundColor: `${layer.dotColor}1A` }]}
-                  >
-                    <View style={[styles.legendDot, { backgroundColor: layer.dotColor }]} />
-                    <Text style={[styles.legendLabel, { color: layer.dotColor }]}>
-                      {layer.label}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-              <Pressable
-                onPress={() => setIsLayerModalOpen(true)}
-                hitSlop={8}
-                accessibilityLabel="레이어 토글 버튼"
+        <View style={styles.legendRow}>
+          <View style={styles.legendChips}>
+            {CALENDAR_LAYERS.filter((layer) => layer.key !== 'HOLIDAY').map((layer) => (
+              <View
+                key={layer.key}
+                style={[styles.legendChip, { backgroundColor: `${layer.dotColor}1A` }]}
               >
-                <Ionicons name="options-outline" size={20} color={colors.text.secondary} />
-              </Pressable>
-            </View>
+                <View style={[styles.legendDot, { backgroundColor: layer.dotColor }]} />
+                <Text style={[styles.legendLabel, { color: layer.dotColor }]}>{layer.label}</Text>
+              </View>
+            ))}
+          </View>
+          <Pressable
+            onPress={() => setIsLayerModalOpen(true)}
+            hitSlop={8}
+            accessibilityLabel="레이어 토글 버튼"
+          >
+            <Ionicons name="options-outline" size={20} color={colors.text.secondary} />
+          </Pressable>
+        </View>
 
-            {isLoading && <LoadingView />}
-            {isError && <ErrorView message="캘린더 정보를 불러오지 못했습니다." />}
+        {isLoading && <LoadingView />}
+        {isError && <ErrorView message="캘린더 정보를 불러오지 못했습니다." />}
 
-            {!isLoading && !isError && (
-              <>
-                <MonthCalendarGrid
-                  year={currentYear}
-                  month={currentMonth}
-                  selectedDateKey={selectedDateKey ?? ''}
-                  onSelectDate={setSelectedDateKey}
-                  eventsByDateKey={eventsByDateKey}
-                  enabledLayers={enabledLayers}
-                />
+        {!isLoading && !isError && (
+          <>
+            <MonthCalendarGrid
+              year={currentYear}
+              month={currentMonth}
+              selectedDateKey={selectedDateKey ?? ''}
+              onSelectDate={setSelectedDateKey}
+              eventsByDateKey={eventsByDateKey}
+              enabledLayers={enabledLayers}
+            />
 
-                {selectedDateKey ? (
-                  <DayEventList
-                    dateLabel={formatDayDetailLabel(parseDateKey(selectedDateKey))}
-                    events={selectedDayEvents}
-                  />
-                ) : (
-                  <Text style={styles.selectHint}>날짜를 선택해주세요.</Text>
-                )}
-              </>
+            {selectedDateKey ? (
+              <DayEventList
+                dateLabel={formatDayDetailLabel(parseDateKey(selectedDateKey))}
+                events={selectedDayEvents}
+              />
+            ) : (
+              <Text style={styles.selectHint}>날짜를 선택해주세요.</Text>
             )}
           </>
         )}
@@ -241,29 +206,6 @@ const styles = StyleSheet.create({
   monthLabel: {
     ...typography.heading3,
     color: colors.text.primary,
-  },
-  viewToggle: {
-    flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.full,
-    padding: 2,
-  },
-  viewToggleOption: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.full,
-  },
-  viewToggleOptionActive: {
-    backgroundColor: colors.primary,
-  },
-  viewToggleLabel: {
-    ...typography.body2,
-    fontSize: typography.caption.fontSize,
-    fontWeight: '600',
-    color: colors.text.secondary,
-  },
-  viewToggleLabelActive: {
-    color: colors.background,
   },
   sectionDivider: {
     height: 1,
