@@ -10,6 +10,8 @@ import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
+import { CategoryCreateScreen } from '@/domain/todo/screens/CategoryCreateScreen';
+import { CategoryManageScreen } from '@/domain/todo/screens/CategoryManageScreen';
 import { TodoScreen } from '@/domain/todo/screens/TodoScreen';
 
 export type RootStackParamList = {
@@ -23,6 +25,8 @@ export type RootStackParamList = {
   Onboarding: undefined;
   Calendar: undefined;
   Todo: undefined;
+  CategoryManage: undefined;
+  CategoryCreate: { categoryId?: number } | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -42,6 +46,8 @@ export function RootNavigator() {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Calendar" component={CalendarScreen} />
         <Stack.Screen name="Todo" component={TodoScreen} />
+        <Stack.Screen name="CategoryManage" component={CategoryManageScreen} />
+        <Stack.Screen name="CategoryCreate" component={CategoryCreateScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

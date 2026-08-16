@@ -20,7 +20,7 @@ export function TodoListItem({ todo, category, isOverdue, onToggleComplete }: To
     : isOverdue
       ? colors.error
       : colors.text.primary;
-  const checkboxColor = todo.completed ? colors.success : isOverdue ? colors.error : colors.border;
+  const checkboxColor = todo.completed ? categoryColor : isOverdue ? colors.error : colors.border;
 
   return (
     <View style={styles.row}>
@@ -28,7 +28,7 @@ export function TodoListItem({ todo, category, isOverdue, onToggleComplete }: To
         style={[
           styles.checkbox,
           { borderColor: checkboxColor },
-          todo.completed && { backgroundColor: colors.success, borderColor: colors.success },
+          todo.completed && { backgroundColor: categoryColor, borderColor: categoryColor },
         ]}
         onPress={() => onToggleComplete(todo.todoId)}
         hitSlop={8}

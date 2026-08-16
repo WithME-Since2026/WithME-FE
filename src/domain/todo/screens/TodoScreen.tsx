@@ -193,10 +193,14 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
       {isSpeedDialOpen && (
         <TodoSpeedDialMenu
           onClose={() => setIsSpeedDialOpen(false)}
-          // TODO: 카테고리 관리 화면 미구현 (GET/PATCH /api/v1/todo/category API는 이미 구현됨)
-          onManageCategories={() => setIsSpeedDialOpen(false)}
-          // TODO: 카테고리 생성 화면 미구현 (POST /api/v1/todo/category API는 이미 구현됨)
-          onCreateCategory={() => setIsSpeedDialOpen(false)}
+          onManageCategories={() => {
+            setIsSpeedDialOpen(false);
+            navigation.navigate('CategoryManage');
+          }}
+          onCreateCategory={() => {
+            setIsSpeedDialOpen(false);
+            navigation.navigate('CategoryCreate', undefined);
+          }}
           onCreateTodo={() => {
             setIsSpeedDialOpen(false);
             setIsCreateSheetOpen(true);

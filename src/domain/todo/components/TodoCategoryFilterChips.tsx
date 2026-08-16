@@ -32,7 +32,10 @@ export function TodoCategoryFilterChips({
         return (
           <Pressable
             key={category.categoryId}
-            style={[styles.chip, isActive && styles.chipActive]}
+            style={[
+              styles.chip,
+              isActive && [styles.chipActive, { backgroundColor: category.categoryColor }],
+            ]}
             onPress={() => onChange(category.categoryId)}
             accessibilityRole="button"
             accessibilityState={{ selected: isActive }}

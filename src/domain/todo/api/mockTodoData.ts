@@ -102,3 +102,10 @@ export function createMockTodo(request: CreateTodoRequest): TodoResponse {
 
   return todo;
 }
+
+// 카테고리 삭제 시 BE(Todo.changeCategory)와 동일하게 해당 todo들의 카테고리를 해제한다
+export function clearMockTodosCategory(categoryId: number): void {
+  mockTodos = mockTodos.map((todo) =>
+    todo.categoryId === categoryId ? { ...todo, categoryId: null } : todo,
+  );
+}

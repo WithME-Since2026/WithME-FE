@@ -30,3 +30,18 @@ export type CreateTodoRequest = {
   categoryId: number | null;
   notificationStatus: boolean;
 };
+
+// yooze.withme.domain.todo.dto.request.CreateCategoryRequest 기준 (POST /api/v1/todo/category)
+export type CreateCategoryRequest = {
+  categoryName: string;
+  categoryColor: string; // '#RRGGBB'
+};
+
+// yooze.withme.domain.todo.dto.request.UpdateCategoryRequest 기준 (PATCH /api/v1/todo/category)
+// null인 필드는 "변경하지 않음"을 의미
+export type UpdateCategoryRequest = {
+  categoryId: number;
+  categoryName?: string;
+  categoryColor?: string;
+  sortOrder?: number;
+};
