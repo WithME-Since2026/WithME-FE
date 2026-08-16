@@ -16,6 +16,7 @@ import { formatDateKey, formatDayDetailLabel, isSameDateKey } from '@/common/uti
 import type { RootStackParamList } from '@/app/navigation';
 
 import { TodoCategoryFilterChips } from '@/domain/todo/components/TodoCategoryFilterChips';
+import { TodoCreateSheet } from '@/domain/todo/components/TodoCreateSheet';
 import { TodoListItem } from '@/domain/todo/components/TodoListItem';
 import { TodoQuickDateStrip } from '@/domain/todo/components/TodoQuickDateStrip';
 import { TodoSpeedDialMenu } from '@/domain/todo/components/TodoSpeedDialMenu';
@@ -39,6 +40,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
   // TODO: 백엔드 완료 처리 API(PATCH /api/v1/todo/completion) 연동 전까지 로컬 상태로만 완료 여부 반영
   const [completedOverrides, setCompletedOverrides] = useState<Record<number, boolean>>({});
   const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
+  const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 
   const {
     data: todoListData,
@@ -59,6 +61,9 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
   }, [categories]);
 
   const selectedDateKey = formatDateKey(selectedDate);
+  // BE는 마감일로 오늘 이전 날짜를 허용하지 않아(@FutureOrPresent), 지연 항목을 보는 중이면 오늘로 보정
+  const createSheetInitialDateKey =
+    selectedDateKey < formatDateKey(new Date()) ? formatDateKey(new Date()) : selectedDateKey;
 
   const todos = useMemo(() => {
     return (todoListData?.todos ?? []).map((todo) => ({
@@ -192,10 +197,19 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
           onManageCategories={() => setIsSpeedDialOpen(false)}
           // TODO: 카테고리 생성 화면 미구현 (POST /api/v1/todo/category API는 이미 구현됨)
           onCreateCategory={() => setIsSpeedDialOpen(false)}
-          // TODO: todo 생성 폼 미구현 (POST /api/v1/todo API는 이미 구현됨)
-          onCreateTodo={() => setIsSpeedDialOpen(false)}
+          onCreateTodo={() => {
+            setIsSpeedDialOpen(false);
+            setIsCreateSheetOpen(true);
+          }}
         />
       )}
+
+      <TodoCreateSheet
+        visible={isCreateSheetOpen}
+        categories={categories}
+        initialDateKey={createSheetInitialDateKey}
+        onClose={() => setIsCreateSheetOpen(false)}
+      />
 
       <Pressable
         style={styles.fab}

@@ -22,3 +22,11 @@ export type TodoCategoryResponse = {
 };
 
 export type TodoCategoryFilter = 'ALL' | number; // number = categoryId
+
+// yooze.withme.domain.todo.dto.request.CreateTodoRequest 기준 (POST /api/v1/todo)
+export type CreateTodoRequest = {
+  title: string;
+  dueDate: string; // 'YYYY-MM-DD', BE에서 오늘 이후만 허용(@FutureOrPresent)
+  categoryId: number | null;
+  notificationStatus: boolean;
+};

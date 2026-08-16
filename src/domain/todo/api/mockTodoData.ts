@@ -1,10 +1,10 @@
 import { formatDateKey } from '@/common/utils/date';
 
-import type { TodoListResponse, TodoResponse } from '@/domain/todo/types';
+import type { CreateTodoRequest, TodoListResponse, TodoResponse } from '@/domain/todo/types';
 
 // GET /api/v1/todo/list 연동 전까지 Todo 화면을 확인할 수 있도록 오늘 기준 상대 날짜로 생성하는 mock 데이터
 // categoryId는 mockCategoryData.ts의 카테고리(1 업무 / 2 개인 / 3 운동 / 4 학습)를 참조
-export function getMockTodoList(): TodoListResponse {
+function buildInitialMockTodos(): TodoResponse[] {
   const today = new Date();
   const offsetDay = (offset: number) => {
     const date = new Date(today);
@@ -12,7 +12,7 @@ export function getMockTodoList(): TodoListResponse {
     return formatDateKey(date);
   };
 
-  const todos: TodoResponse[] = [
+  return [
     {
       todoId: 1,
       title: '병원 예약 전화',
@@ -78,6 +78,27 @@ export function getMockTodoList(): TodoListResponse {
       notificationStatus: false,
     },
   ];
+}
 
-  return { todos };
+// __DEV__ 화면에서 새 할 일 추가 시트로 만든 항목이 목록에 바로 반영되도록 모듈 상태로 유지
+let mockTodos = buildInitialMockTodos();
+let nextMockTodoId = mockTodos.length + 1;
+
+export function getMockTodoList(): TodoListResponse {
+  return { todos: mockTodos };
+}
+
+export function createMockTodo(request: CreateTodoRequest): TodoResponse {
+  const todo: TodoResponse = {
+    todoId: nextMockTodoId++,
+    categoryId: request.categoryId,
+    title: request.title,
+    dueDate: request.dueDate,
+    completed: false,
+    notificationStatus: request.notificationStatus,
+  };
+
+  mockTodos = [...mockTodos, todo];
+
+  return todo;
 }
