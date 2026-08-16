@@ -33,14 +33,23 @@ export function TodoListItem({
   onLongPress,
 }: TodoListItemProps) {
   const categoryColor = category?.categoryColor ?? colors.text.secondary;
-  const titleColor = todo.completed
-    ? colors.text.disabled
-    : isOverdue
-      ? colors.error
-      : colors.text.primary;
+
+  let titleColor = colors.text.primary;
+  if (todo.completed) {
+    titleColor = colors.text.disabled;
+  } else if (isOverdue) {
+    titleColor = colors.error;
+  }
+
   // 완료 체크 표시는 카테고리가 있으면 카테고리 색상, 없으면 메인 색상을 사용한다
   const completedColor = category?.categoryColor ?? colors.primary;
-  const checkboxColor = todo.completed ? completedColor : isOverdue ? colors.error : colors.border;
+  let checkboxColor = colors.border;
+  if (todo.completed) {
+    checkboxColor = completedColor;
+  } else if (isOverdue) {
+    checkboxColor = colors.error;
+  }
+
   const timeOrDateLabel =
     isOverdue || todo.isPostponed ? formatDateLabel(todo.dueDate) : todo.dueTime;
 

@@ -1,9 +1,11 @@
 import { formatDateKey } from '@/common/utils/date';
 
 import type {
+  CompleteTodoRequest,
   CreateTodoRequest,
   TodoListResponse,
   TodoResponse,
+  UpdateTodoDateRequest,
   UpdateTodoRequest,
 } from '@/domain/todo/types';
 
@@ -133,25 +135,50 @@ export function clearMockTodosCategory(categoryId: number): void {
   );
 }
 
-// BE의 Todo.update와 동일하게 undefined인 필드는 기존 값을 유지한다
-export function updateMockTodo(request: UpdateTodoRequest): TodoResponse {
-  const target = mockTodos.find((todo) => todo.todoId === request.todoId);
+function findMockTodoOrThrow(todoId: number): TodoResponse {
+  const target = mockTodos.find((todo) => todo.todoId === todoId);
   if (!target) {
     throw new Error('할 일을 찾을 수 없습니다.');
   }
 
-  const updated: TodoResponse = {
-    ...target,
-    title: request.title ?? target.title,
-    dueDate: request.dueDate ?? target.dueDate,
-    notificationStatus: request.notificationStatus ?? target.notificationStatus,
-    dueTime: request.dueTime !== undefined ? request.dueTime : target.dueTime,
-    isPostponed: request.isPostponed ?? target.isPostponed,
-  };
+  return target;
+}
 
-  mockTodos = mockTodos.map((todo) => (todo.todoId === request.todoId ? updated : todo));
+function replaceMockTodo(updated: TodoResponse): TodoResponse {
+  mockTodos = mockTodos.map((todo) => (todo.todoId === updated.todoId ? updated : todo));
 
   return updated;
+}
+
+// PATCH /api/v1/todo. undefined인 필드는 기존 값을 유지한다 (BE의 Todo.update와 동일한 규칙)
+export function updateMockTodo(request: UpdateTodoRequest): TodoResponse {
+  const target = findMockTodoOrThrow(request.todoId);
+
+  return replaceMockTodo({
+    ...target,
+    title: request.title ?? target.title,
+    categoryId: request.categoryId !== undefined ? request.categoryId : target.categoryId,
+    notificationStatus: request.notificationStatus ?? target.notificationStatus,
+  });
+}
+
+// PATCH /api/v1/todo/completion (아직 미구현, 백엔드 API 추천 참고)
+export function completeMockTodo(request: CompleteTodoRequest): TodoResponse {
+  const target = findMockTodoOrThrow(request.todoId);
+
+  return replaceMockTodo({ ...target, completed: request.completed });
+}
+
+// PATCH /api/v1/todo/date (아직 미구현, 백엔드 API 추천 참고)
+export function updateMockTodoDate(request: UpdateTodoDateRequest): TodoResponse {
+  const target = findMockTodoOrThrow(request.todoId);
+
+  return replaceMockTodo({
+    ...target,
+    dueDate: request.dueDate,
+    dueTime: request.dueTime !== undefined ? request.dueTime : target.dueTime,
+    isPostponed: request.isPostponed ?? target.isPostponed,
+  });
 }
 
 // BE의 Todo.delete()와 동일하게 소프트 삭제 대상이므로 목록에서 제외한다

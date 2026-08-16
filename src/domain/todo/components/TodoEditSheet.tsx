@@ -11,6 +11,7 @@ import { formatMonthLabel, parseDateKey } from '@/common/utils/date';
 import { TodoCategoryPickerSheet } from '@/domain/todo/components/TodoCategoryPickerSheet';
 import { TodoDatePickerSheet } from '@/domain/todo/components/TodoDatePickerSheet';
 import { TodoTimePickerSheet } from '@/domain/todo/components/TodoTimePickerSheet';
+import { useUpdateTodoDateMutation } from '@/domain/todo/hooks/useUpdateTodoDateMutation';
 import { useUpdateTodoMutation } from '@/domain/todo/hooks/useUpdateTodoMutation';
 import type { TodoCategoryResponse, TodoResponse } from '@/domain/todo/types';
 
@@ -38,14 +39,25 @@ export function TodoEditSheet({ visible, todo, categories, onClose }: TodoEditSh
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const [isCategoryPickerOpen, setIsCategoryPickerOpen] = useState(false);
 
-  const { mutate: updateTodo, isPending, isError } = useUpdateTodoMutation();
+  const {
+    mutateAsync: updateTodo,
+    isPending: isUpdatingTodo,
+    isError: isUpdateError,
+  } = useUpdateTodoMutation();
+  const {
+    mutateAsync: updateTodoDate,
+    isPending: isUpdatingDate,
+    isError: isDateError,
+  } = useUpdateTodoDateMutation();
+  const isPending = isUpdatingTodo || isUpdatingDate;
+  const isError = isUpdateError || isDateError;
 
   useEffect(() => {
     if (visible && todo) {
       setTitle(todo.title);
       setCategoryId(todo.categoryId);
       setDueDateKey(todo.dueDate);
-      setTimeLabel(todo.dueTime);
+      setTimeLabel(todo.dueTime ?? null);
     }
   }, [visible, todo]);
 
@@ -57,22 +69,27 @@ export function TodoEditSheet({ visible, todo, categories, onClose }: TodoEditSh
 
   const selectedCategory = categories.find((category) => category.categoryId === categoryId);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
       return;
     }
 
-    updateTodo(
-      {
-        todoId: todo.todoId,
-        title: trimmedTitle,
-        dueDate: dueDateKey,
-        dueTime: timeLabel,
-        isPostponed: false,
-      },
-      { onSuccess: onClose },
-    );
+    try {
+      // 제목/카테고리와 날짜/시간은 BE 계획상 서로 다른 엔드포인트(PATCH /todo, PATCH /todo/date)라 나눠 보낸다
+      await Promise.all([
+        updateTodo({ todoId: todo.todoId, title: trimmedTitle, categoryId }),
+        updateTodoDate({
+          todoId: todo.todoId,
+          dueDate: dueDateKey,
+          dueTime: timeLabel,
+          isPostponed: false,
+        }),
+      ]);
+      onClose();
+    } catch {
+      // 에러 메시지는 isError 상태로 화면에 표시된다
+    }
   };
 
   return (

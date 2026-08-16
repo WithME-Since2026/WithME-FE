@@ -30,10 +30,11 @@ import type { TodoPostponeTarget } from '@/domain/todo/components/TodoQuickActio
 import { TodoQuickDateStrip } from '@/domain/todo/components/TodoQuickDateStrip';
 import { TodoSpeedDialMenu } from '@/domain/todo/components/TodoSpeedDialMenu';
 import { TodoUndoToast } from '@/domain/todo/components/TodoUndoToast';
+import { useCompleteTodoMutation } from '@/domain/todo/hooks/useCompleteTodoMutation';
 import { useDeleteTodoMutation } from '@/domain/todo/hooks/useDeleteTodoMutation';
 import { useTodoCategoriesQuery } from '@/domain/todo/hooks/useTodoCategoriesQuery';
 import { useTodoListQuery } from '@/domain/todo/hooks/useTodoListQuery';
-import { useUpdateTodoMutation } from '@/domain/todo/hooks/useUpdateTodoMutation';
+import { useUpdateTodoDateMutation } from '@/domain/todo/hooks/useUpdateTodoDateMutation';
 import type { TodoCategoryFilter, TodoResponse } from '@/domain/todo/types';
 
 const UNDO_WINDOW_SECONDS = 5;
@@ -60,8 +61,6 @@ type TodoSection = {
 export function TodoScreen({ navigation }: TodoScreenProps) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [categoryFilter, setCategoryFilter] = useState<TodoCategoryFilter>('ALL');
-  // TODO: 백엔드 완료 처리 API(PATCH /api/v1/todo/completion) 연동 전까지 로컬 상태로만 완료 여부 반영
-  const [completedOverrides, setCompletedOverrides] = useState<Record<number, boolean>>({});
   const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
   const [longPressedTodoId, setLongPressedTodoId] = useState<number | null>(null);
@@ -79,7 +78,8 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
     isLoading: isCategoriesLoading,
     isError: isCategoriesError,
   } = useTodoCategoriesQuery();
-  const { mutate: updateTodo } = useUpdateTodoMutation();
+  const { mutate: completeTodo } = useCompleteTodoMutation();
+  const { mutate: updateTodoDate } = useUpdateTodoDateMutation();
   const { mutate: deleteTodo } = useDeleteTodoMutation();
 
   const isLoading = isTodosLoading || isCategoriesLoading;
@@ -94,12 +94,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
   const createSheetInitialDateKey =
     selectedDateKey < formatDateKey(new Date()) ? formatDateKey(new Date()) : selectedDateKey;
 
-  const todos = useMemo(() => {
-    return (todoListData?.todos ?? []).map((todo) => ({
-      ...todo,
-      completed: completedOverrides[todo.todoId] ?? todo.completed,
-    }));
-  }, [todoListData, completedOverrides]);
+  const todos = useMemo(() => todoListData?.todos ?? [], [todoListData]);
 
   const sections = useMemo(() => {
     const matchesCategory = (todo: TodoResponse) =>
@@ -187,21 +182,21 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
 
   const handleToggleComplete = (todoId: number) => {
     setLongPressedTodoId(null);
-    setCompletedOverrides((prev) => {
-      const base = todoListData?.todos.find((todo) => todo.todoId === todoId)?.completed ?? false;
-      const current = prev[todoId] ?? base;
+    const target = todos.find((todo) => todo.todoId === todoId);
+    if (!target) {
+      return;
+    }
 
-      return { ...prev, [todoId]: !current };
-    });
+    completeTodo({ todoId, completed: !target.completed });
   };
 
   const commitPostpone = (todo: TodoResponse, newDueDate: string, label: string) => {
     const previousDueDate = todo.dueDate;
-    const previousDueTime = todo.dueTime;
-    const previousIsPostponed = todo.isPostponed;
+    const previousDueTime = todo.dueTime ?? null;
+    const previousIsPostponed = todo.isPostponed ?? false;
     // 미루기는 날짜만 바꾸는 동작이라 기존 시간은 더 이상 의미가 없어 지우고,
     // 목록에는 시간 대신 새로 바뀐 날짜를 보여준다 (TodoListItem 참고)
-    updateTodo({ todoId: todo.todoId, dueDate: newDueDate, dueTime: null, isPostponed: true });
+    updateTodoDate({ todoId: todo.todoId, dueDate: newDueDate, dueTime: null, isPostponed: true });
     setLongPressedTodoId(null);
     setUndoToast({
       todoId: todo.todoId,
@@ -278,7 +273,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
       return;
     }
 
-    updateTodo({
+    updateTodoDate({
       todoId: undoToast.todoId,
       dueDate: undoToast.previousDueDate,
       dueTime: undoToast.previousDueTime,

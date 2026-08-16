@@ -51,11 +51,12 @@ export async function updateCategory(request: UpdateCategoryRequest) {
   return response.data.data;
 }
 
-// TODO: BE에 카테고리 삭제 엔드포인트가 아직 없음 (CategoryController에 DELETE 매핑 미구현, 백엔드 API 추천 참고)
+// TODO: BE에 카테고리 삭제 엔드포인트가 아직 없음 (CategoryController에 DELETE 매핑 미구현, 백엔드 API 추천 참고).
+// 이 컨트롤러의 PATCH가 경로 없이 body로 categoryId를 받는 것과 같은 컨벤션이라 path param 대신 body로 보낸다
 export async function deleteCategory(categoryId: number) {
   if (__DEV__) {
     return deleteMockCategory(categoryId);
   }
 
-  await apiClient.delete(`/api/v1/todo/category/${categoryId}`);
+  await apiClient.delete('/api/v1/todo/category', { data: { categoryId } });
 }
