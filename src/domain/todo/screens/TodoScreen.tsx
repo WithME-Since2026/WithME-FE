@@ -41,6 +41,8 @@ const UNDO_WINDOW_SECONDS = 5;
 type UndoToastState = {
   todoId: number;
   previousDueDate: string;
+  previousDueTime: string | null;
+  previousIsPostponed: boolean;
   label: string;
   secondsLeft: number;
 };
@@ -195,11 +197,17 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
 
   const commitPostpone = (todo: TodoResponse, newDueDate: string, label: string) => {
     const previousDueDate = todo.dueDate;
-    updateTodo({ todoId: todo.todoId, dueDate: newDueDate });
+    const previousDueTime = todo.dueTime;
+    const previousIsPostponed = todo.isPostponed;
+    // 미루기는 날짜만 바꾸는 동작이라 기존 시간은 더 이상 의미가 없어 지우고,
+    // 목록에는 시간 대신 새로 바뀐 날짜를 보여준다 (TodoListItem 참고)
+    updateTodo({ todoId: todo.todoId, dueDate: newDueDate, dueTime: null, isPostponed: true });
     setLongPressedTodoId(null);
     setUndoToast({
       todoId: todo.todoId,
       previousDueDate,
+      previousDueTime,
+      previousIsPostponed,
       label,
       secondsLeft: UNDO_WINDOW_SECONDS,
     });
@@ -226,7 +234,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
     commitPostpone(
       longPressedTodo,
       formatDateKey(targetDate),
-      `${labelByTarget[target]}로 미뤘습니다`,
+      `${labelByTarget[target]}로 변경했습니다`,
     );
   };
 
@@ -239,7 +247,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
     commitPostpone(
       longPressedTodo,
       dateKey,
-      `${date.getMonth() + 1}월 ${date.getDate()}일로 미뤘습니다`,
+      `${date.getMonth() + 1}월 ${date.getDate()}일로 변경했습니다`,
     );
   };
 
@@ -270,7 +278,12 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
       return;
     }
 
-    updateTodo({ todoId: undoToast.todoId, dueDate: undoToast.previousDueDate });
+    updateTodo({
+      todoId: undoToast.todoId,
+      dueDate: undoToast.previousDueDate,
+      dueTime: undoToast.previousDueTime,
+      isPostponed: undoToast.previousIsPostponed,
+    });
     setUndoToast(null);
   };
 
@@ -407,11 +420,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
           onPress={() => setIsSpeedDialOpen((prev) => !prev)}
           accessibilityLabel={isSpeedDialOpen ? '메뉴 닫기' : 'Todo 추가 메뉴 열기'}
         >
-          {isSpeedDialOpen ? (
-            <Ionicons name="close" size={28} color={colors.background} />
-          ) : (
-            <Text style={styles.fabIcon}>+</Text>
-          )}
+          <Text style={styles.fabIcon}>{isSpeedDialOpen ? '×' : '+'}</Text>
         </Pressable>
       )}
     </SafeAreaView>

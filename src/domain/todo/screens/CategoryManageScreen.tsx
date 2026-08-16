@@ -59,7 +59,7 @@ export function CategoryManageScreen({ navigation }: CategoryManageScreenProps) 
           <Ionicons name="arrow-back" size={18} color={colors.text.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>카테고리 관리</Text>
-        <Pressable style={styles.doneButton} onPress={() => navigation.goBack()}>
+        <Pressable style={styles.doneButton} onPress={() => navigation.goBack()} hitSlop={8}>
           <Text style={styles.doneButtonText}>완료</Text>
         </Pressable>
       </View>
@@ -103,11 +103,15 @@ export function CategoryManageScreen({ navigation }: CategoryManageScreenProps) 
                   </Pressable>
                 </View>
 
-                <View style={[styles.avatar, { backgroundColor: `${category.categoryColor}33` }]}>
-                  <Text style={[styles.avatarText, { color: category.categoryColor }]}>
-                    {category.categoryName.slice(0, 1)}
-                  </Text>
-                </View>
+                <View
+                  style={[
+                    styles.avatar,
+                    {
+                      backgroundColor: `${category.categoryColor}1F`,
+                      borderColor: category.categoryColor,
+                    },
+                  ]}
+                />
 
                 <View style={styles.rowInfo}>
                   <Text style={styles.categoryName}>{category.categoryName}</Text>
@@ -177,13 +181,10 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   doneButton: {
-    paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: borderRadius.full,
-    backgroundColor: `${colors.primary}1A`,
   },
   doneButtonText: {
-    ...typography.caption,
+    ...typography.body2,
     fontWeight: '700',
     color: colors.primary,
   },
@@ -212,12 +213,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    ...typography.body1,
-    fontWeight: '700',
+    borderWidth: 1.5,
   },
   rowInfo: {
     flex: 1,

@@ -37,7 +37,6 @@ export function TodoCreateSheet({
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [dueDateKey, setDueDateKey] = useState(initialDateKey);
-  // TODO: BE의 Todo 엔티티에 시간 컬럼이 없어 선택한 시간은 저장되지 않음 (백엔드 API 추천 참고)
   const [timeLabel, setTimeLabel] = useState<string | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -74,6 +73,7 @@ export function TodoCreateSheet({
         dueDate: dueDateKey,
         categoryId,
         notificationStatus: false,
+        dueTime: timeLabel,
       },
       { onSuccess: onClose },
     );

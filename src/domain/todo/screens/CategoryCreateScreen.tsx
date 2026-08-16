@@ -56,7 +56,6 @@ export function CategoryCreateScreen({ navigation, route }: CategoryCreateScreen
   const isError = isCreateError || isUpdateError;
 
   const trimmedName = name.trim();
-  const previewInitial = trimmedName.slice(0, 1) || '?';
 
   const handleSubmit = () => {
     if (!trimmedName) {
@@ -82,7 +81,7 @@ export function CategoryCreateScreen({ navigation, route }: CategoryCreateScreen
       <View style={styles.header}>
         <Pressable
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('Todo')}
           hitSlop={8}
           accessibilityLabel="뒤로가기"
         >
@@ -122,9 +121,9 @@ export function CategoryCreateScreen({ navigation, route }: CategoryCreateScreen
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>미리보기</Text>
           <View style={[styles.previewCard, { backgroundColor: `${color}1F`, borderColor: color }]}>
-            <View style={[styles.previewAvatar, { backgroundColor: `${color}33` }]}>
-              <Text style={[styles.previewAvatarText, { color }]}>{previewInitial}</Text>
-            </View>
+            <View
+              style={[styles.previewAvatar, { backgroundColor: `${color}1F`, borderColor: color }]}
+            />
             <Text style={[styles.previewName, { color }]}>{trimmedName || '카테고리 이름'}</Text>
           </View>
         </View>
@@ -226,12 +225,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  previewAvatarText: {
-    ...typography.body2,
-    fontWeight: '700',
+    borderWidth: 1.5,
   },
   previewName: {
     ...typography.body1,

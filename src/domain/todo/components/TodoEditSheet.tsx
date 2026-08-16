@@ -33,7 +33,6 @@ export function TodoEditSheet({ visible, todo, categories, onClose }: TodoEditSh
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [dueDateKey, setDueDateKey] = useState('');
-  // TODO: BE의 Todo 엔티티에 시간 컬럼이 없어 선택한 시간은 저장되지 않음 (백엔드 API 추천 참고)
   const [timeLabel, setTimeLabel] = useState<string | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -46,7 +45,7 @@ export function TodoEditSheet({ visible, todo, categories, onClose }: TodoEditSh
       setTitle(todo.title);
       setCategoryId(todo.categoryId);
       setDueDateKey(todo.dueDate);
-      setTimeLabel(null);
+      setTimeLabel(todo.dueTime);
     }
   }, [visible, todo]);
 
@@ -65,7 +64,13 @@ export function TodoEditSheet({ visible, todo, categories, onClose }: TodoEditSh
     }
 
     updateTodo(
-      { todoId: todo.todoId, title: trimmedTitle, dueDate: dueDateKey },
+      {
+        todoId: todo.todoId,
+        title: trimmedTitle,
+        dueDate: dueDateKey,
+        dueTime: timeLabel,
+        isPostponed: false,
+      },
       { onSuccess: onClose },
     );
   };

@@ -3,8 +3,16 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
+import { parseDateKey } from '@/common/utils/date';
 
 import type { TodoCategoryResponse, TodoResponse } from '@/domain/todo/types';
+
+// 지연된 항목이나 미루기로 날짜가 바뀐 항목은 시간 대신 해당 날짜를 짧게 보여준다
+function formatDateLabel(dateKey: string) {
+  const date = parseDateKey(dateKey);
+
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+}
 
 type TodoListItemProps = {
   todo: TodoResponse;
@@ -30,7 +38,11 @@ export function TodoListItem({
     : isOverdue
       ? colors.error
       : colors.text.primary;
-  const checkboxColor = todo.completed ? colors.primary : isOverdue ? colors.error : colors.border;
+  // 완료 체크 표시는 카테고리가 있으면 카테고리 색상, 없으면 메인 색상을 사용한다
+  const completedColor = category?.categoryColor ?? colors.primary;
+  const checkboxColor = todo.completed ? completedColor : isOverdue ? colors.error : colors.border;
+  const timeOrDateLabel =
+    isOverdue || todo.isPostponed ? formatDateLabel(todo.dueDate) : todo.dueTime;
 
   return (
     <Pressable
@@ -42,7 +54,7 @@ export function TodoListItem({
         style={[
           styles.checkbox,
           { borderColor: checkboxColor },
-          todo.completed && { backgroundColor: colors.primary, borderColor: colors.primary },
+          todo.completed && { backgroundColor: completedColor, borderColor: completedColor },
         ]}
         onPress={() => onToggleComplete(todo.todoId)}
         hitSlop={8}
@@ -53,11 +65,14 @@ export function TodoListItem({
       </Pressable>
 
       <View style={styles.content}>
-        <Text
-          style={[styles.title, { color: titleColor }, todo.completed && styles.titleCompleted]}
-        >
-          {todo.title}
-        </Text>
+        <View style={styles.titleRow}>
+          <Text
+            style={[styles.title, { color: titleColor }, todo.completed && styles.titleCompleted]}
+          >
+            {todo.title}
+          </Text>
+          {timeOrDateLabel && <Text style={styles.timeLabel}>{timeOrDateLabel}</Text>}
+        </View>
 
         {category && (
           <View style={[styles.categoryTag, { backgroundColor: `${categoryColor}1F` }]}>
@@ -102,10 +117,23 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.xs,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.xs,
+  },
   title: {
     ...typography.body2,
     fontSize: 13,
     fontWeight: '500',
+    flexShrink: 1,
+  },
+  timeLabel: {
+    ...typography.caption,
+    fontSize: 10,
+    color: colors.text.secondary,
+    flexShrink: 0,
   },
   titleCompleted: {
     textDecorationLine: 'line-through',

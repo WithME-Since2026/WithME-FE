@@ -6,6 +6,10 @@ export type TodoResponse = {
   dueDate: string; // LocalDate → 'YYYY-MM-DD'
   completed: boolean;
   notificationStatus: boolean;
+  // FE 전용 필드. BE에 시간 컬럼이 없어 __DEV__ mock 상태로만 유지되고 새로고침 시 초기화된다 (백엔드 API 추천 참고)
+  dueTime: string | null;
+  // FE 전용 필드. 롱프레스 미루기로 날짜가 바뀐 항목인지 표시 (BE에 미루기 이력이 없어 mock 상태로만 유지)
+  isPostponed: boolean;
 };
 
 export type TodoListResponse = {
@@ -29,6 +33,8 @@ export type CreateTodoRequest = {
   dueDate: string; // 'YYYY-MM-DD', BE에서 오늘 이후만 허용(@FutureOrPresent)
   categoryId: number | null;
   notificationStatus: boolean;
+  // FE 전용 필드. BE에 시간 컬럼이 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
+  dueTime: string | null;
 };
 
 // yooze.withme.domain.todo.entity.Todo.update(title, dueDate, notificationStatus) 기준.
@@ -38,6 +44,9 @@ export type UpdateTodoRequest = {
   title?: string;
   dueDate?: string;
   notificationStatus?: boolean;
+  // FE 전용 필드. BE에 시간 컬럼이 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
+  dueTime?: string | null;
+  isPostponed?: boolean;
 };
 
 // yooze.withme.domain.todo.dto.request.CreateCategoryRequest 기준 (POST /api/v1/todo/category)

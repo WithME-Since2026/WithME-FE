@@ -25,6 +25,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: false,
       categoryId: 2,
       notificationStatus: false,
+      dueTime: null,
+      isPostponed: false,
     },
     {
       todoId: 2,
@@ -33,6 +35,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: false,
       categoryId: 1,
       notificationStatus: false,
+      dueTime: '오후 2:00',
+      isPostponed: false,
     },
     {
       todoId: 3,
@@ -41,6 +45,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: false,
       categoryId: 1,
       notificationStatus: false,
+      dueTime: '오전 10:00',
+      isPostponed: false,
     },
     {
       todoId: 4,
@@ -49,6 +55,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: false,
       categoryId: 3,
       notificationStatus: false,
+      dueTime: '오후 6:00',
+      isPostponed: false,
     },
     {
       todoId: 5,
@@ -57,6 +65,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: false,
       categoryId: 4,
       notificationStatus: false,
+      dueTime: null,
+      isPostponed: false,
     },
     {
       todoId: 6,
@@ -65,6 +75,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: true,
       categoryId: 2,
       notificationStatus: false,
+      dueTime: null,
+      isPostponed: false,
     },
     {
       todoId: 7,
@@ -73,6 +85,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: false,
       categoryId: 1,
       notificationStatus: false,
+      dueTime: null,
+      isPostponed: false,
     },
     {
       todoId: 8,
@@ -81,6 +95,8 @@ function buildInitialMockTodos(): TodoResponse[] {
       completed: false,
       categoryId: 4,
       notificationStatus: false,
+      dueTime: null,
+      isPostponed: false,
     },
   ];
 }
@@ -101,6 +117,8 @@ export function createMockTodo(request: CreateTodoRequest): TodoResponse {
     dueDate: request.dueDate,
     completed: false,
     notificationStatus: request.notificationStatus,
+    dueTime: request.dueTime,
+    isPostponed: false,
   };
 
   mockTodos = [...mockTodos, todo];
@@ -127,6 +145,8 @@ export function updateMockTodo(request: UpdateTodoRequest): TodoResponse {
     title: request.title ?? target.title,
     dueDate: request.dueDate ?? target.dueDate,
     notificationStatus: request.notificationStatus ?? target.notificationStatus,
+    dueTime: request.dueTime !== undefined ? request.dueTime : target.dueTime,
+    isPostponed: request.isPostponed ?? target.isPostponed,
   };
 
   mockTodos = mockTodos.map((todo) => (todo.todoId === request.todoId ? updated : todo));

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
+import { colors, spacing, typography } from '@/common/styles/theme';
 
 import type { TodoCategoryFilter, TodoCategoryResponse } from '@/domain/todo/types';
 
@@ -53,13 +53,16 @@ export function TodoCategoryFilterChips({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: spacing.xs,
+    gap: spacing.sm,
     paddingVertical: spacing.sm,
   },
   chip: {
+    minWidth: 44,
+    height: 28,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    borderRadius: borderRadius.lg,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.surface,
   },
   chipActive: {
@@ -67,6 +70,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.caption,
+    fontSize: 11,
     fontWeight: '500',
     color: colors.text.secondary,
   },
