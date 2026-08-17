@@ -41,8 +41,8 @@ export function TodoListItem({
     titleColor = colors.error;
   }
 
-  // 완료 체크 표시는 카테고리가 있으면 카테고리 색상, 없으면 메인 색상을 사용한다
-  const completedColor = category?.categoryColor ?? colors.primary;
+  // 완료 체크 표시는 항상 메인 색상을 사용한다
+  const completedColor = colors.primary;
   let checkboxColor = colors.border;
   if (todo.completed) {
     checkboxColor = completedColor;
