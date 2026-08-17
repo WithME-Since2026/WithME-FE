@@ -9,6 +9,7 @@ import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
+import { NotificationScreen } from '@/domain/notification/screens/NotificationScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
 
 export type RootStackParamList = {
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   ResetPassword: { loginId: string; email: string; code: string };
   Onboarding: undefined;
   Calendar: undefined;
+  Notification: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -39,6 +41,7 @@ export function RootNavigator() {
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Calendar" component={CalendarScreen} />
+        <Stack.Screen name="Notification" component={NotificationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

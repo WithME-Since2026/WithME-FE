@@ -56,3 +56,28 @@ export function formatDayDetailLabel(date: Date) {
 
   return isSameDateKey(date, new Date()) ? `${label} 오늘` : label;
 }
+
+// 알림 목록 등에서 쓰는 상대 시간 표기 ('방금', 'N분 전', 'N시간 전', '어제', 'M월 D일')
+export function formatRelativeTimeKo(isoDateTime: string) {
+  const target = new Date(isoDateTime);
+  const now = new Date();
+  const diffMinutes = Math.floor((now.getTime() - target.getTime()) / (60 * 1000));
+
+  if (diffMinutes < 1) {
+    return '방금';
+  }
+  if (diffMinutes < 60) {
+    return `${diffMinutes}분 전`;
+  }
+  if (isSameDateKey(target, now)) {
+    return `${Math.floor(diffMinutes / 60)}시간 전`;
+  }
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (isSameDateKey(target, yesterday)) {
+    return '어제';
+  }
+
+  return `${target.getMonth() + 1}월 ${target.getDate()}일`;
+}

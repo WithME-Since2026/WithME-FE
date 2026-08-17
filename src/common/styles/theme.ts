@@ -1,6 +1,14 @@
 export const colors = {
   primary: '#162a56',
   secondary: '#7C3AED',
+  // 알림/탭바 등의 강조 상태에 쓰이는 브라이트 블루 (primary와는 별개 톤)
+  accent: '#4A90FA',
+  // accent를 옅게 깐 배경 (알림 아바타 등 강조 아이콘 배경용)
+  accentSoft: '#E0EAFF',
+  // 강조가 필요 없는 중립 아이콘의 배경/전경 (알림 아바타 등)
+  neutralSoft: '#F0F1F4',
+  neutralIcon: '#6B7080',
+  neutralBorder: '#D8DAE2',
   background: '#FFFFFF',
   surface: '#F9FAFB',
   text: {
