@@ -80,6 +80,13 @@ export function StartScreen({ navigation }: StartScreenProps) {
               >
                 <Text style={styles.devLinkText}>[dev] 캘린더 화면 보기</Text>
               </Pressable>
+              <Pressable
+                style={styles.devLink}
+                onPress={() => navigation.navigate('MyPage')}
+                hitSlop={8}
+              >
+                <Text style={styles.devLinkText}>[dev] 마이페이지 화면 보기</Text>
+              </Pressable>
             </View>
           )}
         </View>

@@ -21,10 +21,19 @@ export const colors = {
   border: '#E5E7EB',
   borderStrong: '#9CA3AF',
   divider: 'rgba(0, 0, 0, 0.08)',
+  // 통계 카드 구분선, 낮은 참석률 막대 등에 쓰이는 연한 회색 (mypage)
+  hairline: '#DCD8D3',
+  // 마이페이지 참석률 카드 전용 그린 계열 (기존 success 토큰과는 별개 톤)
+  attendanceHigh: '#45A64A',
+  attendanceMid: '#BDE1BF',
+  attendanceTrack: '#EFECE8',
+  // 프리미엄 업그레이드 배너 테두리/PRO 배지에 쓰이는 골드
+  premiumGold: '#C8A84B',
   weekend: '#cc4d4da3',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
+  kakaoBadgeText: '#4D3800',
   overlay: 'rgba(0, 0, 0, 0.4)',
 };
 
