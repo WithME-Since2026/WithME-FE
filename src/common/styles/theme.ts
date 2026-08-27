@@ -30,6 +30,20 @@ export const colors = {
   // 프리미엄 업그레이드 배너 테두리/PRO 배지에 쓰이는 골드
   premiumGold: '#C8A84B',
   weekend: '#cc4d4da3',
+  // 알림 유형별 아바타 배경/아이콘 색상 (Figma node 761:15618 실제 값)
+  notifJoinBg: '#D3E3FD',
+  notifScheduleBg: '#FEF3C7',
+  notifScheduleIcon: '#D97706',
+  notifDeadlineBg: '#E7E0EC',
+  notifDeadlineIcon: '#79747E',
+  notifReceivedBg: '#DCFCE7',
+  notifReceivedIcon: '#16A34A',
+  // 알림 읽음 상태의 본문/타임스탬프/구분선 색상 (Figma 실제 값)
+  notifReadText: '#49454F',
+  notifTimestamp: '#CAC4D0',
+  notifDivider: '#E8E0F0',
+  // 액션 완료 토스트 배경 (Figma 실제 값)
+  toastBackground: '#313033',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',

@@ -12,6 +12,8 @@ type NotificationListItemProps = {
   onAccept: (notificationId: number) => void;
   onReject: (notificationId: number) => void;
   onReconfirm: (notificationId: number) => void;
+  // 섹션의 마지막 항목 아래에는 구분선을 그리지 않기 위한 플래그
+  showDivider?: boolean;
 };
 
 const ICON_BY_TYPE = {
@@ -21,80 +23,111 @@ const ICON_BY_TYPE = {
   GROUP_RESPONSE_RECEIVED: 'checkmark-outline',
 } as const;
 
-// Figma 알림 아바타 색상 (node 194:1390/194:1391 등 원본 SVG의 실제 fill/stroke 값)
+// Figma 알림 아바타 색상 (node 761:15618 실제 fill 값, 알림 유형별로 서로 다름)
 const AVATAR_STYLE_BY_TYPE: Record<
   NotificationType,
   { backgroundColor: string; iconColor: string }
 > = {
-  GROUP_JOIN_REQUEST: { backgroundColor: colors.accentSoft, iconColor: colors.primary },
-  GROUP_SCHEDULE_CHANGED: { backgroundColor: colors.accentSoft, iconColor: colors.primary },
-  GROUP_RESPONSE_DEADLINE: { backgroundColor: colors.neutralSoft, iconColor: colors.neutralIcon },
-  GROUP_RESPONSE_RECEIVED: { backgroundColor: colors.neutralSoft, iconColor: colors.neutralIcon },
+  GROUP_JOIN_REQUEST: { backgroundColor: colors.notifJoinBg, iconColor: colors.primary },
+  GROUP_SCHEDULE_CHANGED: {
+    backgroundColor: colors.notifScheduleBg,
+    iconColor: colors.notifScheduleIcon,
+  },
+  GROUP_RESPONSE_DEADLINE: {
+    backgroundColor: colors.notifDeadlineBg,
+    iconColor: colors.notifDeadlineIcon,
+  },
+  GROUP_RESPONSE_RECEIVED: {
+    backgroundColor: colors.notifReceivedBg,
+    iconColor: colors.notifReceivedIcon,
+  },
 };
+
+// 아바타 지름(40) + 아바타-본문 간격(spacing.sm) + 좌측 여백(spacing.lg)만큼
+// 안쪽으로 들여써서, 구분선이 본문 텍스트 시작 위치와 나란히 맞도록 함 (Figma node 761:15812 참고)
+const DIVIDER_INSET = 40 + spacing.sm + spacing.lg;
 
 export function NotificationListItem({
   notification,
   onAccept,
   onReject,
   onReconfirm,
+  showDivider = true,
 }: NotificationListItemProps) {
   const { notificationId, type, message, createdAt, isRead } = notification;
   const avatarStyle = AVATAR_STYLE_BY_TYPE[type];
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.avatar, { backgroundColor: avatarStyle.backgroundColor }]}>
-        <Ionicons name={ICON_BY_TYPE[type]} size={18} color={avatarStyle.iconColor} />
-      </View>
-
-      <View style={styles.body}>
-        <View style={styles.messageRow}>
-          <Text style={styles.message}>{message}</Text>
-          {!isRead && <View style={styles.unreadDot} />}
+    <View style={styles.wrapper}>
+      <View style={styles.row}>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: avatarStyle.backgroundColor },
+            isRead && styles.avatarRead,
+          ]}
+        >
+          <Ionicons name={ICON_BY_TYPE[type]} size={18} color={avatarStyle.iconColor} />
         </View>
-        <Text style={styles.time}>{formatRelativeTimeKo(createdAt)}</Text>
 
-        {type === 'GROUP_JOIN_REQUEST' && (
-          <View style={styles.actionRow}>
-            <Pressable
-              style={[styles.actionButton, styles.actionButtonPrimary]}
-              onPress={() => onAccept(notificationId)}
-            >
-              <Text style={styles.actionButtonPrimaryLabel}>수락</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.actionButton, styles.actionButtonOutline]}
-              onPress={() => onReject(notificationId)}
-            >
-              <Text style={styles.actionButtonOutlineLabel}>거절</Text>
-            </Pressable>
+        <View style={styles.body}>
+          <View style={styles.messageRow}>
+            <Text style={[styles.message, isRead ? styles.messageRead : styles.messageUnread]}>
+              {message}
+            </Text>
+            {!isRead && <View style={styles.unreadDot} />}
           </View>
-        )}
+          <Text style={styles.time}>{formatRelativeTimeKo(createdAt)}</Text>
 
-        {type === 'GROUP_SCHEDULE_CHANGED' && (
-          <View style={styles.actionRow}>
-            <Pressable
-              style={[styles.actionButton, styles.actionButtonPrimary, styles.actionButtonWide]}
-              onPress={() => onReconfirm(notificationId)}
-            >
-              <Text style={styles.actionButtonPrimaryLabel}>재확인하기</Text>
-            </Pressable>
-          </View>
-        )}
+          {type === 'GROUP_JOIN_REQUEST' && !isRead && (
+            <View style={styles.actionRow}>
+              <Pressable
+                style={[styles.actionButton, styles.actionButtonPrimary]}
+                onPress={() => onAccept(notificationId)}
+              >
+                <Text style={styles.actionButtonPrimaryLabel}>수락</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.actionButton, styles.actionButtonOutline]}
+                onPress={() => onReject(notificationId)}
+              >
+                <Text style={styles.actionButtonOutlineLabel}>거절</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {type === 'GROUP_SCHEDULE_CHANGED' && !isRead && (
+            <View style={styles.actionRow}>
+              <Pressable
+                style={[styles.actionButton, styles.actionButtonPrimary]}
+                onPress={() => onReconfirm(notificationId)}
+              >
+                <Text style={styles.actionButtonPrimaryLabel}>재확인하기</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
       </View>
+
+      {showDivider && <View style={styles.divider} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
+    backgroundColor: colors.background,
+  },
+  row: {
     flexDirection: 'row',
     gap: spacing.sm,
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    // 카드 사이 회색 배경이 보이도록 아래쪽에 여백을 둠
-    marginBottom: spacing.sm,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: DIVIDER_INSET,
+    backgroundColor: colors.notifDivider,
   },
   avatar: {
     width: 40,
@@ -102,6 +135,9 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  avatarRead: {
+    opacity: 0.6,
   },
   body: {
     flex: 1,
@@ -114,8 +150,15 @@ const styles = StyleSheet.create({
   message: {
     ...typography.body2,
     fontSize: 13,
-    color: colors.text.primary,
     flex: 1,
+  },
+  messageUnread: {
+    fontWeight: '600',
+    color: colors.text.primary,
+  },
+  messageRead: {
+    fontWeight: '400',
+    color: colors.notifReadText,
   },
   unreadDot: {
     width: 8,
@@ -127,7 +170,7 @@ const styles = StyleSheet.create({
   time: {
     ...typography.caption,
     fontSize: 11,
-    color: colors.text.secondary,
+    color: colors.notifTimestamp,
     marginTop: spacing.xs / 2,
   },
   actionRow: {
@@ -136,14 +179,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   actionButton: {
-    width: 43,
-    height: 28,
-    borderRadius: borderRadius.md,
+    paddingHorizontal: 18,
+    paddingVertical: 7,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  actionButtonWide: {
-    width: 76,
   },
   actionButtonPrimary: {
     backgroundColor: colors.primary,
@@ -156,11 +196,11 @@ const styles = StyleSheet.create({
   actionButtonOutline: {
     backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.neutralBorder,
+    borderColor: colors.notifTimestamp,
   },
   actionButtonOutlineLabel: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.neutralIcon,
+    color: colors.text.primary,
   },
 });
