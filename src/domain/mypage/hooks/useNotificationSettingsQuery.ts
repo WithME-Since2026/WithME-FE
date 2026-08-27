@@ -5,7 +5,7 @@ import { myPageQueryKeys } from '@/domain/mypage/hooks/useMyPageProfileQuery';
 
 export function useNotificationSettingsQuery() {
   return useQuery({
-    queryKey: myPageQueryKeys.notificationSettings,
+    queryKey: myPageQueryKeys.notificationSettings(),
     queryFn: getNotificationSettings,
   });
 }

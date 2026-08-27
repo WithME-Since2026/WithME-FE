@@ -9,7 +9,7 @@ export function useUpdateNotificationSettingsMutation() {
   return useMutation({
     mutationFn: updateNotificationSettings,
     onSuccess: (data) => {
-      queryClient.setQueryData(myPageQueryKeys.notificationSettings, data);
+      queryClient.setQueryData(myPageQueryKeys.notificationSettings(), data);
     },
   });
 }

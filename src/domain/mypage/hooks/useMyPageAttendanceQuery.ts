@@ -5,7 +5,7 @@ import { myPageQueryKeys } from '@/domain/mypage/hooks/useMyPageProfileQuery';
 
 export function useMyPageAttendanceQuery() {
   return useQuery({
-    queryKey: myPageQueryKeys.attendance,
+    queryKey: myPageQueryKeys.attendance(),
     queryFn: getMyPageAttendance,
   });
 }

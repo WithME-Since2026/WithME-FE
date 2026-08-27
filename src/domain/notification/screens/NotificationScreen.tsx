@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,6 +22,10 @@ import { useReadNotificationMutation } from '@/domain/notification/hooks/useRead
 import type { NotificationResponse } from '@/domain/notification/types';
 
 type NotificationScreenProps = NativeStackScreenProps<RootStackParamList, 'Notification'>;
+
+type NotificationListRow =
+  | { kind: 'header'; label: string; topSpacing: boolean }
+  | { kind: 'item'; notification: NotificationResponse; showDivider: boolean };
 
 // 오늘/이전 알림 그룹으로 나눠 알림 목록을 보여주는 화면
 // 하단 탭바는 다른 팀원이 별도로 작업 중이라 여기서는 자리만 비워둠 (충돌 방지)
@@ -51,6 +55,34 @@ export function NotificationScreen({ navigation }: NotificationScreenProps) {
 
     return { todayNotifications: today, pastNotifications: past, hasUnread: unread };
   }, [notifications]);
+
+  const rows = useMemo<NotificationListRow[]>(() => {
+    const result: NotificationListRow[] = [];
+
+    if (todayNotifications.length > 0) {
+      result.push({ kind: 'header', label: '오늘', topSpacing: false });
+      todayNotifications.forEach((notification, index) => {
+        result.push({
+          kind: 'item',
+          notification,
+          showDivider: index < todayNotifications.length - 1,
+        });
+      });
+    }
+
+    if (pastNotifications.length > 0) {
+      result.push({ kind: 'header', label: '이전', topSpacing: todayNotifications.length > 0 });
+      pastNotifications.forEach((notification, index) => {
+        result.push({
+          kind: 'item',
+          notification,
+          showDivider: index < pastNotifications.length - 1,
+        });
+      });
+    }
+
+    return result;
+  }, [todayNotifications, pastNotifications]);
 
   // TODO: 그룹 참가 신청 수락/거절, 일정 재확인 전용 API가 아직 명세되지 않아 우선 읽음 처리만 연동
   const handleAccept = (notificationId: number) => {
@@ -92,39 +124,30 @@ export function NotificationScreen({ navigation }: NotificationScreenProps) {
       {isEmpty && <EmptyView message="새로운 알림이 없습니다." />}
 
       {!isLoading && !isError && !isEmpty && (
-        <ScrollView contentContainerStyle={styles.list}>
-          {todayNotifications.length > 0 && (
-            <>
-              <Text style={styles.sectionLabel}>오늘</Text>
-              {todayNotifications.map((notification, index) => (
-                <NotificationListItem
-                  key={notification.notificationId}
-                  notification={notification}
-                  onAccept={handleAccept}
-                  onReject={handleReject}
-                  onReconfirm={handleReconfirm}
-                  showDivider={index < todayNotifications.length - 1}
-                />
-              ))}
-            </>
-          )}
-
-          {pastNotifications.length > 0 && (
-            <>
-              <Text style={[styles.sectionLabel, styles.sectionLabelSpacing]}>이전</Text>
-              {pastNotifications.map((notification, index) => (
-                <NotificationListItem
-                  key={notification.notificationId}
-                  notification={notification}
-                  onAccept={handleAccept}
-                  onReject={handleReject}
-                  onReconfirm={handleReconfirm}
-                  showDivider={index < pastNotifications.length - 1}
-                />
-              ))}
-            </>
-          )}
-        </ScrollView>
+        <FlatList
+          data={rows}
+          contentContainerStyle={styles.list}
+          keyExtractor={(row) =>
+            row.kind === 'header'
+              ? `header-${row.label}`
+              : `notification-${row.notification.notificationId}`
+          }
+          renderItem={({ item }) =>
+            item.kind === 'header' ? (
+              <Text style={[styles.sectionLabel, item.topSpacing && styles.sectionLabelSpacing]}>
+                {item.label}
+              </Text>
+            ) : (
+              <NotificationListItem
+                notification={item.notification}
+                onAccept={handleAccept}
+                onReject={handleReject}
+                onReconfirm={handleReconfirm}
+                showDivider={item.showDivider}
+              />
+            )
+          }
+        />
       )}
 
       {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}

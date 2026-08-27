@@ -10,7 +10,7 @@ export function useUpdateMyPageProfileMutation() {
   return useMutation({
     mutationFn: updateMyPageProfile,
     onSuccess: (data) => {
-      queryClient.setQueryData<MyPageProfileResponse>(myPageQueryKeys.profile, data);
+      queryClient.setQueryData<MyPageProfileResponse>(myPageQueryKeys.profile(), data);
     },
   });
 }
