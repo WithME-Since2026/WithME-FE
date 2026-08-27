@@ -7,6 +7,7 @@ export const myPageQueryKeys = {
   profile: () => [...myPageQueryKeys.all, 'profile'] as const,
   attendance: () => [...myPageQueryKeys.all, 'attendance'] as const,
   notificationSettings: () => [...myPageQueryKeys.all, 'notification-settings'] as const,
+  groups: () => [...myPageQueryKeys.all, 'groups'] as const,
 };
 
 export function useMyPageProfileQuery() {

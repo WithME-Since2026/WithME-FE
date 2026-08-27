@@ -1,4 +1,5 @@
 import type {
+  MyGroupResponse,
   MyPageAttendanceResponse,
   MyPageProfileResponse,
   NotificationSettingsResponse,
@@ -34,4 +35,13 @@ export function getMockMyPageAttendance(): MyPageAttendanceResponse {
 // GET /api/v1/users/me/notifications 연동 전까지 알림 동의 상태를 확인할 수 있도록 만든 mock 데이터
 export function getMockNotificationSettings(): NotificationSettingsResponse {
   return { notifyAgree: true };
+}
+
+// GET /api/v1/users/me/groups 연동 전까지 참여 모임 목록을 확인할 수 있도록 만든 mock 데이터
+export function getMockMyGroups(): MyGroupResponse[] {
+  return [
+    { groupId: 1, name: '스터디 모임', position: 'OWNER' },
+    { groupId: 2, name: '독서 모임', position: 'MEMBER' },
+    { groupId: 3, name: '러닝 크루', position: 'MEMBER' },
+  ];
 }

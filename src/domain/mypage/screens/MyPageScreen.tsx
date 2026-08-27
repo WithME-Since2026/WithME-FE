@@ -24,6 +24,7 @@ import { ProfileCard } from '@/domain/mypage/components/ProfileCard';
 import { SettingsListItem } from '@/domain/mypage/components/SettingsListItem';
 import { WeeklyAttendanceChart } from '@/domain/mypage/components/WeeklyAttendanceChart';
 import { useLogoutMutation } from '@/domain/mypage/hooks/useLogoutMutation';
+import { useMyGroupsQuery } from '@/domain/mypage/hooks/useMyGroupsQuery';
 import { useMyPageAttendanceQuery } from '@/domain/mypage/hooks/useMyPageAttendanceQuery';
 import { useMyPageProfileQuery } from '@/domain/mypage/hooks/useMyPageProfileQuery';
 import { useNotificationsQuery } from '@/domain/notification/hooks/useNotificationsQuery';
@@ -45,6 +46,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
   } = useMyPageAttendanceQuery();
   const logoutMutation = useLogoutMutation();
   const { data: notifications } = useNotificationsQuery();
+  const { data: groups } = useMyGroupsQuery();
   // 로그아웃/탈퇴 확인 모달에서 어느 액션을 확인 중인지 (Figma node 761:17659)
   const [pendingExitAction, setPendingExitAction] = useState<'logout' | 'withdraw' | null>(null);
   const [isNotificationSettingsExpanded, setIsNotificationSettingsExpanded] = useState(false);
@@ -132,7 +134,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
           <View style={styles.settingsCard}>
             <SettingsListItem
               label="내 모임 관리"
-              badge={{ label: '3', variant: 'accent' }}
+              badge={{ label: String(groups?.length ?? 0), variant: 'accent' }}
               onPress={noop}
             />
             <SettingsListItem

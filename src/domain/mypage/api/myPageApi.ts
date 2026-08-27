@@ -2,11 +2,13 @@ import { apiClient } from '@/common/api/apiClient';
 import type { ApiResponse } from '@/common/types/api';
 
 import {
+  getMockMyGroups,
   getMockMyPageAttendance,
   getMockMyPageProfile,
   getMockNotificationSettings,
 } from '@/domain/mypage/api/mockMyPageData';
 import type {
+  MyGroupResponse,
   MyPageAttendanceResponse,
   MyPageProfileResponse,
   NotificationSettingsResponse,
@@ -51,6 +53,17 @@ export async function getMyPageAttendance() {
   const response = await apiClient.get<ApiResponse<MyPageAttendanceResponse>>(
     '/api/v1/users/me/attendance',
   );
+
+  return response.data.data;
+}
+
+export async function getUserGroups() {
+  // GET /api/v1/users/me/groups 실제 백엔드 API. 연동 전까지 mock 데이터 사용
+  if (__DEV__) {
+    return getMockMyGroups();
+  }
+
+  const response = await apiClient.get<ApiResponse<MyGroupResponse[]>>('/api/v1/users/me/groups');
 
   return response.data.data;
 }

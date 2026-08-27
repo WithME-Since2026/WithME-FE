@@ -36,3 +36,12 @@ export type UpdateNotificationSettingsRequest = {
 export type UpdateNicknameRequest = {
   nickname: string;
 };
+
+export type GroupMemberPosition = 'OWNER' | 'CO_OWNER' | 'MEMBER';
+
+// GET /api/v1/users/me/groups 실제 백엔드 DTO(MyGroupResponse)와 동일한 필드명
+export type MyGroupResponse = {
+  groupId: number;
+  name: string;
+  position: GroupMemberPosition;
+};
