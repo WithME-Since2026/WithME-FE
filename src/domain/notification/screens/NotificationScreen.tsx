@@ -151,9 +151,7 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
   },
   title: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
+    flex: 1,
     textAlign: 'center',
     ...typography.heading3,
     color: colors.text.primary,

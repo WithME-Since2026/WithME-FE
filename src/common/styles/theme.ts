@@ -44,10 +44,32 @@ export const colors = {
   notifDivider: '#E8E0F0',
   // 액션 완료 토스트 배경 (Figma 실제 값)
   toastBackground: '#313033',
+  // 아웃라인 버튼 테두리 등에 쓰이는 중립 회색 (마이페이지 편집 버튼 등, Figma 실제 값)
+  outlineVariant: '#CAC4D0',
+  // 프리미엄 배너 전용 텍스트 색상 (Figma 실제 값)
+  premiumTitleText: '#1A1A1A',
+  // 마이페이지 등에서 반복적으로 쓰이는 회색 보조 텍스트 (Figma 실제 값, text.secondary와는 별개 톤)
+  textMuted: '#807F7D',
+  // 마이페이지 제목/닉네임/통계 수치 등 굵은 강조 텍스트 (Figma 실제 값, text.primary와는 별개 톤)
+  textStrong: '#1A1A1A',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
   kakaoBadgeText: '#4D3800',
+  // 마이페이지 프로필 카드의 "카카오 계정 연결됨" 배지 전용 색상 (Figma 실제 값 — 카카오 브랜드 기본색과는 톤이 미묘하게 다름)
+  kakaoBadgeBg: '#FCE500',
+  kakaoBadgeDot: '#371C1D',
+  // 마이페이지 "내 모임 관리" 배지 등에 쓰이는 구글 블루 계열 (Figma 실제 값, primary/accent와는 별개 톤)
+  linkBlue: '#1A73E8',
+  linkBlueSoft: '#D3E3FD',
+  // 마이페이지 "결제수단 등록" 배지 배경 (Figma 실제 값)
+  settingsBadgeBg: '#F3EDF7',
+  // 마이페이지 최근 6주 참석 차트 전용 그린 계열 (Figma 실제 값, attendanceHigh/Mid와는 별개 톤)
+  weeklyChartHigh: '#16A34A',
+  weeklyChartMid: '#86EFAC',
+  weeklyChartLow: '#DCFCE7',
+  // 마이페이지 회원 탈퇴 등 파괴적 액션 텍스트 (Figma 실제 값, error 토큰과는 별개 톤)
+  destructiveText: '#DC2626',
   overlay: 'rgba(0, 0, 0, 0.4)',
 };
 

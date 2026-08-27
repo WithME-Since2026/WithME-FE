@@ -10,7 +10,7 @@ export function getMockMyPageProfile(): MyPageProfileResponse {
     userId: 1,
     nickname: '홍길동',
     isKakaoLinked: true,
-    profileImageUrl: null,
+    profileImg: null,
   };
 }
 
@@ -21,12 +21,12 @@ export function getMockMyPageAttendance(): MyPageAttendanceResponse {
     monthlyAttendCount: 12,
     averageAttendanceRate: 0.92,
     recentWeeks: [
-      { weekLabel: '6주 전', attendanceRate: 0.42 },
-      { weekLabel: '5주 전', attendanceRate: 1 },
-      { weekLabel: '4주 전', attendanceRate: 0.52 },
-      { weekLabel: '3주 전', attendanceRate: 1 },
-      { weekLabel: '2주 전', attendanceRate: 0.15 },
-      { weekLabel: '1주 전', attendanceRate: 1 },
+      { weekLabel: '6주전', attendanceRate: 0.42 },
+      { weekLabel: '5주전', attendanceRate: 1 },
+      { weekLabel: '4주전', attendanceRate: 0.52 },
+      { weekLabel: '3주전', attendanceRate: 1 },
+      { weekLabel: '2주전', attendanceRate: 0.15 },
+      { weekLabel: '이번주', attendanceRate: 1 },
     ],
   };
 }

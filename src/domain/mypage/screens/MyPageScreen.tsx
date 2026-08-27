@@ -1,24 +1,32 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ConfirmModal } from '@/common/components/ConfirmModal';
 import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
 
+import { KakaoIcon } from '@/domain/auth/components/KakaoIcon';
 import { AttendanceStatsCard } from '@/domain/mypage/components/AttendanceStatsCard';
+import type { NotificationToggleKey } from '@/domain/mypage/components/NotificationSettingsPanel';
+import {
+  INITIAL_NOTIFICATION_TOGGLES,
+  NotificationSettingsPanel,
+} from '@/domain/mypage/components/NotificationSettingsPanel';
 import { ProfileCard } from '@/domain/mypage/components/ProfileCard';
 import { SettingsListItem } from '@/domain/mypage/components/SettingsListItem';
 import { WeeklyAttendanceChart } from '@/domain/mypage/components/WeeklyAttendanceChart';
 import { useLogoutMutation } from '@/domain/mypage/hooks/useLogoutMutation';
 import { useMyPageAttendanceQuery } from '@/domain/mypage/hooks/useMyPageAttendanceQuery';
 import { useMyPageProfileQuery } from '@/domain/mypage/hooks/useMyPageProfileQuery';
-import { useNotificationSettingsQuery } from '@/domain/mypage/hooks/useNotificationSettingsQuery';
-import { useUpdateNotificationSettingsMutation } from '@/domain/mypage/hooks/useUpdateNotificationSettingsMutation';
+import { useNotificationsQuery } from '@/domain/notification/hooks/useNotificationsQuery';
 
 type MyPageScreenProps = NativeStackScreenProps<RootStackParamList, 'MyPage'>;
 
@@ -36,39 +44,43 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
     isError: isAttendanceError,
   } = useMyPageAttendanceQuery();
   const logoutMutation = useLogoutMutation();
-  const { data: notificationSettings } = useNotificationSettingsQuery();
-  const updateNotificationSettingsMutation = useUpdateNotificationSettingsMutation();
+  const { data: notifications } = useNotificationsQuery();
+  // 로그아웃/탈퇴 확인 모달에서 어느 액션을 확인 중인지 (Figma node 761:17659)
+  const [pendingExitAction, setPendingExitAction] = useState<'logout' | 'withdraw' | null>(null);
+  const [isNotificationSettingsExpanded, setIsNotificationSettingsExpanded] = useState(false);
+  // 패널을 접었다 펼쳐도 토글 상태가 유지되도록 부모(이 화면)가 소유한다
+  const [notificationToggles, setNotificationToggles] = useState(INITIAL_NOTIFICATION_TOGGLES);
 
   const isLoading = isProfileLoading || isAttendanceLoading;
   const isError = isProfileError || isAttendanceError;
-
-  const handleLogout = () => {
-    logoutMutation.mutate(undefined, {
-      onSuccess: () => {
-        navigation.reset({ index: 0, routes: [{ name: 'Start' }] });
-      },
-    });
-  };
-
-  // 알림 수신 동의 여부를 허용/허용 안 함 프롬프트로 물어보고 PATCH /api/v1/users/me/notifications에 반영
-  const handleNotificationSettingsPress = () => {
-    Alert.alert('알림 허용', '모임 일정과 리마인드 알림을 받아보시려면 알림을 허용해주세요.', [
-      {
-        text: '허용 안 함',
-        style: 'cancel',
-        onPress: () => updateNotificationSettingsMutation.mutate({ notifyAgree: false }),
-      },
-      {
-        text: '허용',
-        onPress: () => updateNotificationSettingsMutation.mutate({ notifyAgree: true }),
-      },
-    ]);
-  };
+  const hasUnreadNotifications =
+    notifications?.some((notification) => !notification.isRead) ?? false;
 
   // TODO: 회원 탈퇴 API가 아직 명세되지 않아 우선 자리만 만들어 둠
   const handleWithdraw = () => {};
 
-  // TODO: 내 모임 관리/결제수단 등록/문제 신고/편집/프리미엄 화면이 아직 없어 우선 자리만 만들어 둠
+  const handleConfirmExit = () => {
+    if (pendingExitAction === 'logout') {
+      logoutMutation.mutate(undefined, {
+        onSuccess: () => {
+          navigation.reset({ index: 0, routes: [{ name: 'Start' }] });
+        },
+      });
+    } else if (pendingExitAction === 'withdraw') {
+      handleWithdraw();
+    }
+
+    setPendingExitAction(null);
+  };
+
+  // 알림 설정은 별도 화면/팝업이 아니라, 마이페이지 설정 목록에서 바로 그 아래로 펼쳐지는 형태로 관리한다.
+  const handleNotificationSettingsPress = () => setIsNotificationSettingsExpanded((prev) => !prev);
+  const handleToggleNotification = (key: NotificationToggleKey) => {
+    setNotificationToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+  const handleEditProfilePress = () => navigation.navigate('ProfileEdit');
+
+  // TODO: 내 모임 관리/결제수단 등록/문제 신고/프리미엄 화면이 아직 없어 우선 자리만 만들어 둠
   const noop = () => {};
 
   return (
@@ -81,7 +93,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
           hitSlop={8}
         >
           <Ionicons name="notifications-outline" size={20} color={colors.text.primary} />
-          <View style={styles.bellDot} />
+          {hasUnreadNotifications && <View style={styles.bellDot} />}
         </Pressable>
       </View>
 
@@ -90,7 +102,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
 
       {!isLoading && !isError && profile && attendance && (
         <ScrollView contentContainerStyle={styles.content}>
-          <ProfileCard profile={profile} onEditPress={noop} />
+          <ProfileCard profile={profile} onEditPress={handleEditProfilePress} />
 
           <AttendanceStatsCard
             groupCount={attendance.groupCount}
@@ -104,9 +116,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
           />
 
           <Pressable style={styles.premiumBanner} onPress={noop}>
-            <View style={styles.premiumIcon}>
-              <Ionicons name="chatbubble-ellipses" size={18} color={colors.kakaoText} />
-            </View>
+            <KakaoIcon size={36} background />
             <View style={styles.premiumBody}>
               <View style={styles.premiumTitleRow}>
                 <Text style={styles.premiumTitle}>프리미엄 업그레이드</Text>
@@ -116,7 +126,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
               </View>
               <Text style={styles.premiumSubtitle}>알림톡 리마인드 · 첫 달 100원</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.text.secondary} />
+            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
           </Pressable>
 
           <View style={styles.settingsCard}>
@@ -127,15 +137,16 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
             />
             <SettingsListItem
               label="알림 설정"
-              badge={
-                notificationSettings
-                  ? notificationSettings.notifyAgree
-                    ? { label: '켜짐', variant: 'accent' }
-                    : { label: '꺼짐', variant: 'neutral' }
-                  : undefined
-              }
               onPress={handleNotificationSettingsPress}
+              expanded={isNotificationSettingsExpanded}
+              showDivider={!isNotificationSettingsExpanded}
             />
+            {isNotificationSettingsExpanded && (
+              <NotificationSettingsPanel
+                toggles={notificationToggles}
+                onToggle={handleToggleNotification}
+              />
+            )}
             <SettingsListItem
               label="결제수단 등록"
               badge={{ label: '카드 · 1234', variant: 'neutral' }}
@@ -144,16 +155,24 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
             <SettingsListItem label="문제 신고" onPress={noop} showDivider={false} />
           </View>
 
-          <Pressable style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutLabel}>로그아웃</Text>
-            <Ionicons name="chevron-forward" size={18} color={colors.error} />
-          </Pressable>
-
-          <Pressable style={styles.withdrawButton} onPress={handleWithdraw} hitSlop={8}>
-            <Text style={styles.withdrawLabel}>탈퇴하기</Text>
-          </Pressable>
+          <View style={styles.exitRow}>
+            <Pressable onPress={() => setPendingExitAction('logout')} hitSlop={8}>
+              <Text style={styles.logoutLabel}>로그아웃</Text>
+            </Pressable>
+            <Pressable onPress={() => setPendingExitAction('withdraw')} hitSlop={8}>
+              <Text style={styles.withdrawLabel}>회원 탈퇴</Text>
+            </Pressable>
+          </View>
         </ScrollView>
       )}
+
+      <ConfirmModal
+        visible={pendingExitAction !== null}
+        // 로그아웃 문구만 확정 반영. 탈퇴 문구는 아직 그대로 둠(추후 별도 요청 시 변경)
+        message={pendingExitAction === 'logout' ? '정말 로그아웃 하시겠어요?' : '정말 떠나시나요?'}
+        onCancel={() => setPendingExitAction(null)}
+        onConfirm={handleConfirmExit}
+      />
 
       {/* TODO: 하단 탭바(홈/캘린더/마이)는 다른 팀원이 작업 중 — 완료되면 여기에 연결 */}
     </SafeAreaView>
@@ -169,14 +188,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
+    paddingHorizontal: 20,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   title: {
     ...typography.heading1,
     fontSize: 26,
-    color: colors.text.primary,
+    color: colors.textStrong,
   },
   bellButton: {
     width: 36,
@@ -196,27 +215,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.error,
   },
   content: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 20,
     paddingBottom: spacing.xl,
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   premiumBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    // Figma 실제 값(아이콘~텍스트 간격 12px)
+    gap: 12,
+    height: 68,
     backgroundColor: colors.background,
     borderRadius: borderRadius.lg,
     borderWidth: 1.5,
     borderColor: colors.premiumGold,
-    padding: spacing.sm,
-  },
-  premiumIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.kakao,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 12,
+    // Figma 실제 값: 0px 2px 4px rgba(200,168,75,0.15)
+    shadowColor: colors.premiumGold,
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   premiumBody: {
     flex: 1,
@@ -230,13 +249,13 @@ const styles = StyleSheet.create({
     ...typography.body2,
     fontSize: 15,
     fontWeight: '700',
-    color: colors.text.primary,
+    color: colors.premiumTitleText,
   },
   premiumProBadge: {
-    paddingHorizontal: spacing.xs,
+    width: 28,
     height: 15,
     borderRadius: borderRadius.sm,
-    backgroundColor: colors.text.primary,
+    backgroundColor: colors.premiumTitleText,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -247,35 +266,35 @@ const styles = StyleSheet.create({
   },
   premiumSubtitle: {
     ...typography.caption,
-    color: colors.text.secondary,
+    color: colors.textMuted,
     marginTop: 2,
   },
   settingsCard: {
-    borderRadius: borderRadius.lg,
+    borderRadius: 24,
     backgroundColor: colors.background,
     overflow: 'hidden',
+    // Figma 실제 값: 0px 1px 2px rgba(0,0,0,0.08)
+    shadowColor: '#000000',
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
-  logoutButton: {
+  exitRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 44,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.background,
+    justifyContent: 'center',
+    gap: spacing.xl,
+    paddingVertical: spacing.sm,
   },
   logoutLabel: {
-    ...typography.body2,
-    fontSize: 15,
-    color: colors.error,
-  },
-  withdrawButton: {
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
+    ...typography.caption,
+    fontWeight: '500',
+    // Figma 실제 값(#49454F) — 알림 화면의 읽음 처리된 본문 색과 동일해 재사용
+    color: colors.notifReadText,
   },
   withdrawLabel: {
     ...typography.caption,
-    color: colors.text.secondary,
-    textDecorationLine: 'underline',
+    fontWeight: '500',
+    color: colors.destructiveText,
   },
 });

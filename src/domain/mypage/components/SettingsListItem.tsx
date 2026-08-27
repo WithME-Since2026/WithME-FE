@@ -11,6 +11,8 @@ type SettingsListItemProps = {
   badge?: { label: string; variant: SettingsListItemBadgeVariant };
   onPress: () => void;
   showDivider?: boolean;
+  // 알림 설정처럼 그 자리에서 펼쳐지는 행일 때만 전달 — 펼쳐졌으면 화살표가 아래를 향하게 함
+  expanded?: boolean;
 };
 
 export function SettingsListItem({
@@ -18,6 +20,7 @@ export function SettingsListItem({
   badge,
   onPress,
   showDivider = true,
+  expanded,
 }: SettingsListItemProps) {
   return (
     <View>
@@ -35,7 +38,11 @@ export function SettingsListItem({
               </Text>
             </View>
           )}
-          <Ionicons name="chevron-forward" size={18} color={colors.text.secondary} />
+          <Ionicons
+            name={expanded ? 'chevron-down' : 'chevron-forward'}
+            size={16}
+            color={colors.text.secondary}
+          />
         </View>
       </Pressable>
       {showDivider && <View style={styles.divider} />}
@@ -49,7 +56,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    paddingVertical: 15,
   },
   label: {
     ...typography.body2,
@@ -59,39 +66,40 @@ const styles = StyleSheet.create({
   trailing: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: spacing.md,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.hairline,
+    backgroundColor: colors.notifDivider,
     marginHorizontal: spacing.md,
   },
   badgeAccent: {
-    minWidth: 23,
+    minWidth: 24,
     height: 24,
     paddingHorizontal: spacing.xs,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.accentSoft,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.linkBlueSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeAccentLabel: {
     ...typography.caption,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
-    color: colors.accent,
+    color: colors.linkBlue,
   },
   badgeNeutral: {
     height: 24,
     paddingHorizontal: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.neutralSoft,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.settingsBadgeBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeNeutralLabel: {
     ...typography.caption,
-    fontSize: 11,
-    color: colors.neutralIcon,
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.notifReadText,
   },
 });

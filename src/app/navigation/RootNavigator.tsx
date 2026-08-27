@@ -10,6 +10,7 @@ import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
 import { MyPageScreen } from '@/domain/mypage/screens/MyPageScreen';
+import { ProfileEditScreen } from '@/domain/mypage/screens/ProfileEditScreen';
 import { NotificationScreen } from '@/domain/notification/screens/NotificationScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
 
@@ -25,6 +26,7 @@ export type RootStackParamList = {
   Calendar: undefined;
   Notification: undefined;
   MyPage: undefined;
+  ProfileEdit: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -45,6 +47,7 @@ export function RootNavigator() {
         <Stack.Screen name="Calendar" component={CalendarScreen} />
         <Stack.Screen name="Notification" component={NotificationScreen} />
         <Stack.Screen name="MyPage" component={MyPageScreen} />
+        <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

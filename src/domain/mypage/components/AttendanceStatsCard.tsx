@@ -46,6 +46,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     flexDirection: 'row',
     alignItems: 'center',
+    // Figma 실제 값: 0px 2px 5px rgba(26,26,26,0.06)
+    shadowColor: '#1A1A1A',
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   stat: {
     flex: 1,
@@ -55,7 +61,7 @@ const styles = StyleSheet.create({
   value: {
     ...typography.heading3,
     fontSize: 22,
-    color: colors.text.primary,
+    color: colors.textStrong,
   },
   valueHighlight: {
     color: colors.attendanceHigh,
@@ -63,7 +69,7 @@ const styles = StyleSheet.create({
   label: {
     ...typography.caption,
     fontSize: 11,
-    color: colors.text.secondary,
+    color: colors.textMuted,
   },
   divider: {
     width: 1,
