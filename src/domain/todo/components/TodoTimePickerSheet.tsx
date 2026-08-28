@@ -148,15 +148,15 @@ export function TodoTimePickerSheet({
             <View style={styles.handle} />
 
             <View style={styles.header}>
-              <Text style={styles.title}>시간 선택</Text>
               <Pressable
-                style={styles.closeButton}
+                style={styles.backButton}
                 onPress={onClose}
                 hitSlop={8}
-                accessibilityLabel="닫기"
+                accessibilityLabel="뒤로"
               >
-                <Ionicons name="close" size={16} color={colors.text.secondary} />
+                <Ionicons name="chevron-back" size={20} color={colors.text.primary} />
               </Pressable>
+              <Text style={styles.title}>시간 선택</Text>
             </View>
 
             <View style={styles.wheelContainer}>
@@ -185,7 +185,11 @@ export function TodoTimePickerSheet({
               />
             </View>
 
-            <Button label="선택 완료" onPress={handleConfirm} style={styles.confirmButton} />
+            <Button
+              label="선택 완료"
+              onPress={handleConfirm}
+              style={[styles.confirmButton, styles.pillButton]}
+            />
 
             <Pressable onPress={handleClear} hitSlop={8} style={styles.clearButton}>
               <Text style={styles.clearButtonText}>선택 안 함</Text>
@@ -211,41 +215,35 @@ const styles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: colors.background,
-    borderTopLeftRadius: borderRadius.lg,
-    borderTopRightRadius: borderRadius.lg,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
     paddingBottom: spacing.xl,
   },
   handle: {
     alignSelf: 'center',
-    width: 36,
+    width: 32,
     height: 4,
-    borderRadius: borderRadius.sm / 2,
-    backgroundColor: colors.border,
+    borderRadius: 2,
+    backgroundColor: '#CAC4D0',
     marginBottom: spacing.sm,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: -spacing.lg,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    marginHorizontal: -spacing.sm,
   },
-  title: {
-    ...typography.heading3,
-    color: colors.text.primary,
-  },
-  closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.surface,
+  backButton: {
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.text.primary,
   },
   wheelContainer: {
     flexDirection: 'row',
@@ -288,6 +286,9 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginTop: spacing.md,
+  },
+  pillButton: {
+    borderRadius: borderRadius.full,
   },
   clearButton: {
     alignSelf: 'center',

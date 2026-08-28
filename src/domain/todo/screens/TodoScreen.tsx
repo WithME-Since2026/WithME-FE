@@ -385,6 +385,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
         categories={categories}
         initialDateKey={createSheetInitialDateKey}
         onClose={() => setIsCreateSheetOpen(false)}
+        onAddCategory={() => navigation.navigate('CategoryCreate', undefined)}
       />
 
       <TodoDatePickerSheet
@@ -399,6 +400,7 @@ export function TodoScreen({ navigation }: TodoScreenProps) {
         todo={editingTodo}
         categories={categories}
         onClose={() => setEditingTodoId(null)}
+        onAddCategory={() => navigation.navigate('CategoryCreate', undefined)}
       />
 
       {undoToast && (

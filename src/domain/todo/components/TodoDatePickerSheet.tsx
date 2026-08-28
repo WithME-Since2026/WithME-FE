@@ -9,9 +9,9 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 import {
   formatDateKey,
   formatMonthLabel,
-  getMonthGrid,
+  getMondayStartMonthGrid,
   parseDateKey,
-  WEEKDAY_LABELS_KO,
+  WEEKDAY_LABELS_KO_MON_START,
 } from '@/common/utils/date';
 
 type TodoDatePickerSheetProps = {
@@ -21,7 +21,8 @@ type TodoDatePickerSheetProps = {
   onClose: () => void;
 };
 
-// "새 할 일" 시트의 날짜 행에서 열리는 달력 바텀시트 (Figma 6e 날짜 선택기)
+// "새 할 일" 시트의 날짜 행에서 열리는 달력 바텀시트 (Figma 784-19414)
+// 캘린더 메인뷰(MonthCalendarGrid)와 같은 월요일 시작 그리드·배지 스타일을 재사용해 톤을 맞춘다
 export function TodoDatePickerSheet({
   visible,
   selectedDateKey,
@@ -48,10 +49,10 @@ export function TodoDatePickerSheet({
   const month = viewDate.getMonth() + 1;
   const todayKey = formatDateKey(new Date());
 
-  const cells = getMonthGrid(year, month);
+  const cells = getMondayStartMonthGrid(year, month);
   const weeks = Array.from({ length: cells.length / 7 }, (_, index) =>
     cells.slice(index * 7, index * 7 + 7),
-  );
+  ).filter((week) => week.some((cell) => cell.isCurrentMonth));
 
   const handleChangeMonth = (offset: number) => {
     setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + offset, 1));
@@ -72,19 +73,20 @@ export function TodoDatePickerSheet({
             <View style={styles.handle} />
 
             <View style={styles.header}>
-              <Text style={styles.title}>날짜 선택</Text>
               <Pressable
-                style={styles.closeButton}
+                style={styles.backButton}
                 onPress={onClose}
                 hitSlop={8}
-                accessibilityLabel="닫기"
+                accessibilityLabel="뒤로"
               >
-                <Ionicons name="close" size={16} color={colors.text.secondary} />
+                <Ionicons name="chevron-back" size={20} color={colors.text.primary} />
               </Pressable>
+              <Text style={styles.title}>날짜 선택</Text>
             </View>
 
             <View style={styles.monthNavRow}>
               <Pressable
+                style={styles.navButton}
                 onPress={() => handleChangeMonth(-1)}
                 hitSlop={8}
                 accessibilityLabel="이전 달"
@@ -93,6 +95,7 @@ export function TodoDatePickerSheet({
               </Pressable>
               <Text style={styles.monthLabel}>{formatMonthLabel(year, month)}</Text>
               <Pressable
+                style={styles.navButton}
                 onPress={() => handleChangeMonth(1)}
                 hitSlop={8}
                 accessibilityLabel="다음 달"
@@ -102,10 +105,14 @@ export function TodoDatePickerSheet({
             </View>
 
             <View style={styles.weekdayRow}>
-              {WEEKDAY_LABELS_KO.map((label, index) => (
+              {WEEKDAY_LABELS_KO_MON_START.map((label, index) => (
                 <Text
                   key={label}
-                  style={[styles.weekdayLabel, (index === 0 || index === 6) && styles.weekendText]}
+                  style={[
+                    styles.weekdayLabel,
+                    index === 5 && styles.saturdayLabel,
+                    index === 6 && styles.sundayLabel,
+                  ]}
                 >
                   {label}
                 </Text>
@@ -115,9 +122,12 @@ export function TodoDatePickerSheet({
             {weeks.map((week) => (
               <View key={week[0].dateKey} style={styles.weekRow}>
                 {week.map((cell, columnIndex) => {
+                  if (!cell.isCurrentMonth) {
+                    return <View key={cell.dateKey} style={styles.cell} />;
+                  }
+
                   const isToday = cell.dateKey === todayKey;
                   const isSelected = cell.dateKey === tempDateKey;
-                  const isWeekend = columnIndex === 0 || columnIndex === 6;
 
                   return (
                     <Pressable
@@ -137,10 +147,9 @@ export function TodoDatePickerSheet({
                         <Text
                           style={[
                             styles.dayLabel,
-                            !cell.isCurrentMonth && styles.otherMonthText,
-                            isWeekend && cell.isCurrentMonth && styles.weekendText,
-                            isToday && !isSelected && styles.todayText,
-                            isSelected && styles.selectedText,
+                            columnIndex === 5 && styles.saturdayLabel,
+                            columnIndex === 6 && styles.sundayLabel,
+                            isSelected && styles.selectedLabel,
                           ]}
                         >
                           {cell.date.getDate()}
@@ -174,64 +183,65 @@ const styles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: colors.background,
-    borderTopLeftRadius: borderRadius.lg,
-    borderTopRightRadius: borderRadius.lg,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
     paddingBottom: spacing.xl,
   },
   handle: {
     alignSelf: 'center',
-    width: 36,
+    width: 32,
     height: 4,
-    borderRadius: borderRadius.sm / 2,
-    backgroundColor: colors.border,
+    borderRadius: 2,
+    backgroundColor: '#CAC4D0',
     marginBottom: spacing.sm,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: -spacing.lg,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    marginHorizontal: -spacing.sm,
   },
-  title: {
-    ...typography.heading3,
-    color: colors.text.primary,
-  },
-  closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.surface,
+  backButton: {
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.text.primary,
   },
   monthNavRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.md,
-    paddingHorizontal: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  navButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   monthLabel: {
-    ...typography.body1,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '500',
     color: colors.text.primary,
   },
   weekdayRow: {
     flexDirection: 'row',
     marginTop: spacing.sm,
+    paddingBottom: spacing.xs,
   },
   weekdayLabel: {
     flex: 1,
     textAlign: 'center',
     ...typography.caption,
-    fontSize: 10,
-    color: colors.text.secondary,
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#49454F',
   },
   weekRow: {
     flexDirection: 'row',
@@ -243,8 +253,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayBadge: {
-    width: 28,
-    height: 28,
+    width: 36,
+    height: 36,
     borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
@@ -253,28 +263,27 @@ const styles = StyleSheet.create({
     backgroundColor: `${colors.primary}1A`,
   },
   selectedBadge: {
+    borderRadius: borderRadius.md + 2,
     backgroundColor: colors.primary,
   },
   dayLabel: {
     ...typography.body2,
-    fontSize: 13,
+    fontSize: 14,
     color: colors.text.primary,
   },
-  otherMonthText: {
-    color: colors.text.disabled,
-  },
-  weekendText: {
+  saturdayLabel: {
     color: colors.weekend,
   },
-  todayText: {
-    color: colors.primary,
+  sundayLabel: {
+    color: colors.weekend,
     fontWeight: '700',
   },
-  selectedText: {
+  selectedLabel: {
     color: colors.background,
     fontWeight: '700',
   },
   confirmButton: {
     marginTop: spacing.md,
+    borderRadius: borderRadius.full,
   },
 });

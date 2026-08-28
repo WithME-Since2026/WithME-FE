@@ -1,8 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
-import type { CalendarCell } from '@/common/utils/date';
-import { formatDateKey, WEEKDAY_LABELS_KO } from '@/common/utils/date';
+import {
+  formatDateKey,
+  getMondayStartMonthGrid,
+  WEEKDAY_LABELS_KO_MON_START,
+} from '@/common/utils/date';
 
 import {
   CALENDAR_DESIGN_COLORS,
@@ -12,30 +15,6 @@ import {
 import type { CalendarEventResponse, CalendarLayerKey } from '@/domain/calendar/types';
 
 const MAX_DOTS_PER_DAY = 3;
-
-// WEEKDAY_LABELS_KO는 일요일 시작(일월화수목금토) 기준이라, 토·일이 오른쪽에 모이는
-// 피그마 디자인(월화수목금토일)에 맞춰 표시용 라벨만 월요일 시작 순서로 재배열함
-const DISPLAY_WEEKDAY_LABELS = [...WEEKDAY_LABELS_KO.slice(1), WEEKDAY_LABELS_KO[0]];
-
-// getMonthGrid는 일요일 시작 그리드라, 이미 짜여진 주(week) 배열을 단순히 앞칸을 뒤로 돌리면
-// (예: [일,월,...,토] → [월,...,토,일]) 그 "일"이 실제로는 그 주의 이전 일요일이라 날짜가
-// 한 주씩 밀려 보이는 문제가 생김. 그래서 월요일 시작 그리드를 처음부터 별도로 계산함
-function getMondayStartMonthGrid(year: number, month: number): CalendarCell[] {
-  const firstDayOfMonth = new Date(year, month - 1, 1);
-  const leadingOffset = (firstDayOfMonth.getDay() + 6) % 7;
-  const gridStart = new Date(year, month - 1, 1 - leadingOffset);
-
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(gridStart);
-    date.setDate(gridStart.getDate() + index);
-
-    return {
-      date,
-      dateKey: formatDateKey(date),
-      isCurrentMonth: date.getMonth() === month - 1,
-    };
-  });
-}
 
 type MonthCalendarGridProps = {
   year: number;
@@ -64,7 +43,7 @@ export function MonthCalendarGrid({
   return (
     <View style={styles.container}>
       <View style={styles.weekdayRow}>
-        {DISPLAY_WEEKDAY_LABELS.map((label, index) => (
+        {WEEKDAY_LABELS_KO_MON_START.map((label, index) => (
           <Text
             key={label}
             style={[
@@ -127,6 +106,7 @@ export function MonthCalendarGrid({
                       style={[
                         styles.dot,
                         {
+                          // 캘린더 점 색은 카테고리별이 아니라 레이어(모임/할 일/공휴일) 토글 색으로 통일
                           backgroundColor: CALENDAR_LAYERS.find((l) => l.key === event.type)
                             ?.dotColor,
                         },

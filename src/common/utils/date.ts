@@ -1,5 +1,8 @@
 export const WEEKDAY_LABELS_KO = ['일', '월', '화', '수', '목', '금', '토'];
 
+// 캘린더 화면들이 토·일을 오른쪽에 모아 보여주는 월요일 시작 레이아웃을 쓸 때 재사용하는 요일 라벨
+export const WEEKDAY_LABELS_KO_MON_START = [...WEEKDAY_LABELS_KO.slice(1), WEEKDAY_LABELS_KO[0]];
+
 export type CalendarCell = {
   date: Date;
   dateKey: string;
@@ -32,6 +35,25 @@ export function getMonthGrid(year: number, month: number): CalendarCell[] {
   // getDay(): 일요일=0 ~ 토요일=6, 일요일 시작 기준과 그대로 일치
   const leadingOffset = firstDayOfMonth.getDay();
 
+  const gridStart = new Date(year, month - 1, 1 - leadingOffset);
+
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(gridStart);
+    date.setDate(gridStart.getDate() + index);
+
+    return {
+      date,
+      dateKey: formatDateKey(date),
+      isCurrentMonth: date.getMonth() === month - 1,
+    };
+  });
+}
+
+// 월요일 시작 6주(42칸) 그리드. 토·일을 오른쪽에 모아 보여주는 캘린더 디자인 전용이며,
+// 그 외의 요일 순서 계산(예: formatDayDetailLabel)은 계속 getMonthGrid/WEEKDAY_LABELS_KO(일요일 시작)를 쓴다
+export function getMondayStartMonthGrid(year: number, month: number): CalendarCell[] {
+  const firstDayOfMonth = new Date(year, month - 1, 1);
+  const leadingOffset = (firstDayOfMonth.getDay() + 6) % 7;
   const gridStart = new Date(year, month - 1, 1 - leadingOffset);
 
   return Array.from({ length: 42 }, (_, index) => {

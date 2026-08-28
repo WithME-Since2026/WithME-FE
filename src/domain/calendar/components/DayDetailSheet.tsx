@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,6 +14,10 @@ type DayDetailSheetProps = {
   dateLabel: string;
   events: CalendarEventResponse[];
   onClose: () => void;
+  // "할 일 추가"/할 일 수정(⋯) — 실제 TodoCreateSheet·TodoEditSheet를 여는 건 화면(CalendarScreen)이
+  // 담당해 도메인 간 컴포넌트 직접 참조 없이 콜백으로만 연결한다
+  onAddTodo: () => void;
+  onEditTodo: (eventId: number) => void;
 };
 
 // 피그마(784-18713 등)에서만 쓰이는 뉴트럴/톤 컬러. 파란색 계열만 앱 메인 컬러(colors.primary) 기반으로 파생시킴
@@ -26,7 +30,14 @@ const HOLIDAY_SUBTITLE_COLOR = '#B91C1C';
 const TODO_CHIP_BG = `${CALENDAR_LAYER_COLORS.TODO}17`;
 
 // 날짜를 탭했을 때 뜨는 하단 시트. 그 날의 모임/할 일/공휴일을 종류별로 보여줌
-export function DayDetailSheet({ visible, dateLabel, events, onClose }: DayDetailSheetProps) {
+export function DayDetailSheet({
+  visible,
+  dateLabel,
+  events,
+  onClose,
+  onAddTodo,
+  onEditTodo,
+}: DayDetailSheetProps) {
   // TODO: 할 일 완료 상태는 백엔드 연동 전까지 시트 안에서만 유지되는 로컬 상태
   const [locallyCompletedIds, setLocallyCompletedIds] = useState<Set<number>>(new Set());
 
@@ -46,6 +57,11 @@ export function DayDetailSheet({ visible, dateLabel, events, onClose }: DayDetai
         .join(' · ') || '일정 없음';
 
   const isEmpty = events.length === 0;
+  // 피그마 시안(784-18713 h413px / 784-22544 h258px, 772px 기준)의 상태별 시트 높이 비율을 그대로 옮김.
+  // 날짜마다 일정 개수가 달라도 시트 높이는 상태별로 고정되고, 넘치는 내용은 아래 ScrollView가 담당한다
+  const isCompact =
+    isEmpty || (holidayEvents.length > 0 && groupEvents.length + todoEvents.length === 0);
+  const sheetHeight = isCompact ? '38%' : '58%';
 
   const handleToggleTodo = (eventId: number) => {
     setLocallyCompletedIds((prev) => {
@@ -64,7 +80,10 @@ export function DayDetailSheet({ visible, dateLabel, events, onClose }: DayDetai
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={(event) => event.stopPropagation()}>
+        <Pressable
+          style={[styles.sheet, { height: sheetHeight }]}
+          onPress={(event) => event.stopPropagation()}
+        >
           <View style={styles.dragHandleRow}>
             <View style={styles.dragHandle} />
           </View>
@@ -93,105 +112,124 @@ export function DayDetailSheet({ visible, dateLabel, events, onClose }: DayDetai
 
           <View style={styles.divider} />
 
-          {isEmpty ? (
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIconCircle}>
-                <Ionicons name="calendar-outline" size={26} color={colors.primary} />
+          <ScrollView style={styles.scrollArea} showsVerticalScrollIndicator={false}>
+            {isEmpty ? (
+              <View style={styles.emptyState}>
+                <View style={styles.emptyIconCircle}>
+                  <Ionicons name="calendar-outline" size={26} color={colors.primary} />
+                </View>
+                <Text style={styles.emptyTitle}>이 날은 비어있어요</Text>
+                <Text style={styles.emptySubtitle}>할 일을 추가해보세요</Text>
               </View>
-              <Text style={styles.emptyTitle}>이 날은 비어있어요</Text>
-              <Text style={styles.emptySubtitle}>할 일을 추가해보세요</Text>
-            </View>
-          ) : (
-            <View style={styles.body}>
-              {holidayEvents.map((event) => (
-                <View key={event.eventId} style={styles.holidayCard}>
-                  <View style={styles.holidayDot} />
-                  <View>
-                    <Text style={styles.holidayTitle}>{event.title}</Text>
-                    <Text style={styles.holidaySubtitle}>{event.badgeLabel}</Text>
-                  </View>
-                </View>
-              ))}
-
-              {groupEvents.map((event) => (
-                <View key={event.eventId} style={styles.groupCard}>
-                  <View style={styles.groupBar} />
-                  <View style={styles.groupContent}>
-                    <View style={styles.groupTopRow}>
-                      <View style={styles.groupBadge}>
-                        <Text style={styles.groupBadgeText}>WithME</Text>
-                      </View>
+            ) : (
+              <View style={styles.body}>
+                {holidayEvents.map((event) => (
+                  <View key={event.eventId} style={styles.holidayCard}>
+                    <View style={styles.holidayDot} />
+                    <View>
+                      <Text style={styles.holidayTitle}>{event.title}</Text>
+                      <Text style={styles.holidaySubtitle}>{event.badgeLabel}</Text>
                     </View>
-                    <Text style={styles.groupTitle}>{event.title}</Text>
-                    {event.time && (
-                      <View style={styles.groupMetaRow}>
-                        <Ionicons name="time-outline" size={11} color={colors.text.secondary} />
-                        <Text style={styles.groupMetaText}>{event.time}</Text>
-                      </View>
-                    )}
-                    {event.location && (
-                      <View style={styles.groupLocationRow}>
-                        <Ionicons name="location-outline" size={11} color={colors.text.secondary} />
-                        <Text style={styles.groupMetaText}>{event.location}</Text>
-                      </View>
-                    )}
                   </View>
-                </View>
-              ))}
+                ))}
 
-              {pendingTodos.length > 0 && (
-                <>
-                  <Text style={styles.sectionLabel}>할 일</Text>
-                  {pendingTodos.map((event) => (
-                    <View key={event.eventId} style={styles.todoCard}>
-                      <View style={styles.todoBar} />
-                      <View style={styles.todoContentRow}>
-                        <Pressable
-                          onPress={() => handleToggleTodo(event.eventId)}
-                          hitSlop={8}
-                          accessibilityLabel="할 일 완료 처리"
-                        >
-                          <View style={styles.todoCheckbox} />
-                        </Pressable>
-                        <View style={styles.todoTextGroup}>
-                          <Text style={styles.todoTitle}>{event.title}</Text>
-                          <View style={styles.todoChip}>
-                            <Text style={styles.todoChipText}>{event.badgeLabel}</Text>
-                          </View>
+                {groupEvents.map((event) => (
+                  <View key={event.eventId} style={styles.groupCard}>
+                    <View style={styles.groupBar} />
+                    <View style={styles.groupContent}>
+                      <View style={styles.groupTopRow}>
+                        <View style={styles.groupBadge}>
+                          <Text style={styles.groupBadgeText}>WithME</Text>
                         </View>
-                        <View style={styles.kebabButton}>
+                      </View>
+                      <Text style={styles.groupTitle}>{event.title}</Text>
+                      {event.time && (
+                        <View style={styles.groupMetaRow}>
+                          <Ionicons name="time-outline" size={11} color={colors.text.secondary} />
+                          <Text style={styles.groupMetaText}>{event.time}</Text>
+                        </View>
+                      )}
+                      {event.location && (
+                        <View style={styles.groupLocationRow}>
                           <Ionicons
-                            name="ellipsis-horizontal"
-                            size={18}
+                            name="location-outline"
+                            size={11}
                             color={colors.text.secondary}
                           />
+                          <Text style={styles.groupMetaText}>{event.location}</Text>
                         </View>
-                      </View>
+                      )}
                     </View>
-                  ))}
-                </>
-              )}
+                  </View>
+                ))}
 
-              {doneTodos.length > 0 && (
-                <>
-                  <Text style={styles.sectionLabel}>완료됨</Text>
-                  {doneTodos.map((event) => (
-                    <Pressable
-                      key={event.eventId}
-                      style={styles.doneTodoRow}
-                      onPress={() => handleToggleTodo(event.eventId)}
-                    >
-                      <Ionicons name="checkmark-circle" size={22} color={colors.success} />
-                      <Text style={[styles.todoTitle, styles.todoTitleDone]}>{event.title}</Text>
-                    </Pressable>
-                  ))}
-                </>
-              )}
-            </View>
-          )}
+                {pendingTodos.length > 0 && (
+                  <>
+                    <Text style={styles.sectionLabel}>할 일</Text>
+                    {pendingTodos.map((event) => {
+                      const categoryColor = event.color ?? CALENDAR_LAYER_COLORS.TODO;
+
+                      return (
+                        <View key={event.eventId} style={styles.todoCard}>
+                          <View style={[styles.todoBar, { backgroundColor: categoryColor }]} />
+                          <View style={styles.todoContentRow}>
+                            <Pressable
+                              onPress={() => handleToggleTodo(event.eventId)}
+                              hitSlop={8}
+                              accessibilityLabel="할 일 완료 처리"
+                            >
+                              <View style={[styles.todoCheckbox, { borderColor: categoryColor }]} />
+                            </Pressable>
+                            <View style={styles.todoTextGroup}>
+                              <Text style={styles.todoTitle}>{event.title}</Text>
+                              <View
+                                style={[styles.todoChip, { backgroundColor: `${categoryColor}17` }]}
+                              >
+                                <Text style={[styles.todoChipText, { color: categoryColor }]}>
+                                  {event.badgeLabel}
+                                </Text>
+                              </View>
+                            </View>
+                            <Pressable
+                              style={styles.kebabButton}
+                              onPress={() => onEditTodo(event.eventId)}
+                              hitSlop={8}
+                              accessibilityLabel="할 일 수정"
+                            >
+                              <Ionicons
+                                name="ellipsis-horizontal"
+                                size={18}
+                                color={colors.text.secondary}
+                              />
+                            </Pressable>
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </>
+                )}
+
+                {doneTodos.length > 0 && (
+                  <>
+                    <Text style={styles.sectionLabel}>완료됨</Text>
+                    {doneTodos.map((event) => (
+                      <Pressable
+                        key={event.eventId}
+                        style={styles.doneTodoRow}
+                        onPress={() => handleToggleTodo(event.eventId)}
+                      >
+                        <Ionicons name="checkmark-circle" size={22} color={colors.success} />
+                        <Text style={[styles.todoTitle, styles.todoTitleDone]}>{event.title}</Text>
+                      </Pressable>
+                    ))}
+                  </>
+                )}
+              </View>
+            )}
+          </ScrollView>
 
           <View style={styles.footer}>
-            <Pressable style={styles.addButton} hitSlop={8}>
+            <Pressable style={styles.addButton} onPress={onAddTodo} hitSlop={8}>
               <Ionicons name="add" size={18} color={colors.background} />
               <Text style={styles.addButtonText}>할 일 추가</Text>
             </Pressable>
@@ -212,7 +250,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    maxHeight: '75%',
   },
   dragHandleRow: {
     alignItems: 'center',
@@ -262,6 +299,9 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: DIVIDER_COLOR,
     marginTop: 12,
+  },
+  scrollArea: {
+    flex: 1,
   },
   emptyState: {
     alignItems: 'center',

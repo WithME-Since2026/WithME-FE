@@ -26,6 +26,10 @@ import { MonthCalendarGrid } from '@/domain/calendar/components/MonthCalendarGri
 import { CALENDAR_DESIGN_COLORS } from '@/domain/calendar/constants/calendarLayers';
 import { useCalendarMonthQuery } from '@/domain/calendar/hooks/useCalendarMonthQuery';
 import type { CalendarEventResponse, CalendarLayerKey } from '@/domain/calendar/types';
+import { TodoCreateSheet } from '@/domain/todo/components/TodoCreateSheet';
+import { TodoEditSheet } from '@/domain/todo/components/TodoEditSheet';
+import { useTodoCategoriesQuery } from '@/domain/todo/hooks/useTodoCategoriesQuery';
+import { useTodoListQuery } from '@/domain/todo/hooks/useTodoListQuery';
 
 type CalendarScreenProps = NativeStackScreenProps<RootStackParamList, 'Calendar'>;
 
@@ -35,10 +39,14 @@ const DEFAULT_ENABLED_LAYERS: Record<CalendarLayerKey, boolean> = {
   HOLIDAY: false,
 };
 
+// domain/todo의 실제 할 일과 domain/calendar의 mock 이벤트가 서로 다른 id 체계를 쓰기 때문에
+// 캘린더 이벤트 id와 겹치지 않도록 큰 오프셋을 더해 구분한다
+const TODO_EVENT_ID_OFFSET = 1_000_000;
+
 const today = new Date();
 
 // 모임 일정 + 할 일 마감을 한 화면에서 보여주는 통합 캘린더뷰. 레이어 토글로 항목별 표시 여부를 제어함
-export function CalendarScreen(_props: CalendarScreenProps) {
+export function CalendarScreen({ navigation }: CalendarScreenProps) {
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(formatDateKey(today));
@@ -46,19 +54,42 @@ export function CalendarScreen(_props: CalendarScreenProps) {
     useState<Record<CalendarLayerKey, boolean>>(DEFAULT_ENABLED_LAYERS);
   const [isLayerModalOpen, setIsLayerModalOpen] = useState(false);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
+  const [isTodoCreateSheetOpen, setIsTodoCreateSheetOpen] = useState(false);
+  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
 
   const { data: monthData, isLoading, isError } = useCalendarMonthQuery(currentYear, currentMonth);
+  const { data: categories } = useTodoCategoriesQuery();
+  const { data: todoListData } = useTodoListQuery();
 
   const eventsByDateKey = useMemo(() => {
     const map = new Map<string, CalendarEventResponse[]>();
 
-    monthData?.events.forEach((event) => {
+    const addEvent = (event: CalendarEventResponse) => {
       const existing = map.get(event.date) ?? [];
       map.set(event.date, [...existing, event]);
+    };
+
+    monthData?.events.forEach(addEvent);
+
+    // "할 일 추가" 시트로 만든 할 일이 캘린더에도 바로 보이도록 domain/todo의 실제 목록을 합쳐서 보여준다.
+    // TODO: 백엔드가 캘린더/할 일 API를 통합하기 전까지는 이렇게 화면에서 두 mock 데이터를 합치는 임시 방편이다
+    todoListData?.todos.forEach((todo) => {
+      const category = categories?.find((item) => item.categoryId === todo.categoryId);
+
+      addEvent({
+        eventId: TODO_EVENT_ID_OFFSET + todo.todoId,
+        type: 'TODO',
+        title: todo.title,
+        date: todo.dueDate,
+        time: todo.dueTime ?? null,
+        badgeLabel: category?.categoryName ?? 'Todo',
+        location: null,
+        color: category?.categoryColor ?? null,
+      });
     });
 
     return map;
-  }, [monthData]);
+  }, [monthData, todoListData, categories]);
 
   const selectedDayEvents = useMemo(() => {
     if (!selectedDateKey) {
@@ -69,6 +100,17 @@ export function CalendarScreen(_props: CalendarScreenProps) {
       .filter((event) => enabledLayers[event.type])
       .sort((a, b) => parseKoreanTimeToMinutes(a.time) - parseKoreanTimeToMinutes(b.time));
   }, [eventsByDateKey, selectedDateKey, enabledLayers]);
+
+  const editingTodo = todoListData?.todos.find((todo) => todo.todoId === editingTodoId) ?? null;
+
+  const handleEditTodo = (eventId: number) => {
+    // TODO_EVENT_ID_OFFSET 미만이면 mockCalendarData 자체의 예시 이벤트라 실제 할 일이 아니므로 무시한다
+    if (eventId < TODO_EVENT_ID_OFFSET) {
+      return;
+    }
+
+    setEditingTodoId(eventId - TODO_EVENT_ID_OFFSET);
+  };
 
   const handleToggleLayer = (key: CalendarLayerKey) => {
     setEnabledLayers((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -182,6 +224,24 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         dateLabel={selectedDateKey ? formatDayDetailLabel(parseDateKey(selectedDateKey)) : ''}
         events={selectedDayEvents}
         onClose={() => setSelectedDateKey(null)}
+        onAddTodo={() => setIsTodoCreateSheetOpen(true)}
+        onEditTodo={handleEditTodo}
+      />
+
+      <TodoCreateSheet
+        visible={isTodoCreateSheetOpen}
+        categories={categories ?? []}
+        initialDateKey={selectedDateKey ?? formatDateKey(today)}
+        onClose={() => setIsTodoCreateSheetOpen(false)}
+        onAddCategory={() => navigation.navigate('CategoryCreate', undefined)}
+      />
+
+      <TodoEditSheet
+        visible={editingTodoId !== null}
+        todo={editingTodo}
+        categories={categories ?? []}
+        onClose={() => setEditingTodoId(null)}
+        onAddCategory={() => navigation.navigate('CategoryCreate', undefined)}
       />
     </SafeAreaView>
   );
