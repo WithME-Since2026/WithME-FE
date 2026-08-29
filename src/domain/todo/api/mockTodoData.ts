@@ -1,7 +1,6 @@
 import { formatDateKey } from '@/common/utils/date';
 
 import type {
-  CompleteTodoRequest,
   CreateTodoRequest,
   TodoListResponse,
   TodoResponse,
@@ -128,13 +127,6 @@ export function createMockTodo(request: CreateTodoRequest): TodoResponse {
   return todo;
 }
 
-// 카테고리 삭제 시 BE(Todo.changeCategory)와 동일하게 해당 todo들의 카테고리를 해제한다
-export function clearMockTodosCategory(categoryId: number): void {
-  mockTodos = mockTodos.map((todo) =>
-    todo.categoryId === categoryId ? { ...todo, categoryId: null } : todo,
-  );
-}
-
 function findMockTodoOrThrow(todoId: number): TodoResponse {
   const target = mockTodos.find((todo) => todo.todoId === todoId);
   if (!target) {
@@ -160,13 +152,6 @@ export function updateMockTodo(request: UpdateTodoRequest): TodoResponse {
     categoryId: request.categoryId !== undefined ? request.categoryId : target.categoryId,
     notificationStatus: request.notificationStatus ?? target.notificationStatus,
   });
-}
-
-// PATCH /api/v1/todo/completion (아직 미구현, 백엔드 API 추천 참고)
-export function completeMockTodo(request: CompleteTodoRequest): TodoResponse {
-  const target = findMockTodoOrThrow(request.todoId);
-
-  return replaceMockTodo({ ...target, completed: request.completed });
 }
 
 // PATCH /api/v1/todo/date (아직 미구현, 백엔드 API 추천 참고)

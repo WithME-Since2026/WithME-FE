@@ -46,7 +46,7 @@ const TODO_EVENT_ID_OFFSET = 1_000_000;
 const today = new Date();
 
 // 모임 일정 + 할 일 마감을 한 화면에서 보여주는 통합 캘린더뷰. 레이어 토글로 항목별 표시 여부를 제어함
-export function CalendarScreen({ navigation }: CalendarScreenProps) {
+export function CalendarScreen(_props: CalendarScreenProps) {
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(formatDateKey(today));
@@ -233,7 +233,6 @@ export function CalendarScreen({ navigation }: CalendarScreenProps) {
         categories={categories ?? []}
         initialDateKey={selectedDateKey ?? formatDateKey(today)}
         onClose={() => setIsTodoCreateSheetOpen(false)}
-        onAddCategory={() => navigation.navigate('CategoryCreate', undefined)}
       />
 
       <TodoEditSheet
@@ -241,7 +240,6 @@ export function CalendarScreen({ navigation }: CalendarScreenProps) {
         todo={editingTodo}
         categories={categories ?? []}
         onClose={() => setEditingTodoId(null)}
-        onAddCategory={() => navigation.navigate('CategoryCreate', undefined)}
       />
     </SafeAreaView>
   );

@@ -2,7 +2,6 @@ import { apiClient } from '@/common/api/apiClient';
 import type { ApiResponse } from '@/common/types/api';
 
 import {
-  completeMockTodo,
   createMockTodo,
   deleteMockTodo,
   getMockTodoList,
@@ -10,7 +9,6 @@ import {
   updateMockTodoDate,
 } from '@/domain/todo/api/mockTodoData';
 import type {
-  CompleteTodoRequest,
   CreateTodoRequest,
   TodoListResponse,
   TodoResponse,
@@ -47,20 +45,6 @@ export async function updateTodo(request: UpdateTodoRequest) {
   }
 
   const response = await apiClient.patch<ApiResponse<TodoResponse>>('/api/v1/todo', request);
-
-  return response.data.data;
-}
-
-// TODO: BE에 아직 완료 처리 엔드포인트가 없음 (계획된 PATCH /api/v1/todo/completion, 백엔드 API 추천 참고)
-export async function completeTodo(request: CompleteTodoRequest) {
-  if (__DEV__) {
-    return completeMockTodo(request);
-  }
-
-  const response = await apiClient.patch<ApiResponse<TodoResponse>>(
-    '/api/v1/todo/completion',
-    request,
-  );
 
   return response.data.data;
 }

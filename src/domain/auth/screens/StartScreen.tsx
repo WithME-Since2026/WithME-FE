@@ -65,8 +65,8 @@ export function StartScreen({ navigation }: StartScreenProps) {
           {__DEV__ && (
             <View style={styles.devSection}>
               <Text style={styles.devLabel}>[dev] 로그인 없이 화면 바로가기</Text>
-              <Pressable onPress={() => navigation.navigate('Todo')} hitSlop={8}>
-                <Text style={styles.devLink}>[dev] Todo 화면 바로가기</Text>
+              <Pressable onPress={() => navigation.navigate('Calendar')} hitSlop={8}>
+                <Text style={styles.devLink}>[dev] 캘린더 화면 바로가기</Text>
               </Pressable>
             </View>
           )}

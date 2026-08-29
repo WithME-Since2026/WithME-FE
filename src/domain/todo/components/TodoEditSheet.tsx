@@ -21,8 +21,9 @@ type TodoEditSheetProps = {
   todo: TodoResponse | null;
   categories: TodoCategoryResponse[];
   onClose: () => void;
-  // "+" 칩을 눌렀을 때 카테고리 생성 화면으로 이동시키기 위한 콜백 (내비게이션은 화면 쪽에서 담당)
-  onAddCategory: () => void;
+  // "+" 칩을 눌렀을 때 카테고리 생성 화면으로 이동시키기 위한 콜백 (내비게이션은 화면 쪽에서 담당).
+  // 카테고리 생성 화면이 아직 없어 전달하지 않으면 "+" 칩 자체를 숨긴다
+  onAddCategory?: () => void;
 };
 
 function formatDateRowLabel(dateKey: string) {
@@ -184,13 +185,15 @@ export function TodoEditSheet({
                         </Pressable>
                       );
                     })}
-                    <Pressable
-                      style={styles.addChipButton}
-                      onPress={onAddCategory}
-                      accessibilityLabel="카테고리 추가"
-                    >
-                      <Ionicons name="add" size={15} color={colors.text.secondary} />
-                    </Pressable>
+                    {onAddCategory && (
+                      <Pressable
+                        style={styles.addChipButton}
+                        onPress={onAddCategory}
+                        accessibilityLabel="카테고리 추가"
+                      >
+                        <Ionicons name="add" size={15} color={colors.text.secondary} />
+                      </Pressable>
+                    )}
                   </View>
                 </View>
 

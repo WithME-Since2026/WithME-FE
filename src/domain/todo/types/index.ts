@@ -47,12 +47,6 @@ export type UpdateTodoRequest = {
   notificationStatus?: boolean;
 };
 
-// PATCH /api/v1/todo/completion — todo 완료처리 전용 엔드포인트 (아직 미구현, 백엔드 API 추천 참고)
-export type CompleteTodoRequest = {
-  todoId: number;
-  completed: boolean;
-};
-
 // PATCH /api/v1/todo/date — todo 날짜 수정 전용 엔드포인트 (아직 미구현, 백엔드 API 추천 참고)
 export type UpdateTodoDateRequest = {
   todoId: number;
@@ -60,19 +54,4 @@ export type UpdateTodoDateRequest = {
   // FE 전용 필드. BE에 시간 컬럼이 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
   dueTime?: string | null;
   isPostponed?: boolean;
-};
-
-// yooze.withme.domain.todo.dto.request.CreateCategoryRequest 기준 (POST /api/v1/todo/category)
-export type CreateCategoryRequest = {
-  categoryName: string;
-  categoryColor: string; // '#RRGGBB'
-};
-
-// yooze.withme.domain.todo.dto.request.UpdateCategoryRequest 기준 (PATCH /api/v1/todo/category)
-// null인 필드는 "변경하지 않음"을 의미
-export type UpdateCategoryRequest = {
-  categoryId: number;
-  categoryName?: string;
-  categoryColor?: string;
-  sortOrder?: number;
 };
