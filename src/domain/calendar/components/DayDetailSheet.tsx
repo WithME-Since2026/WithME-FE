@@ -78,7 +78,8 @@ export function DayDetailSheet({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    // 아래에서 슬라이드 업되는 느낌 대신 표준 화면 전환처럼 자연스럽게 나타나도록 fade 사용
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable
           style={[styles.sheet, { height: sheetHeight }]}

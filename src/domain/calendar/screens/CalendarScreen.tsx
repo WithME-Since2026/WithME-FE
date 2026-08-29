@@ -49,7 +49,8 @@ const today = new Date();
 export function CalendarScreen(_props: CalendarScreenProps) {
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
-  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(formatDateKey(today));
+  // 진입 시 오늘 날짜 시트가 바로 뜨지 않고 달력이 보이도록 선택 없음 상태로 시작
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
   const [enabledLayers, setEnabledLayers] =
     useState<Record<CalendarLayerKey, boolean>>(DEFAULT_ENABLED_LAYERS);
   const [isLayerModalOpen, setIsLayerModalOpen] = useState(false);
