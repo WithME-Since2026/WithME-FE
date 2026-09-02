@@ -26,6 +26,7 @@ import { MonthCalendarGrid } from '@/domain/calendar/components/MonthCalendarGri
 import { CALENDAR_DESIGN_COLORS } from '@/domain/calendar/constants/calendarLayers';
 import { useCalendarMonthQuery } from '@/domain/calendar/hooks/useCalendarMonthQuery';
 import type { CalendarEventResponse, CalendarLayerKey } from '@/domain/calendar/types';
+import { CategoryManageSheet } from '@/domain/todo/components/CategoryManageSheet';
 import { TodoCreateSheet } from '@/domain/todo/components/TodoCreateSheet';
 import { TodoEditSheet } from '@/domain/todo/components/TodoEditSheet';
 import { useTodoCategoriesQuery } from '@/domain/todo/hooks/useTodoCategoriesQuery';
@@ -57,6 +58,7 @@ export function CalendarScreen(_props: CalendarScreenProps) {
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isTodoCreateSheetOpen, setIsTodoCreateSheetOpen] = useState(false);
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
+  const [isCategoryManageOpen, setIsCategoryManageOpen] = useState(false);
 
   const { data: monthData, isLoading, isError } = useCalendarMonthQuery(currentYear, currentMonth);
   const { data: categories } = useTodoCategoriesQuery();
@@ -234,6 +236,7 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         categories={categories ?? []}
         initialDateKey={selectedDateKey ?? formatDateKey(today)}
         onClose={() => setIsTodoCreateSheetOpen(false)}
+        onAddCategory={() => setIsCategoryManageOpen(true)}
       />
 
       <TodoEditSheet
@@ -241,6 +244,13 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         todo={editingTodo}
         categories={categories ?? []}
         onClose={() => setEditingTodoId(null)}
+        onAddCategory={() => setIsCategoryManageOpen(true)}
+      />
+
+      <CategoryManageSheet
+        visible={isCategoryManageOpen}
+        categories={categories ?? []}
+        onClose={() => setIsCategoryManageOpen(false)}
       />
     </SafeAreaView>
   );

@@ -27,6 +27,29 @@ export type TodoCategoryResponse = {
 
 export type TodoCategoryFilter = 'ALL' | number; // number = categoryId
 
+// yooze.withme.domain.todo.dto.response.CategoryResponse 기준 (카테고리 생성/수정 응답 — 목록 응답과 달리 todoCount가 없다)
+export type CategoryResponse = {
+  categoryId: number;
+  categoryName: string;
+  categoryColor: string;
+  sortOrder: number;
+};
+
+// yooze.withme.domain.todo.dto.request.CreateCategoryRequest 기준 (POST /api/v1/todo/category)
+export type CreateCategoryRequest = {
+  categoryName: string;
+  categoryColor: string; // '#RRGGBB'
+};
+
+// yooze.withme.domain.todo.dto.request.UpdateCategoryRequest 기준 (PATCH /api/v1/todo/category)
+// categoryName/categoryColor/sortOrder는 undefined면 기존 값 유지 (BE의 strip 로직과 동일하게 null은 보내지 않는다)
+export type UpdateCategoryRequest = {
+  categoryId: number;
+  categoryName?: string;
+  categoryColor?: string;
+  sortOrder?: number;
+};
+
 // yooze.withme.domain.todo.dto.request.CreateTodoRequest 기준 (POST /api/v1/todo)
 export type CreateTodoRequest = {
   title: string;
