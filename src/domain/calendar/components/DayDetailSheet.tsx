@@ -14,10 +14,10 @@ type DayDetailSheetProps = {
   dateLabel: string;
   events: CalendarEventResponse[];
   onClose: () => void;
-  // "할 일 추가"/할 일 수정(⋯) — 실제 TodoCreateSheet·TodoEditSheet를 여는 건 화면(CalendarScreen)이
-  // 담당해 도메인 간 컴포넌트 직접 참조 없이 콜백으로만 연결한다
+  // "할 일 추가"/"⋯" 빠른 날짜 변경 팝업 — 실제 TodoCreateSheet·TodoQuickActionSheet를 여는 건
+  // 화면(CalendarScreen)이 담당해 도메인 간 컴포넌트 직접 참조 없이 콜백으로만 연결한다
   onAddTodo: () => void;
-  onEditTodo: (eventId: number) => void;
+  onOpenTodoActions: (eventId: number) => void;
 };
 
 // 피그마(784-18713 등)에서만 쓰이는 뉴트럴/톤 컬러. 파란색 계열만 앱 메인 컬러(colors.primary) 기반으로 파생시킴
@@ -36,7 +36,7 @@ export function DayDetailSheet({
   events,
   onClose,
   onAddTodo,
-  onEditTodo,
+  onOpenTodoActions,
 }: DayDetailSheetProps) {
   // TODO: 할 일 완료 상태는 백엔드 연동 전까지 시트 안에서만 유지되는 로컬 상태
   const [locallyCompletedIds, setLocallyCompletedIds] = useState<Set<number>>(new Set());
@@ -193,9 +193,9 @@ export function DayDetailSheet({
                             </View>
                             <Pressable
                               style={styles.kebabButton}
-                              onPress={() => onEditTodo(event.eventId)}
+                              onPress={() => onOpenTodoActions(event.eventId)}
                               hitSlop={8}
-                              accessibilityLabel="할 일 수정"
+                              accessibilityLabel="할 일 옵션"
                             >
                               <Ionicons
                                 name="ellipsis-horizontal"

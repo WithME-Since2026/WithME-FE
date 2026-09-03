@@ -5,16 +5,20 @@ import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 
 import { Button } from '@/common/components/Button';
-import { ConfirmModal } from '@/common/components/ConfirmModal';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 import { formatMonthLabel, parseDateKey } from '@/common/utils/date';
 
 import { TodoDatePickerSheet } from '@/domain/todo/components/TodoDatePickerSheet';
+import { TodoRecurrenceSheet } from '@/domain/todo/components/TodoRecurrenceSheet';
 import { TodoTimePickerSheet } from '@/domain/todo/components/TodoTimePickerSheet';
-import { useDeleteTodoMutation } from '@/domain/todo/hooks/useDeleteTodoMutation';
+import {
+  createMonthlyRecurrence,
+  createWeeklyRecurrence,
+  formatRecurrenceSummary,
+} from '@/domain/todo/constants/recurrence';
 import { useUpdateTodoDateMutation } from '@/domain/todo/hooks/useUpdateTodoDateMutation';
 import { useUpdateTodoMutation } from '@/domain/todo/hooks/useUpdateTodoMutation';
-import type { TodoCategoryResponse, TodoResponse } from '@/domain/todo/types';
+import type { TodoCategoryResponse, TodoRecurrenceRule, TodoResponse } from '@/domain/todo/types';
 
 type TodoEditSheetProps = {
   visible: boolean;
@@ -45,9 +49,10 @@ export function TodoEditSheet({
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [dueDateKey, setDueDateKey] = useState('');
   const [timeLabel, setTimeLabel] = useState<string | null>(null);
+  const [recurrence, setRecurrence] = useState<TodoRecurrenceRule | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
-  const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+  const [isRecurrenceSheetOpen, setIsRecurrenceSheetOpen] = useState(false);
 
   const {
     mutateAsync: updateTodo,
@@ -62,14 +67,13 @@ export function TodoEditSheet({
   const isPending = isUpdatingTodo || isUpdatingDate;
   const isError = isUpdateError || isDateError;
 
-  const { mutate: deleteTodo, isPending: isDeleting } = useDeleteTodoMutation();
-
   useEffect(() => {
     if (visible && todo) {
       setTitle(todo.title);
       setCategoryId(todo.categoryId);
       setDueDateKey(todo.dueDate);
       setTimeLabel(todo.dueTime ?? null);
+      setRecurrence(todo.recurrence ?? null);
     }
   }, [visible, todo]);
 
@@ -92,7 +96,7 @@ export function TodoEditSheet({
     try {
       // 제목/카테고리와 날짜/시간은 BE 계획상 서로 다른 엔드포인트(PATCH /todo, PATCH /todo/date)라 나눠 보낸다
       await Promise.all([
-        updateTodo({ todoId: todo.todoId, title: trimmedTitle, categoryId }),
+        updateTodo({ todoId: todo.todoId, title: trimmedTitle, categoryId, recurrence }),
         updateTodoDate({
           todoId: todo.todoId,
           dueDate: dueDateKey,
@@ -106,14 +110,16 @@ export function TodoEditSheet({
     }
   };
 
-  const handleConfirmDelete = () => {
-    setIsDeleteConfirmVisible(false);
-    deleteTodo(todo.todoId, { onSuccess: onClose });
-  };
-
   return (
     <>
-      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      {/* "맞춤 반복" 시트가 열려 있는 동안엔 이 Modal을 잠깐 숨긴다. 두 개의 <Modal>이 동시에 떠 있으면
+          위(TodoRecurrenceSheet)의 TextInput(횟수 입력)이 포커스를 못 잡는 문제가 있다 */}
+      <Modal
+        visible={visible && !isRecurrenceSheetOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
         <View style={styles.modalRoot}>
           <Pressable style={styles.backdrop} onPress={onClose} />
 
@@ -214,17 +220,83 @@ export function TodoEditSheet({
                     <Ionicons name="chevron-forward" size={16} color={colors.text.secondary} />
                   </View>
                 </Pressable>
-              </View>
 
-              <Pressable
-                style={styles.deleteButton}
-                onPress={() => setIsDeleteConfirmVisible(true)}
-                disabled={isDeleting}
-                hitSlop={8}
-              >
-                <Ionicons name="trash-outline" size={16} color={colors.error} />
-                <Text style={styles.deleteButtonText}>할 일 삭제</Text>
-              </Pressable>
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>반복</Text>
+                  <View style={styles.chipRow}>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        !recurrence && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setRecurrence(null)}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          !recurrence && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        안 함
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        recurrence?.frequency === 'WEEKLY' && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setRecurrence(createWeeklyRecurrence(dueDateKey))}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          recurrence?.frequency === 'WEEKLY' && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        매주
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        recurrence?.frequency === 'MONTHLY' && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setRecurrence(createMonthlyRecurrence())}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          recurrence?.frequency === 'MONTHLY' && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        매월
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        recurrence?.frequency === 'CUSTOM' && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setIsRecurrenceSheetOpen(true)}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          recurrence?.frequency === 'CUSTOM' && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        {recurrence?.frequency === 'CUSTOM'
+                          ? formatRecurrenceSummary(recurrence)
+                          : '맞춤'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
 
               <View style={styles.footer}>
                 <Pressable style={styles.cancelButton} onPress={onClose}>
@@ -257,11 +329,12 @@ export function TodoEditSheet({
         onClose={() => setIsTimePickerOpen(false)}
       />
 
-      <ConfirmModal
-        visible={isDeleteConfirmVisible}
-        message="할 일을 정말 삭제하실건가요?"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setIsDeleteConfirmVisible(false)}
+      <TodoRecurrenceSheet
+        visible={isRecurrenceSheetOpen}
+        initialRule={recurrence?.frequency === 'CUSTOM' ? recurrence : null}
+        dueDateKey={dueDateKey}
+        onConfirm={setRecurrence}
+        onClose={() => setIsRecurrenceSheetOpen(false)}
       />
     </>
   );
@@ -366,7 +439,25 @@ const styles = StyleSheet.create({
   chipLabel: {
     fontSize: 13,
     fontWeight: '500',
+    lineHeight: 16,
     color: '#49454F',
+    // Android는 폰트 자체에 상하 여백(font padding)이 붙어 텍스트가 배경 박스 중앙에서 아래로
+    // 밀려 보인다 — 안 함/매주/매월/맞춤 칩처럼 텍스트 한 줄만 있는 버튼에서 특히 도드라짐
+    includeFontPadding: false,
+  },
+  // chip은 카테고리 칩(점+체크 아이콘이 앞에 붙는)에 맞춘 비대칭 좌우 패딩(paddingLeft/paddingRight)이라,
+  // paddingHorizontal로는 덮어써지지 않는다 — RN(Yoga)이 paddingLeft/paddingRight 같은 구체적인
+  // 값을 paddingHorizontal보다 항상 우선하기 때문에 반드시 같은 이름(paddingLeft/paddingRight)으로 덮어써야 한다
+  recurrenceChip: {
+    paddingLeft: 12,
+    paddingRight: 12,
+  },
+  recurrenceChipSelected: {
+    backgroundColor: `${colors.primary}14`,
+    borderColor: colors.primary,
+  },
+  recurrenceChipLabelSelected: {
+    color: colors.primary,
   },
   addChipButton: {
     width: 32,
@@ -393,19 +484,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: colors.text.disabled,
-  },
-  deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.xs,
-    paddingVertical: spacing.sm,
-  },
-  deleteButtonText: {
-    ...typography.body2,
-    fontWeight: '600',
-    color: colors.error,
   },
   footer: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import { formatDateKey } from '@/common/utils/date';
+import { formatDateKey, parseDateKey } from '@/common/utils/date';
 
 import type {
   CreateTodoRequest,
@@ -28,6 +28,7 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: null,
       isPostponed: false,
+      recurrence: null,
     },
     {
       todoId: 2,
@@ -38,6 +39,7 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: '오후 2:00',
       isPostponed: false,
+      recurrence: null,
     },
     {
       todoId: 3,
@@ -48,6 +50,13 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: '오전 10:00',
       isPostponed: false,
+      recurrence: {
+        frequency: 'WEEKLY',
+        interval: 1,
+        unit: 'WEEK',
+        weekdays: [parseDateKey(offsetDay(0)).getDay()],
+        end: { type: 'NEVER' },
+      },
     },
     {
       todoId: 4,
@@ -58,6 +67,7 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: '오후 6:00',
       isPostponed: false,
+      recurrence: null,
     },
     {
       todoId: 5,
@@ -68,6 +78,7 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: null,
       isPostponed: false,
+      recurrence: null,
     },
     {
       todoId: 6,
@@ -78,6 +89,7 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: null,
       isPostponed: false,
+      recurrence: null,
     },
     {
       todoId: 7,
@@ -88,6 +100,7 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: null,
       isPostponed: false,
+      recurrence: null,
     },
     {
       todoId: 8,
@@ -98,6 +111,7 @@ function buildInitialMockTodos(): TodoResponse[] {
       notificationStatus: false,
       dueTime: null,
       isPostponed: false,
+      recurrence: null,
     },
   ];
 }
@@ -120,6 +134,7 @@ export function createMockTodo(request: CreateTodoRequest): TodoResponse {
     notificationStatus: request.notificationStatus,
     dueTime: request.dueTime,
     isPostponed: false,
+    recurrence: request.recurrence,
   };
 
   mockTodos = [...mockTodos, todo];
@@ -151,6 +166,7 @@ export function updateMockTodo(request: UpdateTodoRequest): TodoResponse {
     title: request.title ?? target.title,
     categoryId: request.categoryId !== undefined ? request.categoryId : target.categoryId,
     notificationStatus: request.notificationStatus ?? target.notificationStatus,
+    recurrence: request.recurrence !== undefined ? request.recurrence : target.recurrence,
   });
 }
 

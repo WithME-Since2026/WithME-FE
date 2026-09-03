@@ -10,6 +10,8 @@ export type TodoResponse = {
   dueTime?: string | null;
   // FE 전용 필드. 롱프레스 미루기로 날짜가 바뀐 항목인지 표시 (BE에 미루기 이력이 없어 mock 상태로만 유지)
   isPostponed?: boolean;
+  // FE 전용 필드. BE에 반복 관련 필드가 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
+  recurrence?: TodoRecurrenceRule | null;
 };
 
 export type TodoListResponse = {
@@ -58,6 +60,8 @@ export type CreateTodoRequest = {
   notificationStatus: boolean;
   // FE 전용 필드. BE에 시간 컬럼이 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
   dueTime: string | null;
+  // FE 전용 필드. BE에 반복 관련 필드가 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
+  recurrence: TodoRecurrenceRule | null;
 };
 
 // PATCH /api/v1/todo — 제목/카테고리/알림처럼 일반 수정을 담당한다.
@@ -68,6 +72,8 @@ export type UpdateTodoRequest = {
   title?: string;
   categoryId?: number | null;
   notificationStatus?: boolean;
+  // FE 전용 필드. BE에 반복 관련 필드가 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
+  recurrence?: TodoRecurrenceRule | null;
 };
 
 // PATCH /api/v1/todo/date — todo 날짜 수정 전용 엔드포인트 (아직 미구현, 백엔드 API 추천 참고)
@@ -77,4 +83,21 @@ export type UpdateTodoDateRequest = {
   // FE 전용 필드. BE에 시간 컬럼이 없어 __DEV__ mock에만 저장된다 (백엔드 API 추천 참고)
   dueTime?: string | null;
   isPostponed?: boolean;
+};
+
+// FE 전용 반복 규칙. BE에 반복 관련 필드/API가 전혀 없어 dueTime과 동일하게 __DEV__ mock에만 저장되고
+// 새로고침 시 초기화된다 (백엔드 API 추천 참고). "안 함"은 recurrence를 null/undefined로 표현한다
+export type TodoRecurrenceFrequency = 'WEEKLY' | 'MONTHLY' | 'CUSTOM';
+export type TodoRecurrenceUnit = 'DAY' | 'WEEK' | 'MONTH';
+export type TodoRecurrenceEnd =
+  | { type: 'NEVER' }
+  | { type: 'ON_DATE'; date: string } // 'YYYY-MM-DD'
+  | { type: 'AFTER_COUNT'; count: number };
+
+export type TodoRecurrenceRule = {
+  frequency: TodoRecurrenceFrequency;
+  interval: number; // 매 N. '매주'/'매월' 칩은 항상 1이고 '맞춤'만 사용자가 조절한다
+  unit: TodoRecurrenceUnit; // '매주'→WEEK, '매월'→MONTH로 고정되고 '맞춤'만 선택 가능하다
+  weekdays: number[]; // 0(일)~6(토). unit === 'WEEK'일 때만 의미가 있다
+  end: TodoRecurrenceEnd;
 };

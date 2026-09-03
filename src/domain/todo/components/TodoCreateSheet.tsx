@@ -9,9 +9,15 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 import { formatMonthLabel, parseDateKey } from '@/common/utils/date';
 
 import { TodoDatePickerSheet } from '@/domain/todo/components/TodoDatePickerSheet';
+import { TodoRecurrenceSheet } from '@/domain/todo/components/TodoRecurrenceSheet';
 import { TodoTimePickerSheet } from '@/domain/todo/components/TodoTimePickerSheet';
+import {
+  createMonthlyRecurrence,
+  createWeeklyRecurrence,
+  formatRecurrenceSummary,
+} from '@/domain/todo/constants/recurrence';
 import { useCreateTodoMutation } from '@/domain/todo/hooks/useCreateTodoMutation';
-import type { TodoCategoryResponse } from '@/domain/todo/types';
+import type { TodoCategoryResponse, TodoRecurrenceRule } from '@/domain/todo/types';
 
 type TodoCreateSheetProps = {
   visible: boolean;
@@ -41,8 +47,10 @@ export function TodoCreateSheet({
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [dueDateKey, setDueDateKey] = useState(initialDateKey);
   const [timeLabel, setTimeLabel] = useState<string | null>(null);
+  const [recurrence, setRecurrence] = useState<TodoRecurrenceRule | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+  const [isRecurrenceSheetOpen, setIsRecurrenceSheetOpen] = useState(false);
 
   const { mutate: createTodo, isPending, isError } = useCreateTodoMutation();
 
@@ -52,6 +60,7 @@ export function TodoCreateSheet({
       setCategoryId(null);
       setDueDateKey(initialDateKey);
       setTimeLabel(null);
+      setRecurrence(null);
     }
   }, [visible, initialDateKey]);
 
@@ -78,6 +87,7 @@ export function TodoCreateSheet({
         categoryId,
         notificationStatus: false,
         dueTime: timeLabel,
+        recurrence,
       },
       { onSuccess: onClose },
     );
@@ -85,7 +95,14 @@ export function TodoCreateSheet({
 
   return (
     <>
-      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      {/* "맞춤 반복" 시트가 열려 있는 동안엔 이 Modal을 잠깐 숨긴다. 두 개의 <Modal>이 동시에 떠 있으면
+          위(TodoRecurrenceSheet)의 TextInput(횟수 입력)이 포커스를 못 잡는 문제가 있다 */}
+      <Modal
+        visible={visible && !isRecurrenceSheetOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
         <View style={styles.modalRoot}>
           <Pressable style={styles.backdrop} onPress={onClose} />
 
@@ -187,6 +204,82 @@ export function TodoCreateSheet({
                     <Ionicons name="chevron-forward" size={16} color={colors.text.secondary} />
                   </View>
                 </Pressable>
+
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>반복</Text>
+                  <View style={styles.chipRow}>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        !recurrence && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setRecurrence(null)}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          !recurrence && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        안 함
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        recurrence?.frequency === 'WEEKLY' && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setRecurrence(createWeeklyRecurrence(dueDateKey))}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          recurrence?.frequency === 'WEEKLY' && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        매주
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        recurrence?.frequency === 'MONTHLY' && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setRecurrence(createMonthlyRecurrence())}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          recurrence?.frequency === 'MONTHLY' && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        매월
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.chip,
+                        styles.recurrenceChip,
+                        recurrence?.frequency === 'CUSTOM' && styles.recurrenceChipSelected,
+                      ]}
+                      onPress={() => setIsRecurrenceSheetOpen(true)}
+                    >
+                      <Text
+                        style={[
+                          styles.chipLabel,
+                          recurrence?.frequency === 'CUSTOM' && styles.recurrenceChipLabelSelected,
+                        ]}
+                      >
+                        {recurrence?.frequency === 'CUSTOM'
+                          ? formatRecurrenceSummary(recurrence)
+                          : '맞춤'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
               </View>
 
               <View style={styles.footer}>
@@ -218,6 +311,14 @@ export function TodoCreateSheet({
         initialTime={timeLabel}
         onConfirm={setTimeLabel}
         onClose={() => setIsTimePickerOpen(false)}
+      />
+
+      <TodoRecurrenceSheet
+        visible={isRecurrenceSheetOpen}
+        initialRule={recurrence?.frequency === 'CUSTOM' ? recurrence : null}
+        dueDateKey={dueDateKey}
+        onConfirm={setRecurrence}
+        onClose={() => setIsRecurrenceSheetOpen(false)}
       />
     </>
   );
@@ -322,7 +423,25 @@ const styles = StyleSheet.create({
   chipLabel: {
     fontSize: 13,
     fontWeight: '500',
+    lineHeight: 16,
     color: '#49454F',
+    // Android는 폰트 자체에 상하 여백(font padding)이 붙어 텍스트가 배경 박스 중앙에서 아래로
+    // 밀려 보인다 — 안 함/매주/매월/맞춤 칩처럼 텍스트 한 줄만 있는 버튼에서 특히 도드라짐
+    includeFontPadding: false,
+  },
+  // chip은 카테고리 칩(점+체크 아이콘이 앞에 붙는)에 맞춘 비대칭 좌우 패딩(paddingLeft/paddingRight)이라,
+  // paddingHorizontal로는 덮어써지지 않는다 — RN(Yoga)이 paddingLeft/paddingRight 같은 구체적인
+  // 값을 paddingHorizontal보다 항상 우선하기 때문에 반드시 같은 이름(paddingLeft/paddingRight)으로 덮어써야 한다
+  recurrenceChip: {
+    paddingLeft: 12,
+    paddingRight: 12,
+  },
+  recurrenceChipSelected: {
+    backgroundColor: `${colors.primary}14`,
+    borderColor: colors.primary,
+  },
+  recurrenceChipLabelSelected: {
+    color: colors.primary,
   },
   addChipButton: {
     width: 32,

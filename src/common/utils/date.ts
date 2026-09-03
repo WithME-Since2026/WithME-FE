@@ -18,6 +18,13 @@ export function formatDateKey(date: Date) {
   return toDateKey(date.getFullYear(), date.getMonth() + 1, date.getDate());
 }
 
+export function addDays(date: Date, days: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+
+  return next;
+}
+
 // 'YYYY-MM-DD' → 로컬 Date (new Date(string) 사용 시 UTC로 해석되는 문제 방지)
 export function parseDateKey(dateKey: string): Date {
   const [year, month, day] = dateKey.split('-').map(Number);

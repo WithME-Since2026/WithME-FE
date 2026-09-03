@@ -29,6 +29,7 @@ import type { CalendarEventResponse, CalendarLayerKey } from '@/domain/calendar/
 import { CategoryManageSheet } from '@/domain/todo/components/CategoryManageSheet';
 import { TodoCreateSheet } from '@/domain/todo/components/TodoCreateSheet';
 import { TodoEditSheet } from '@/domain/todo/components/TodoEditSheet';
+import { TodoQuickActionSheet } from '@/domain/todo/components/TodoQuickActionSheet';
 import { useTodoCategoriesQuery } from '@/domain/todo/hooks/useTodoCategoriesQuery';
 import { useTodoListQuery } from '@/domain/todo/hooks/useTodoListQuery';
 
@@ -58,6 +59,7 @@ export function CalendarScreen(_props: CalendarScreenProps) {
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isTodoCreateSheetOpen, setIsTodoCreateSheetOpen] = useState(false);
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
+  const [quickActionTodoId, setQuickActionTodoId] = useState<number | null>(null);
   const [isCategoryManageOpen, setIsCategoryManageOpen] = useState(false);
 
   const { data: monthData, isLoading, isError } = useCalendarMonthQuery(currentYear, currentMonth);
@@ -105,14 +107,27 @@ export function CalendarScreen(_props: CalendarScreenProps) {
   }, [eventsByDateKey, selectedDateKey, enabledLayers]);
 
   const editingTodo = todoListData?.todos.find((todo) => todo.todoId === editingTodoId) ?? null;
+  const quickActionTodo =
+    todoListData?.todos.find((todo) => todo.todoId === quickActionTodoId) ?? null;
 
-  const handleEditTodo = (eventId: number) => {
-    // TODO_EVENT_ID_OFFSET 미만이면 mockCalendarData 자체의 예시 이벤트라 실제 할 일이 아니므로 무시한다
-    if (eventId < TODO_EVENT_ID_OFFSET) {
-      return;
+  // TODO_EVENT_ID_OFFSET 미만이면 mockCalendarData 자체의 예시 이벤트라 실제 할 일이 아니므로 무시한다
+  const toTodoId = (eventId: number) =>
+    eventId < TODO_EVENT_ID_OFFSET ? null : eventId - TODO_EVENT_ID_OFFSET;
+
+  const handleOpenTodoActions = (eventId: number) => {
+    const todoId = toTodoId(eventId);
+
+    if (todoId !== null) {
+      // 빠른 날짜 변경 팝업은 캘린더 그리드 위에 바로 뜨는 디자인(Figma 784-22833)이라
+      // 할 일/모임 일정이 나열된 날짜 상세 시트는 먼저 닫는다
+      setSelectedDateKey(null);
+      setQuickActionTodoId(todoId);
     }
+  };
 
-    setEditingTodoId(eventId - TODO_EVENT_ID_OFFSET);
+  const handleEditFromQuickActions = () => {
+    setQuickActionTodoId(null);
+    setEditingTodoId(quickActionTodoId);
   };
 
   const handleToggleLayer = (key: CalendarLayerKey) => {
@@ -228,7 +243,7 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         events={selectedDayEvents}
         onClose={() => setSelectedDateKey(null)}
         onAddTodo={() => setIsTodoCreateSheetOpen(true)}
-        onEditTodo={handleEditTodo}
+        onOpenTodoActions={handleOpenTodoActions}
       />
 
       <TodoCreateSheet
@@ -245,6 +260,13 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         categories={categories ?? []}
         onClose={() => setEditingTodoId(null)}
         onAddCategory={() => setIsCategoryManageOpen(true)}
+      />
+
+      <TodoQuickActionSheet
+        visible={quickActionTodoId !== null}
+        todo={quickActionTodo}
+        onClose={() => setQuickActionTodoId(null)}
+        onEditTodo={handleEditFromQuickActions}
       />
 
       <CategoryManageSheet
