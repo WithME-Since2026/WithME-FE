@@ -9,7 +9,6 @@ import { Toast } from '@/common/components/Toast';
 import { colors, spacing } from '@/common/styles/theme';
 import { addDays, formatDateKey } from '@/common/utils/date';
 
-import { CALENDAR_LAYER_COLORS } from '@/domain/calendar/constants/calendarLayers';
 import { useDeleteTodoMutation } from '@/domain/todo/hooks/useDeleteTodoMutation';
 import { useUpdateTodoDateMutation } from '@/domain/todo/hooks/useUpdateTodoDateMutation';
 import type { TodoResponse } from '@/domain/todo/types';
@@ -29,7 +28,13 @@ const OUTLINE = '#79747E';
 const ON_SURFACE = '#1C1B1F';
 const ON_SURFACE_VARIANT = '#49454F';
 const TODAY_COLOR = '#1A73E8';
+// 캘린더의 Todo 레이어 강조색(CALENDAR_LAYER_COLORS.TODO)과 같은 값 — domain/todo가
+// domain/calendar를 역참조하지 않도록 값만 그대로 여기 로컬로 둔다
+const TOMORROW_COLOR = '#D97706';
 const NEXT_WEEK_COLOR = '#16A34A';
+const TODAY_ICON_BG = 'rgba(26, 115, 232, 0.08)';
+const TOMORROW_ICON_BG = 'rgba(217, 119, 6, 0.08)';
+const NEXT_WEEK_ICON_BG = 'rgba(22, 163, 74, 0.08)';
 
 // 캘린더 날짜 상세 시트의 "⋯"에서 열리는 빠른 날짜 변경 팝업 (Figma 784-22833)
 export function TodoQuickActionSheet({
@@ -94,7 +99,7 @@ export function TodoQuickActionSheet({
               </View>
 
               <Pressable style={styles.row} onPress={handleToday}>
-                <View style={[styles.iconCircle, { backgroundColor: 'rgba(26, 115, 232, 0.08)' }]}>
+                <View style={[styles.iconCircle, { backgroundColor: TODAY_ICON_BG }]}>
                   <Ionicons name="calendar-outline" size={20} color={TODAY_COLOR} />
                 </View>
                 <View style={styles.rowTextGroup}>
@@ -105,12 +110,8 @@ export function TodoQuickActionSheet({
               </Pressable>
 
               <Pressable style={styles.row} onPress={handleTomorrow}>
-                <View style={[styles.iconCircle, { backgroundColor: 'rgba(217, 119, 6, 0.08)' }]}>
-                  <Ionicons
-                    name="play-skip-forward-outline"
-                    size={18}
-                    color={CALENDAR_LAYER_COLORS.TODO}
-                  />
+                <View style={[styles.iconCircle, { backgroundColor: TOMORROW_ICON_BG }]}>
+                  <Ionicons name="play-skip-forward-outline" size={18} color={TOMORROW_COLOR} />
                 </View>
                 <View style={styles.rowTextGroup}>
                   <Text style={styles.rowLabel}>내일로 미루기</Text>
@@ -120,7 +121,7 @@ export function TodoQuickActionSheet({
               </Pressable>
 
               <Pressable style={styles.row} onPress={handleNextWeek}>
-                <View style={[styles.iconCircle, { backgroundColor: 'rgba(22, 163, 74, 0.08)' }]}>
+                <View style={[styles.iconCircle, { backgroundColor: NEXT_WEEK_ICON_BG }]}>
                   <Ionicons name="play-forward-outline" size={18} color={NEXT_WEEK_COLOR} />
                 </View>
                 <View style={styles.rowTextGroup}>

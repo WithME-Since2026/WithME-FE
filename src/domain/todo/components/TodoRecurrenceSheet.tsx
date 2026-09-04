@@ -45,6 +45,21 @@ function formatEndDateLabel(dateKey: string) {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 
+function buildRecurrenceEnd(
+  endType: EndType,
+  endDate: string,
+  endCount: string,
+): TodoRecurrenceEnd {
+  switch (endType) {
+    case 'ON_DATE':
+      return { type: 'ON_DATE', date: endDate };
+    case 'AFTER_COUNT':
+      return { type: 'AFTER_COUNT', count: Math.max(1, Number(endCount) || 1) };
+    case 'NEVER':
+      return { type: 'NEVER' };
+  }
+}
+
 type TodoRecurrenceSheetProps = {
   visible: boolean;
   // 이미 "맞춤"으로 설정된 규칙이 있으면 이 값으로 초기화하고, 없으면 dueDateKey 기준 기본값을 쓴다
@@ -105,12 +120,7 @@ export function TodoRecurrenceSheet({
       return;
     }
 
-    const end: TodoRecurrenceEnd =
-      endType === 'ON_DATE'
-        ? { type: 'ON_DATE', date: endDate }
-        : endType === 'AFTER_COUNT'
-          ? { type: 'AFTER_COUNT', count: Math.max(1, Number(endCount) || 1) }
-          : { type: 'NEVER' };
+    const end = buildRecurrenceEnd(endType, endDate, endCount);
 
     onConfirm({
       frequency: 'CUSTOM',
@@ -135,7 +145,7 @@ export function TodoRecurrenceSheet({
 
           <View style={styles.sheetPositioner} pointerEvents="box-none">
             <View style={styles.sheet}>
-              <View style={styles.handle} />
+              <View style={styles.dragHandle} />
 
               <View style={styles.header}>
                 <Pressable
@@ -331,7 +341,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
     gap: spacing.md,
   },
-  handle: {
+  dragHandle: {
     alignSelf: 'center',
     width: 32,
     height: 4,

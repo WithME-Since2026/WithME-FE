@@ -11,6 +11,11 @@ type ToastProps = {
   autoHideDurationMs?: number;
 };
 
+// 이 토스트(Figma 784-23480)만의 다크 톤 컬러. 앱 전역 theme에는 없어 로컬로 정의함
+const TOAST_BG = '#313033';
+const TOAST_TEXT = '#FFFFFF';
+const TOAST_CLOSE_TEXT = '#DBE9FD';
+
 export function Toast({ visible, message, onClose, autoHideDurationMs = 2500 }: ToastProps) {
   useEffect(() => {
     if (!visible) {
@@ -50,7 +55,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#313033',
+    backgroundColor: TOAST_BG,
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -63,7 +68,7 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 14,
     lineHeight: 21,
-    color: '#FFFFFF',
+    color: TOAST_TEXT,
   },
   closeButton: {
     paddingLeft: 12,
@@ -72,6 +77,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     lineHeight: 21,
-    color: '#DBE9FD',
+    color: TOAST_CLOSE_TEXT,
   },
 });
