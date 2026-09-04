@@ -4,6 +4,7 @@ import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-nativ
 
 import { Ionicons } from '@expo/vector-icons';
 
+import { getApiErrorMessage } from '@/common/api/apiError';
 import { Button } from '@/common/components/Button';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 import { formatMonthLabel, parseDateKey } from '@/common/utils/date';
@@ -48,7 +49,8 @@ export function TodoCreateSheet({
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const [isRecurrenceSheetOpen, setIsRecurrenceSheetOpen] = useState(false);
 
-  const { mutate: createTodo, isPending, isError } = useCreateTodoMutation();
+  const { mutate: createTodo, isPending, isError, error } = useCreateTodoMutation();
+  const errorMessage = getApiErrorMessage(error, '할 일을 추가하지 못했어요. 다시 시도해주세요.');
 
   useEffect(() => {
     if (visible) {
@@ -130,11 +132,7 @@ export function TodoCreateSheet({
                     autoFocus
                   />
                 </View>
-                {isError && (
-                  <Text style={styles.errorText}>
-                    할 일을 추가하지 못했어요. 다시 시도해주세요.
-                  </Text>
-                )}
+                {isError && <Text style={styles.errorText}>{errorMessage}</Text>}
 
                 <View style={styles.field}>
                   <Text style={styles.fieldLabel}>카테고리</Text>

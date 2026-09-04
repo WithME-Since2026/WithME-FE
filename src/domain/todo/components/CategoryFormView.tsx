@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
+import { getApiErrorMessage } from '@/common/api/apiError';
 import { Button } from '@/common/components/Button';
 import { spacing } from '@/common/styles/theme';
 
@@ -30,14 +31,22 @@ export function CategoryFormView({ mode, category, onBack, onSuccess }: Category
     mutate: createCategory,
     isPending: isCreating,
     isError: isCreateError,
+    error: createError,
   } = useCreateCategoryMutation();
   const {
     mutate: updateCategory,
     isPending: isUpdating,
     isError: isUpdateError,
+    error: updateError,
   } = useUpdateCategoryMutation();
   const isPending = isCreating || isUpdating;
   const isError = isCreateError || isUpdateError;
+  // BE가 이름 중복(DUPLICATE_CATEGORY_NAME)/정렬 충돌(CATEGORY_ORDER_CONFLICT) 등 구체적인
+  // message를 내려주므로, 있으면 그대로 보여주고 없을 때만 아래 기본 문구로 대체한다
+  const errorMessage = getApiErrorMessage(
+    createError ?? updateError,
+    '카테고리를 저장하지 못했어요. 다시 시도해주세요.',
+  );
 
   useEffect(() => {
     setName(category?.categoryName ?? '');
@@ -101,9 +110,7 @@ export function CategoryFormView({ mode, category, onBack, onSuccess }: Category
           />
         </View>
 
-        {isError && (
-          <Text style={styles.errorText}>카테고리를 저장하지 못했어요. 다시 시도해주세요.</Text>
-        )}
+        {isError && <Text style={styles.errorText}>{errorMessage}</Text>}
 
         <View style={styles.field}>
           <Text style={styles.fieldLabel}>색상</Text>

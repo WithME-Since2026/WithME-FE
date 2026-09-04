@@ -4,6 +4,7 @@ import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-nativ
 
 import { Ionicons } from '@expo/vector-icons';
 
+import { getApiErrorMessage } from '@/common/api/apiError';
 import { Button } from '@/common/components/Button';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 import { formatMonthLabel, parseDateKey } from '@/common/utils/date';
@@ -54,14 +55,20 @@ export function TodoEditSheet({
     mutateAsync: updateTodo,
     isPending: isUpdatingTodo,
     isError: isUpdateError,
+    error: updateTodoError,
   } = useUpdateTodoMutation();
   const {
     mutateAsync: updateTodoDate,
     isPending: isUpdatingDate,
     isError: isDateError,
+    error: updateDateError,
   } = useUpdateTodoDateMutation();
   const isPending = isUpdatingTodo || isUpdatingDate;
   const isError = isUpdateError || isDateError;
+  const errorMessage = getApiErrorMessage(
+    updateTodoError ?? updateDateError,
+    '할 일을 수정하지 못했어요. 다시 시도해주세요.',
+  );
 
   useEffect(() => {
     if (visible && todo) {
@@ -146,11 +153,7 @@ export function TodoEditSheet({
                     placeholderTextColor="rgba(28, 27, 31, 0.5)"
                   />
                 </View>
-                {isError && (
-                  <Text style={styles.errorText}>
-                    할 일을 수정하지 못했어요. 다시 시도해주세요.
-                  </Text>
-                )}
+                {isError && <Text style={styles.errorText}>{errorMessage}</Text>}
 
                 <View style={styles.field}>
                   <Text style={styles.fieldLabel}>카테고리</Text>
