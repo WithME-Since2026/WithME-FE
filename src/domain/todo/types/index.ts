@@ -85,6 +85,13 @@ export type UpdateTodoDateRequest = {
   isPostponed?: boolean;
 };
 
+// PATCH /api/v1/todo/completion — 완료 토글 전용 엔드포인트 (아직 미구현, 백엔드 API 추천 참고).
+// BE의 Todo.updateCompleted(boolean)과 동일하게 completed 하나만 받는다
+export type UpdateTodoCompletionRequest = {
+  todoId: number;
+  completed: boolean;
+};
+
 // FE 전용 반복 규칙. BE에 반복 관련 필드/API가 전혀 없어 dueTime과 동일하게 __DEV__ mock에만 저장되고
 // 새로고침 시 초기화된다 (백엔드 API 추천 참고). "안 함"은 recurrence를 null/undefined로 표현한다
 export type TodoRecurrenceFrequency = 'WEEKLY' | 'MONTHLY' | 'CUSTOM';

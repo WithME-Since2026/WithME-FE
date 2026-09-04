@@ -6,12 +6,14 @@ import {
   deleteMockTodo,
   getMockTodoList,
   updateMockTodo,
+  updateMockTodoCompletion,
   updateMockTodoDate,
 } from '@/domain/todo/api/mockTodoData';
 import type {
   CreateTodoRequest,
   TodoListResponse,
   TodoResponse,
+  UpdateTodoCompletionRequest,
   UpdateTodoDateRequest,
   UpdateTodoRequest,
 } from '@/domain/todo/types';
@@ -77,4 +79,18 @@ export async function deleteTodo(todoId: number) {
   }
 
   await apiClient.delete('/api/v1/todo', { data: { todoId } });
+}
+
+// TODO: BE에 아직 완료 토글 엔드포인트가 없음 (계획된 PATCH /api/v1/todo/completion, 백엔드 API 추천 참고)
+export async function updateTodoCompletion(request: UpdateTodoCompletionRequest) {
+  if (__DEV__) {
+    return updateMockTodoCompletion(request);
+  }
+
+  const response = await apiClient.patch<ApiResponse<TodoResponse>>(
+    '/api/v1/todo/completion',
+    request,
+  );
+
+  return response.data.data;
 }

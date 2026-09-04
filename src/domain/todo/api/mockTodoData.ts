@@ -4,6 +4,7 @@ import type {
   CreateTodoRequest,
   TodoListResponse,
   TodoResponse,
+  UpdateTodoCompletionRequest,
   UpdateTodoDateRequest,
   UpdateTodoRequest,
 } from '@/domain/todo/types';
@@ -185,4 +186,11 @@ export function updateMockTodoDate(request: UpdateTodoDateRequest): TodoResponse
 // BE의 Todo.delete()와 동일하게 소프트 삭제 대상이므로 목록에서 제외한다
 export function deleteMockTodo(todoId: number): void {
   mockTodos = mockTodos.filter((todo) => todo.todoId !== todoId);
+}
+
+// PATCH /api/v1/todo/completion (아직 미구현, 백엔드 API 추천 참고)
+export function updateMockTodoCompletion(request: UpdateTodoCompletionRequest): TodoResponse {
+  const target = findMockTodoOrThrow(request.todoId);
+
+  return replaceMockTodo({ ...target, completed: request.completed });
 }

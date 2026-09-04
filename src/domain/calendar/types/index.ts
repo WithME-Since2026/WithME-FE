@@ -12,6 +12,8 @@ export type CalendarEventResponse = {
   // 할 일이면 그 할 일의 카테고리 색상('#RRGGBB'), 카테고리가 없거나 할 일이 아니면 null
   // (null일 때는 레이어 기본색(CALENDAR_LAYERS)으로 대체해서 표시)
   color: string | null;
+  // 할 일 완료 여부. 할 일(TODO)이 아니면 항상 false
+  completed: boolean;
 };
 
 export type CalendarMonthResponse = {

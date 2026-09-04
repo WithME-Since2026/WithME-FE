@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +16,7 @@ type DayDetailSheetProps = {
   // 화면(CalendarScreen)이 담당해 도메인 간 컴포넌트 직접 참조 없이 콜백으로만 연결한다
   onAddTodo: () => void;
   onOpenTodoActions: (eventId: number) => void;
+  onToggleTodoComplete: (eventId: number, completed: boolean) => void;
 };
 
 // 피그마(784-18713 등)에서만 쓰이는 뉴트럴/톤 컬러. 파란색 계열만 앱 메인 컬러(colors.primary) 기반으로 파생시킴
@@ -37,15 +36,13 @@ export function DayDetailSheet({
   onClose,
   onAddTodo,
   onOpenTodoActions,
+  onToggleTodoComplete,
 }: DayDetailSheetProps) {
-  // TODO: 할 일 완료 상태는 백엔드 연동 전까지 시트 안에서만 유지되는 로컬 상태
-  const [locallyCompletedIds, setLocallyCompletedIds] = useState<Set<number>>(new Set());
-
   const holidayEvents = events.filter((event) => event.type === 'HOLIDAY');
   const groupEvents = events.filter((event) => event.type === 'GROUP');
   const todoEvents = events.filter((event) => event.type === 'TODO');
-  const pendingTodos = todoEvents.filter((event) => !locallyCompletedIds.has(event.eventId));
-  const doneTodos = todoEvents.filter((event) => locallyCompletedIds.has(event.eventId));
+  const pendingTodos = todoEvents.filter((event) => !event.completed);
+  const doneTodos = todoEvents.filter((event) => event.completed);
 
   const summaryText = holidayEvents.length
     ? holidayEvents.map((event) => event.title).join(', ')
@@ -62,20 +59,6 @@ export function DayDetailSheet({
   const isCompact =
     isEmpty || (holidayEvents.length > 0 && groupEvents.length + todoEvents.length === 0);
   const sheetHeight = isCompact ? '38%' : '58%';
-
-  const handleToggleTodo = (eventId: number) => {
-    setLocallyCompletedIds((prev) => {
-      const next = new Set(prev);
-
-      if (next.has(eventId)) {
-        next.delete(eventId);
-      } else {
-        next.add(eventId);
-      }
-
-      return next;
-    });
-  };
 
   return (
     // 아래에서 슬라이드 업되는 느낌 대신 표준 화면 전환처럼 자연스럽게 나타나도록 fade 사용
@@ -175,7 +158,7 @@ export function DayDetailSheet({
                           <View style={[styles.todoBar, { backgroundColor: categoryColor }]} />
                           <View style={styles.todoContentRow}>
                             <Pressable
-                              onPress={() => handleToggleTodo(event.eventId)}
+                              onPress={() => onToggleTodoComplete(event.eventId, true)}
                               hitSlop={8}
                               accessibilityLabel="할 일 완료 처리"
                             >
@@ -217,7 +200,7 @@ export function DayDetailSheet({
                       <Pressable
                         key={event.eventId}
                         style={styles.doneTodoRow}
-                        onPress={() => handleToggleTodo(event.eventId)}
+                        onPress={() => onToggleTodoComplete(event.eventId, false)}
                       >
                         <Ionicons name="checkmark-circle" size={22} color={colors.success} />
                         <Text style={[styles.todoTitle, styles.todoTitleDone]}>{event.title}</Text>

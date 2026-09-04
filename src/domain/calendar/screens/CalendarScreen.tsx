@@ -32,6 +32,7 @@ import { TodoEditSheet } from '@/domain/todo/components/TodoEditSheet';
 import { TodoQuickActionSheet } from '@/domain/todo/components/TodoQuickActionSheet';
 import { useTodoCategoriesQuery } from '@/domain/todo/hooks/useTodoCategoriesQuery';
 import { useTodoListQuery } from '@/domain/todo/hooks/useTodoListQuery';
+import { useUpdateTodoCompletionMutation } from '@/domain/todo/hooks/useUpdateTodoCompletionMutation';
 
 type CalendarScreenProps = NativeStackScreenProps<RootStackParamList, 'Calendar'>;
 
@@ -65,6 +66,7 @@ export function CalendarScreen(_props: CalendarScreenProps) {
   const { data: monthData, isLoading, isError } = useCalendarMonthQuery(currentYear, currentMonth);
   const { data: categories } = useTodoCategoriesQuery();
   const { data: todoListData } = useTodoListQuery();
+  const { mutate: updateTodoCompletion } = useUpdateTodoCompletionMutation();
 
   const eventsByDateKey = useMemo(() => {
     const map = new Map<string, CalendarEventResponse[]>();
@@ -90,6 +92,7 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         badgeLabel: category?.categoryName ?? 'Todo',
         location: null,
         color: category?.categoryColor ?? null,
+        completed: todo.completed,
       });
     });
 
@@ -128,6 +131,15 @@ export function CalendarScreen(_props: CalendarScreenProps) {
   const handleEditFromQuickActions = () => {
     setQuickActionTodoId(null);
     setEditingTodoId(quickActionTodoId);
+  };
+
+  const handleToggleTodoComplete = (eventId: number, completed: boolean) => {
+    const todoId = toTodoId(eventId);
+
+    // mockCalendarData 자체의 예시 이벤트는 실제 할 일이 아니라 완료 처리를 보낼 대상이 없다
+    if (todoId !== null) {
+      updateTodoCompletion({ todoId, completed });
+    }
   };
 
   const handleToggleLayer = (key: CalendarLayerKey) => {
@@ -244,6 +256,7 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         onClose={() => setSelectedDateKey(null)}
         onAddTodo={() => setIsTodoCreateSheetOpen(true)}
         onOpenTodoActions={handleOpenTodoActions}
+        onToggleTodoComplete={handleToggleTodoComplete}
       />
 
       <TodoCreateSheet
