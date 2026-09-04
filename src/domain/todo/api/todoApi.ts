@@ -33,7 +33,16 @@ export async function createTodo(request: CreateTodoRequest) {
     return createMockTodo(request);
   }
 
-  const response = await apiClient.post<ApiResponse<TodoResponse>>('/api/v1/todo', request);
+  // dueTime/recurrence는 BE CreateTodoRequest에 없는 FE 전용 필드라, 그대로 보내면 BE가
+  // 모르는 프로퍼티로 400을 던진다 (fail-on-unknown-properties 기본값 true). BE가 실제로
+  // 받는 필드만 골라서 보낸다 — 백엔드 API 추천 참고
+  const { title, dueDate, categoryId, notificationStatus } = request;
+  const response = await apiClient.post<ApiResponse<TodoResponse>>('/api/v1/todo', {
+    title,
+    dueDate,
+    categoryId,
+    notificationStatus,
+  });
 
   return response.data.data;
 }
