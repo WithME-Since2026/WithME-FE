@@ -61,34 +61,6 @@ export function StartScreen({ navigation }: StartScreenProps) {
               아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
             </Text>
           </Pressable>
-
-          {/* TODO: 로그인 연동 전까지 백엔드 없이 화면을 확인할 수 있도록 개발 중에만 노출하는 바로가기 */}
-          {__DEV__ && (
-            <View style={styles.devSection}>
-              <Text style={styles.devSectionLabel}>[dev] 로그인 없이 화면 확인</Text>
-              <Pressable
-                style={styles.devLink}
-                onPress={() => navigation.navigate('Notification')}
-                hitSlop={8}
-              >
-                <Text style={styles.devLinkText}>[dev] 알림 화면 보기</Text>
-              </Pressable>
-              <Pressable
-                style={styles.devLink}
-                onPress={() => navigation.navigate('Calendar')}
-                hitSlop={8}
-              >
-                <Text style={styles.devLinkText}>[dev] 캘린더 화면 보기</Text>
-              </Pressable>
-              <Pressable
-                style={styles.devLink}
-                onPress={() => navigation.navigate('MyPage')}
-                hitSlop={8}
-              >
-                <Text style={styles.devLinkText}>[dev] 마이페이지 화면 보기</Text>
-              </Pressable>
-            </View>
-          )}
         </View>
       </View>
     </SafeAreaView>
@@ -163,27 +135,6 @@ const styles = StyleSheet.create({
   signUpLinkHighlight: {
     fontWeight: '700',
     color: colors.text.primary,
-    textDecorationLine: 'underline',
-  },
-  devSection: {
-    marginTop: spacing.lg,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  devSectionLabel: {
-    ...typography.caption,
-    color: colors.text.disabled,
-  },
-  devLink: {
-    paddingVertical: spacing.xs / 2,
-  },
-  devLinkText: {
-    ...typography.body2,
-    color: colors.error,
     textDecorationLine: 'underline',
   },
 });
