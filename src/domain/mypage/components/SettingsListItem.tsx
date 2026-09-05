@@ -11,8 +11,6 @@ type SettingsListItemProps = {
   badge?: { label: string; variant: SettingsListItemBadgeVariant };
   onPress: () => void;
   showDivider?: boolean;
-  // 알림 설정처럼 그 자리에서 펼쳐지는 행일 때만 전달 — 펼쳐졌으면 화살표가 아래를 향하게 함
-  expanded?: boolean;
 };
 
 export function SettingsListItem({
@@ -20,7 +18,6 @@ export function SettingsListItem({
   badge,
   onPress,
   showDivider = true,
-  expanded,
 }: SettingsListItemProps) {
   return (
     <View>
@@ -38,11 +35,7 @@ export function SettingsListItem({
               </Text>
             </View>
           )}
-          <Ionicons
-            name={expanded ? 'chevron-down' : 'chevron-forward'}
-            size={16}
-            color={colors.text.secondary}
-          />
+          <Ionicons name="chevron-forward" size={16} color={colors.text.secondary} />
         </View>
       </Pressable>
       {showDivider && <View style={styles.divider} />}

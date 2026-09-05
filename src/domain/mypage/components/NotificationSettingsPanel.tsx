@@ -26,13 +26,12 @@ type NotificationSettingsPanelProps = {
   onToggle: (key: NotificationToggleKey) => void;
 };
 
-// 마이페이지 설정 목록에서 "알림 설정"을 누르면 그 자리에서 펼쳐지는 인라인 패널 (Figma node 698:4976의 알림 설정 카드를 분리).
-// 토글 상태는 접었다 펼쳐도 유지되도록 부모(MyPageScreen)가 소유한다.
+// 알림 설정 화면(NotificationSettingsScreen)의 "모임 알림" 카드에 들어가는 토글 목록
 export function NotificationSettingsPanel({ toggles, onToggle }: NotificationSettingsPanelProps) {
   return (
     <View style={styles.container}>
-      {TOGGLE_ITEMS.map((item) => (
-        <View key={item.key} style={styles.row}>
+      {TOGGLE_ITEMS.map((item, index) => (
+        <View key={item.key} style={[styles.row, index > 0 && styles.rowDivider]}>
           <View style={styles.textGroup}>
             <Text style={styles.label}>{item.label}</Text>
             <Text style={styles.hint}>{item.hint}</Text>
@@ -54,7 +53,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.sm + 4,
+  },
+  rowDivider: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.notifDivider,
   },
@@ -64,12 +65,12 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.body2,
-    fontSize: 14,
+    fontSize: 15,
     color: colors.text.primary,
   },
   hint: {
     ...typography.caption,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.notifReadText,
     marginTop: 2,
   },

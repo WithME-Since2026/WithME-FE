@@ -15,11 +15,6 @@ import type { RootStackParamList } from '@/app/navigation';
 
 import { KakaoIcon } from '@/domain/auth/components/KakaoIcon';
 import { AttendanceStatsCard } from '@/domain/mypage/components/AttendanceStatsCard';
-import type { NotificationToggleKey } from '@/domain/mypage/components/NotificationSettingsPanel';
-import {
-  INITIAL_NOTIFICATION_TOGGLES,
-  NotificationSettingsPanel,
-} from '@/domain/mypage/components/NotificationSettingsPanel';
 import { ProfileCard } from '@/domain/mypage/components/ProfileCard';
 import { SettingsListItem } from '@/domain/mypage/components/SettingsListItem';
 import { WeeklyAttendanceChart } from '@/domain/mypage/components/WeeklyAttendanceChart';
@@ -49,9 +44,6 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
   const { data: groups } = useMyGroupsQuery();
   // 로그아웃/탈퇴 확인 모달에서 어느 액션을 확인 중인지 (Figma node 761:17659)
   const [pendingExitAction, setPendingExitAction] = useState<'logout' | 'withdraw' | null>(null);
-  const [isNotificationSettingsExpanded, setIsNotificationSettingsExpanded] = useState(false);
-  // 패널을 접었다 펼쳐도 토글 상태가 유지되도록 부모(이 화면)가 소유한다
-  const [notificationToggles, setNotificationToggles] = useState(INITIAL_NOTIFICATION_TOGGLES);
 
   const isLoading = isProfileLoading || isAttendanceLoading;
   const isError = isProfileError || isAttendanceError;
@@ -75,11 +67,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
     setPendingExitAction(null);
   };
 
-  // 알림 설정은 별도 화면/팝업이 아니라, 마이페이지 설정 목록에서 바로 그 아래로 펼쳐지는 형태로 관리한다.
-  const handleNotificationSettingsPress = () => setIsNotificationSettingsExpanded((prev) => !prev);
-  const handleToggleNotification = (key: NotificationToggleKey) => {
-    setNotificationToggles((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  const handleNotificationSettingsPress = () => navigation.navigate('NotificationSettings');
   const handleEditProfilePress = () => navigation.navigate('ProfileEdit');
 
   // TODO: 내 모임 관리/결제수단 등록/문제 신고/프리미엄 화면이 아직 없어 우선 자리만 만들어 둠
@@ -137,18 +125,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
               badge={{ label: String(groups?.length ?? 0), variant: 'accent' }}
               onPress={noop}
             />
-            <SettingsListItem
-              label="알림 설정"
-              onPress={handleNotificationSettingsPress}
-              expanded={isNotificationSettingsExpanded}
-              showDivider={!isNotificationSettingsExpanded}
-            />
-            {isNotificationSettingsExpanded && (
-              <NotificationSettingsPanel
-                toggles={notificationToggles}
-                onToggle={handleToggleNotification}
-              />
-            )}
+            <SettingsListItem label="알림 설정" onPress={handleNotificationSettingsPress} />
             <SettingsListItem
               label="결제수단 등록"
               badge={{ label: '카드 · 1234', variant: 'neutral' }}
