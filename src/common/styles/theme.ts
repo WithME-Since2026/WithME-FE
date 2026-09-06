@@ -29,6 +29,19 @@ export const colors = {
   attendanceTrack: '#EFECE8',
   // 프리미엄 업그레이드 배너 테두리/PRO 배지에 쓰이는 골드
   premiumGold: '#C8A84B',
+  // 프리미엄 구독/결제수단 등록 화면 배경 (Figma 실제 값, surface보다 살짝 밝은 톤)
+  premiumScreenBg: '#F6F7F9',
+  // 프리미엄 구독 화면의 체크 아이콘 배경·특가 카드 배경 (Figma 실제 값, linkBlueSoft와는 톤이 다름)
+  premiumAccentSoft: '#DBEAFF',
+  // 프리미엄 구독 화면의 혜택 목록 카드 배경 (Figma 실제 값)
+  premiumFeatureCardBg: '#DEE0E8',
+  // 결제수단 등록 화면의 구독 상품 요약 카드 배경 (Figma 실제 값)
+  premiumCardBg: '#F7F7F7',
+  // 결제수단 등록 화면의 카드/구분선 테두리색 (Figma 실제 값)
+  premiumInputBorder: '#E0DED6',
+  // 결제 완료 화면의 안내 박스 배경/텍스트 (Figma 실제 값)
+  premiumInfoBg: '#F5F5FA',
+  premiumInfoText: '#737373',
   weekend: '#cc4d4da3',
   // 알림 유형별 아바타 배경/아이콘 색상 (Figma node 761:15618 실제 값)
   notifJoinBg: '#D3E3FD',

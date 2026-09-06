@@ -27,6 +27,9 @@ export function StartScreen({ navigation }: StartScreenProps) {
     navigation.navigate('SignUp');
   };
 
+  // 로그인 없이도 새로 만든 프리미엄 구독/결제수단 등록 화면을 바로 확인할 수 있도록 하는 개발용 진입 버튼
+  const handleDevSubscriptionPress = () => navigation.navigate('Subscription');
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
@@ -61,6 +64,16 @@ export function StartScreen({ navigation }: StartScreenProps) {
               아직 계정이 없으신가요? <Text style={styles.signUpLinkHighlight}>회원가입</Text>
             </Text>
           </Pressable>
+
+          {__DEV__ && (
+            <View style={styles.devSection}>
+              <Button
+                label="[dev] 프리미엄 구독 화면 바로가기"
+                variant="outline"
+                onPress={handleDevSubscriptionPress}
+              />
+            </View>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -136,5 +149,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text.primary,
     textDecorationLine: 'underline',
+  },
+  devSection: {
+    marginTop: spacing.md,
   },
 });
