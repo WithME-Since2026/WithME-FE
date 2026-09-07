@@ -5,16 +5,18 @@ import { borderRadius, colors } from '@/common/styles/theme';
 type ToggleSwitchProps = {
   value: boolean;
   onValueChange: (value: boolean) => void;
+  accessibilityLabel: string;
 };
 
 // Figma M3Switch를 그대로 옮긴 커스텀 토글 (RN 기본 Switch는 OFF 상태의 아웃라인 표현이 안 돼 직접 구현)
-export function ToggleSwitch({ value, onValueChange }: ToggleSwitchProps) {
+export function ToggleSwitch({ value, onValueChange, accessibilityLabel }: ToggleSwitchProps) {
   return (
     <Pressable
       onPress={() => onValueChange(!value)}
       style={[styles.track, value ? styles.trackOn : styles.trackOff]}
       hitSlop={8}
       accessibilityRole="switch"
+      accessibilityLabel={accessibilityLabel}
       accessibilityState={{ checked: value }}
     >
       <View style={[styles.thumb, value ? styles.thumbOn : styles.thumbOff]} />

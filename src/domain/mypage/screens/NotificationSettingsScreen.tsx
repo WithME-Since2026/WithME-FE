@@ -75,6 +75,7 @@ export function NotificationSettingsScreen({ navigation }: NotificationSettingsS
               <ToggleSwitch
                 value={notificationSettings.notifyAgree}
                 onValueChange={handleTogglePushAll}
+                accessibilityLabel="푸시 알림 전체"
               />
             </View>
           </View>
