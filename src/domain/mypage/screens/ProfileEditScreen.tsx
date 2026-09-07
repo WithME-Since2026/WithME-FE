@@ -49,6 +49,7 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
           onPress={() => navigation.navigate('MyPage')}
           hitSlop={8}
           style={styles.backButton}
+          accessibilityLabel="뒤로 가기"
         >
           <Ionicons name="chevron-back" size={22} color={colors.text.primary} />
         </Pressable>
