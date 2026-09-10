@@ -66,6 +66,7 @@ export function CreateMeetingCompleteScreen({
           variant="kakao"
           icon={<KakaoIcon />}
           onPress={handleKakaoShare}
+          style={styles.kakaoButton}
         />
 
         <Pressable style={styles.homeLink} onPress={handleBackToHome} hitSlop={8}>
@@ -148,6 +149,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
     backgroundColor: colors.meeting.primary,
+  },
+  kakaoButton: {
+    alignSelf: 'stretch',
   },
   homeLink: {
     marginTop: spacing.lg,

@@ -16,12 +16,15 @@ import { AttendanceChoiceButtons } from '@/domain/meeting/components/AttendanceC
 import { AttendanceCountBadges } from '@/domain/meeting/components/AttendanceCountBadges';
 import { AttendanceProgressBar } from '@/domain/meeting/components/AttendanceProgressBar';
 import { AttendanceRadialProgress } from '@/domain/meeting/components/AttendanceRadialProgress';
+import { LeaveMeetingConfirmDialog } from '@/domain/meeting/components/LeaveMeetingConfirmDialog';
+import { MeetingActionSheet } from '@/domain/meeting/components/MeetingActionSheet';
 import { MeetingDetailInfoCard } from '@/domain/meeting/components/MeetingDetailInfoCard';
 import { MemberListCard } from '@/domain/meeting/components/MemberListCard';
 import { useMeetingDetailQuery } from '@/domain/meeting/hooks/useMeetingDetailQuery';
 import type { MeetingAttendanceSummary, MyAttendanceStatus } from '@/domain/meeting/types';
 
-// 액션 메뉴 시트(H3a~c), 리마인더 발송, 일정 변경 요청, 전체보기는 별도 이슈에서 연결 예정
+// 일정 변경, 모임 정보 수정, 알림 설정, 모임 삭제, 리마인더 발송, 전체보기는
+// 아직 목적 화면이 없어 별도 이슈에서 연결 예정
 function handlePendingAction() {}
 
 const ATTENDANCE_KEY_BY_STATUS: Record<MyAttendanceStatus, keyof MeetingAttendanceSummary> = {
@@ -58,9 +61,22 @@ export function MeetingDetailScreen({ route, navigation }: MeetingDetailScreenPr
     isRefetching,
   } = useMeetingDetailQuery(meetingId);
   const [myAttendanceStatus, setMyAttendanceStatus] = useState<MyAttendanceStatus | null>(null);
+  const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
+  const [isLeaveConfirmOpen, setIsLeaveConfirmOpen] = useState(false);
 
   const handleBackPress = () => {
     navigation.goBack();
+  };
+
+  const handleRequestLeave = () => {
+    setIsActionSheetOpen(false);
+    setIsLeaveConfirmOpen(true);
+  };
+
+  const handleConfirmLeave = () => {
+    setIsLeaveConfirmOpen(false);
+    // TODO: 모임 나가기 API 확정 후 연결. 지금은 홈으로 돌아가는 것으로 대체
+    navigation.navigate('Main');
   };
 
   if (isLoading) {
@@ -89,7 +105,7 @@ export function MeetingDetailScreen({ route, navigation }: MeetingDetailScreenPr
           {meeting.title}
         </Text>
 
-        <Pressable onPress={handlePendingAction} hitSlop={8}>
+        <Pressable onPress={() => setIsActionSheetOpen(true)} hitSlop={8}>
           <Ionicons name="ellipsis-horizontal" size={20} color={colors.text.secondary} />
         </Pressable>
       </View>
@@ -170,6 +186,24 @@ export function MeetingDetailScreen({ route, navigation }: MeetingDetailScreenPr
           </>
         )}
       </ScrollView>
+
+      <MeetingActionSheet
+        visible={isActionSheetOpen}
+        title={meeting.title}
+        isOperator={isOperator}
+        onClose={() => setIsActionSheetOpen(false)}
+        onReschedule={handlePendingAction}
+        onEditInfo={handlePendingAction}
+        onNotificationSettings={handlePendingAction}
+        onLeave={handleRequestLeave}
+        onDelete={handlePendingAction}
+      />
+
+      <LeaveMeetingConfirmDialog
+        visible={isLeaveConfirmOpen}
+        onCancel={() => setIsLeaveConfirmOpen(false)}
+        onConfirm={handleConfirmLeave}
+      />
     </SafeAreaView>
   );
 }
