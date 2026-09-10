@@ -1,5 +1,8 @@
+// 팀 전체 브랜드 primary 색상 (Figma 디자인 시스템 기준값). 도메인별 팔레트에서도 이 값을 그대로 재사용해 서로 다른 파랑이 섞이지 않게 함
+const PRIMARY_COLOR = '#162a56';
+
 export const colors = {
-  primary: '#162a56',
+  primary: PRIMARY_COLOR,
   secondary: '#7C3AED',
   background: '#FFFFFF',
   surface: '#F9FAFB',
@@ -20,7 +23,7 @@ export const colors = {
   overlay: 'rgba(0, 0, 0, 0.4)',
   // 모임 홈/상세/생성 플로우 전용 팔레트 (Figma "모임" 섹션 고정 컬러)
   meeting: {
-    primary: '#1A73E8',
+    primary: PRIMARY_COLOR,
     badgeBackground: '#D3E3FD',
     participantCardBorder: '#C9CCE0',
     outlineBorder: '#E8E0F0',
@@ -31,7 +34,7 @@ export const colors = {
     pendingText: '#CAC4D0',
     dotInactive: '#D1D5DB',
     statusInProgressBackground: '#D3E3FD',
-    statusInProgressText: '#1A73E8',
+    statusInProgressText: PRIMARY_COLOR,
     statusDoneBackground: '#F3F4F6',
     statusDoneText: '#9CA3AF',
     statusAttendingBorder: '#16A34A',
