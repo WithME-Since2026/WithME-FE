@@ -1,11 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
+import { colors, spacing, typography } from '@/common/styles/theme';
 
 export type MeetingRoleFilter = 'ALL' | 'OPERATOR' | 'PARTICIPANT';
 
 type MeetingRoleFilterTabsProps = {
-  tabs: { value: MeetingRoleFilter; label: string }[];
+  tabs: { value: MeetingRoleFilter; label: string; count: number }[];
   value: MeetingRoleFilter;
   onChange: (value: MeetingRoleFilter) => void;
 };
@@ -19,12 +19,18 @@ export function MeetingRoleFilterTabs({ tabs, value, onChange }: MeetingRoleFilt
         return (
           <Pressable
             key={tab.value}
-            style={[styles.tab, isActive && styles.tabActive]}
+            style={styles.tab}
             onPress={() => onChange(tab.value)}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
           >
-            <Text style={[styles.label, isActive && styles.labelActive]}>{tab.label}</Text>
+            <View style={styles.tabContent}>
+              <Text style={[styles.label, isActive && styles.labelActive]}>{tab.label}</Text>
+              <Text style={[styles.count, isActive ? styles.countActive : styles.countInactive]}>
+                {tab.count}
+              </Text>
+            </View>
+            {isActive && <View style={styles.underline} />}
           </Pressable>
         );
       })}
@@ -35,32 +41,42 @@ export function MeetingRoleFilterTabs({ tabs, value, onChange }: MeetingRoleFilt
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.meeting.filterTabBackground,
-    borderRadius: borderRadius.lg,
-    padding: 4,
-    gap: 4,
+    borderBottomWidth: 1.5,
+    borderBottomColor: colors.meeting.outlineBorder,
   },
   tab: {
     flex: 1,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.md,
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: spacing.sm,
   },
-  tabActive: {
-    backgroundColor: colors.background,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
+  tabContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   label: {
     ...typography.body2,
-    fontWeight: '600',
-    color: colors.text.secondary,
+    color: colors.meeting.mutedText,
   },
   labelActive: {
-    color: colors.text.primary,
+    fontWeight: '600',
+    color: colors.meeting.primary,
+  },
+  count: {
+    ...typography.caption,
+    fontWeight: '700',
+  },
+  countActive: {
+    color: colors.meeting.primary,
+  },
+  countInactive: {
+    color: colors.meeting.pendingText,
+  },
+  underline: {
+    marginTop: spacing.sm,
+    height: 2.5,
+    width: '70%',
+    borderRadius: 1.5,
+    backgroundColor: colors.meeting.primary,
   },
 });

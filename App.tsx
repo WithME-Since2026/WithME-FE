@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 
+import { LoadingView } from '@/common/components/LoadingView';
+
 import { AppProviders } from '@/app/providers';
 import { RootNavigator } from '@/app/navigation';
 
@@ -9,7 +11,7 @@ export default function App() {
   const [iconsLoaded] = useFonts({ ...Ionicons.font });
 
   if (!iconsLoaded) {
-    return null;
+    return <LoadingView />;
   }
 
   return (

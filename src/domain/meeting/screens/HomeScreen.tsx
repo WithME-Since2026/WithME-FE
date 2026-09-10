@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyView } from '@/common/components/EmptyView';
@@ -19,22 +22,29 @@ import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
+import type { MainTabParamList, RootStackParamList } from '@/app/navigation';
+
 import { FeaturedMeetingCard } from '@/domain/meeting/components/FeaturedMeetingCard';
 import { MeetingListItem } from '@/domain/meeting/components/MeetingListItem';
 import type { MeetingRoleFilter } from '@/domain/meeting/components/MeetingRoleFilterTabs';
 import { MeetingRoleFilterTabs } from '@/domain/meeting/components/MeetingRoleFilterTabs';
 import { useHomeMeetingsQuery } from '@/domain/meeting/hooks/useHomeMeetingsQuery';
 
-const ROLE_FILTER_TABS: { value: MeetingRoleFilter; label: string }[] = [
+const ROLE_FILTER_LABELS: { value: MeetingRoleFilter; label: string }[] = [
   { value: 'ALL', label: '전체' },
   { value: 'OPERATOR', label: '운영' },
   { value: 'PARTICIPANT', label: '참여' },
 ];
 
-// 모임 상세(H1c/H1d) 화면이 아직 없어 카드 액션은 추후 이슈에서 navigation 연결 예정
+// 리마인더 발송/참석 응답은 모임 상세 화면에서 처리하므로 홈 카드에서는 추후 이슈에서 연결 예정
 function handlePendingAction() {}
 
-export function HomeScreen() {
+type HomeScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, 'Home'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+export function HomeScreen({ navigation }: HomeScreenProps) {
   const { data, isLoading, isError } = useHomeMeetingsQuery();
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
@@ -72,6 +82,10 @@ export function HomeScreen() {
     setActiveFeaturedIndex(index);
   };
 
+  const handleViewMeetingDetail = (meetingId: number) => {
+    navigation.navigate('MeetingDetail', { meetingId });
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -105,7 +119,7 @@ export function HomeScreen() {
                 <View key={meeting.meetingId} style={[styles.featuredPage, { width }]}>
                   <FeaturedMeetingCard
                     meeting={meeting}
-                    onViewStatusPress={handlePendingAction}
+                    onViewStatusPress={() => handleViewMeetingDetail(meeting.meetingId)}
                     onRemindPress={handlePendingAction}
                     onAttendPress={handlePendingAction}
                     onDeclinePress={handlePendingAction}
@@ -130,9 +144,9 @@ export function HomeScreen() {
 
         <View style={styles.filterSection}>
           <MeetingRoleFilterTabs
-            tabs={ROLE_FILTER_TABS.map((tab) => ({
+            tabs={ROLE_FILTER_LABELS.map((tab) => ({
               ...tab,
-              label: `${tab.label} ${roleFilterCounts[tab.value]}`,
+              count: roleFilterCounts[tab.value],
             }))}
             value={roleFilter}
             onChange={setRoleFilter}
@@ -151,13 +165,21 @@ export function HomeScreen() {
             <EmptyView message="해당하는 모임이 없습니다." />
           ) : (
             filteredOtherMeetings.map((meeting) => (
-              <MeetingListItem key={meeting.meetingId} meeting={meeting} />
+              <MeetingListItem
+                key={meeting.meetingId}
+                meeting={meeting}
+                onPress={() => handleViewMeetingDetail(meeting.meetingId)}
+              />
             ))
           )}
         </View>
       </ScrollView>
 
-      <Pressable style={styles.fab} hitSlop={8}>
+      <Pressable
+        style={styles.fab}
+        hitSlop={8}
+        onPress={() => navigation.navigate('CreateMeeting')}
+      >
         <Ionicons name="add" size={24} color={colors.background} />
       </Pressable>
     </SafeAreaView>
@@ -219,6 +241,7 @@ const styles = StyleSheet.create({
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     gap: spacing.xs,
     marginTop: spacing.sm,
   },
@@ -226,10 +249,11 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.border,
+    backgroundColor: colors.meeting.dotInactive,
   },
   dotActive: {
-    backgroundColor: colors.text.secondary,
+    width: 20,
+    backgroundColor: colors.meeting.primary,
   },
   filterSection: {
     paddingHorizontal: spacing.lg,
@@ -246,11 +270,11 @@ const styles = StyleSheet.create({
   listHeaderTitle: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.text.secondary,
+    color: colors.meeting.mutedText,
   },
   sortLabel: {
     ...typography.caption,
-    color: colors.primary,
+    color: colors.meeting.primary,
   },
   list: {
     paddingHorizontal: spacing.lg,
@@ -262,13 +286,13 @@ const styles = StyleSheet.create({
     bottom: spacing.xl,
     width: 56,
     height: 56,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.meeting.cardBackground,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.meeting.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.meeting.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 4,
   },

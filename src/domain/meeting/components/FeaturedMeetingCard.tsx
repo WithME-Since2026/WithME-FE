@@ -21,55 +21,56 @@ export function FeaturedMeetingCard({
   onDeclinePress,
   onUndecidedPress,
 }: FeaturedMeetingCardProps) {
-  const { role, title, scheduleText, locationText, dDayLabel, attendance } = meeting;
+  const { role, roundLabel, title, dateLabel, timeLabel, locationText, dDayLabel, attendance } =
+    meeting;
   const isOperator = role === 'OPERATOR';
-  const totalAttendance = attendance.attending + attendance.notAttending + attendance.pending;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, !isOperator && styles.cardParticipant]}>
       <View style={styles.topRow}>
-        <View
-          style={[
-            styles.roleBadge,
-            { backgroundColor: isOperator ? colors.meeting.operatorBadge : colors.meeting.participantBadge },
-          ]}
-        >
-          <Text style={styles.roleBadgeLabel}>{isOperator ? '운영자' : '참여자'}</Text>
+        <View style={styles.roleBadge}>
+          <Text style={styles.roleBadgeLabel}>
+            {isOperator ? '운영자' : '참여자'} · {roundLabel}
+          </Text>
         </View>
 
-        <View style={styles.dDayBadge}>
-          <Text style={styles.dDayLabel}>{dDayLabel}</Text>
-        </View>
+        <Text style={styles.dDayLabel}>{dDayLabel}</Text>
       </View>
 
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.meta}>{scheduleText}</Text>
-      <Text style={styles.meta}>{locationText}</Text>
+      <Text style={styles.meta}>
+        {dateLabel} {timeLabel} · {locationText}
+      </Text>
 
       <View style={styles.progressTrack}>
-        {attendance.attending > 0 && (
-          <View style={{ flex: attendance.attending, backgroundColor: colors.meeting.attending }} />
-        )}
-        {attendance.notAttending > 0 && (
-          <View
-            style={{ flex: attendance.notAttending, backgroundColor: colors.meeting.notAttending }}
-          />
-        )}
-        {(attendance.pending > 0 || totalAttendance === 0) && (
-          <View style={{ flex: attendance.pending || 1, backgroundColor: colors.meeting.pending }} />
-        )}
+        <View style={{ flex: attendance.attending, backgroundColor: colors.meeting.primary }} />
+        <View style={{ flex: attendance.notAttending, backgroundColor: colors.meeting.notAttending }} />
       </View>
 
-      <Text style={styles.summaryText}>
-        <Text style={{ color: colors.meeting.attending }}>참석 {attendance.attending}</Text>
-        <Text style={{ color: colors.meeting.pending }}> · </Text>
-        <Text style={{ color: colors.meeting.notAttending }}>불참 {attendance.notAttending}</Text>
-        <Text style={{ color: colors.meeting.pending }}> · 미응답 {attendance.pending}</Text>
-      </Text>
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryText}>
+          참석 <Text style={[styles.summaryValue, { color: colors.meeting.primary }]}>{attendance.attending}</Text>
+        </Text>
+        <Text style={styles.summaryText}>
+          불참{' '}
+          <Text style={[styles.summaryValue, { color: colors.meeting.notAttending }]}>
+            {attendance.notAttending}
+          </Text>
+        </Text>
+        <Text style={styles.summaryText}>
+          미응답{' '}
+          <Text style={[styles.summaryValue, { color: colors.meeting.pendingText }]}>
+            {attendance.pending}
+          </Text>
+        </Text>
+      </View>
 
       {isOperator ? (
         <View style={styles.actionRow}>
-          <Pressable style={[styles.actionButton, styles.actionButtonPrimary]} onPress={onViewStatusPress}>
+          <Pressable
+            style={[styles.actionButton, styles.actionButtonPrimary, styles.actionButtonWide]}
+            onPress={onViewStatusPress}
+          >
             <Text style={styles.actionLabelPrimary}>현황 보기</Text>
           </Pressable>
           <Pressable style={[styles.actionButton, styles.actionButtonOutline]} onPress={onRemindPress}>
@@ -78,14 +79,17 @@ export function FeaturedMeetingCard({
         </View>
       ) : (
         <View style={styles.actionRow}>
-          <Pressable style={[styles.actionButton, styles.actionButtonPrimary]} onPress={onAttendPress}>
-            <Text style={styles.actionLabelPrimary}>참석하기</Text>
-          </Pressable>
-          <Pressable style={[styles.actionButton, styles.actionButtonDark]} onPress={onDeclinePress}>
-            <Text style={styles.actionLabelPrimary}>불참하기</Text>
+          <Pressable
+            style={[styles.actionButton, styles.actionButtonPrimary, styles.actionButtonWide]}
+            onPress={onAttendPress}
+          >
+            <Text style={styles.actionLabelPrimary}>참석</Text>
           </Pressable>
           <Pressable style={[styles.actionButton, styles.actionButtonOutline]} onPress={onUndecidedPress}>
-            <Text style={styles.actionLabelMuted}>미정</Text>
+            <Text style={styles.actionLabelOutline}>미정</Text>
+          </Pressable>
+          <Pressable style={[styles.actionButton, styles.actionButtonOutline]} onPress={onDeclinePress}>
+            <Text style={styles.actionLabelOutline}>불참</Text>
           </Pressable>
         </View>
       )}
@@ -95,9 +99,18 @@ export function FeaturedMeetingCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.meeting.cardBackground,
-    borderRadius: borderRadius.lg,
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.lg + 8,
     padding: spacing.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  cardParticipant: {
+    borderWidth: 1,
+    borderColor: colors.meeting.participantCardBorder,
   },
   topRow: {
     flexDirection: 'row',
@@ -105,52 +118,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   roleBadge: {
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 3,
+    backgroundColor: colors.meeting.badgeBackground,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
     borderRadius: borderRadius.sm,
   },
   roleBadgeLabel: {
     ...typography.caption,
-    fontSize: 9,
     fontWeight: '700',
-    color: colors.background,
-  },
-  dDayBadge: {
-    backgroundColor: colors.meeting.dDayBackground,
-    borderWidth: 1,
-    borderColor: colors.meeting.dDayBorder,
-    borderRadius: borderRadius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
+    color: colors.meeting.primary,
   },
   dDayLabel: {
     ...typography.caption,
-    fontSize: 9,
-    fontWeight: '700',
-    color: colors.background,
+    color: colors.meeting.mutedText,
   },
   title: {
-    ...typography.heading3,
-    color: colors.background,
+    ...typography.heading2,
+    color: colors.meeting.strongText,
     marginTop: spacing.sm,
   },
   meta: {
-    ...typography.caption,
+    ...typography.body2,
     color: colors.meeting.mutedText,
-    marginTop: 2,
+    marginTop: spacing.xs,
   },
   progressTrack: {
     flexDirection: 'row',
-    height: 7,
+    height: 6,
     borderRadius: borderRadius.sm,
     overflow: 'hidden',
-    backgroundColor: colors.meeting.cardDivider,
+    backgroundColor: colors.meeting.progressTrack,
     marginTop: spacing.md,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginTop: spacing.sm,
   },
   summaryText: {
     ...typography.caption,
-    fontSize: 9,
-    marginTop: spacing.xs,
+    color: colors.meeting.mutedText,
+  },
+  summaryValue: {
+    fontWeight: '700',
   },
   actionRow: {
     flexDirection: 'row',
@@ -159,22 +169,20 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    height: 38,
-    borderRadius: borderRadius.md,
+    height: 46,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionButtonPrimary: {
-    backgroundColor: colors.primary,
+  actionButtonWide: {
+    flex: 2,
   },
-  actionButtonDark: {
-    backgroundColor: colors.meeting.cardDivider,
-    borderWidth: 1.5,
-    borderColor: colors.meeting.dDayBorder,
+  actionButtonPrimary: {
+    backgroundColor: colors.meeting.primary,
   },
   actionButtonOutline: {
-    borderWidth: 1.5,
-    borderColor: colors.meeting.dDayBorder,
+    borderWidth: 1,
+    borderColor: colors.meeting.outlineBorder,
   },
   actionLabelPrimary: {
     ...typography.body2,
@@ -183,10 +191,7 @@ const styles = StyleSheet.create({
   },
   actionLabelOutline: {
     ...typography.body2,
-    color: colors.background,
-  },
-  actionLabelMuted: {
-    ...typography.body2,
+    fontWeight: '600',
     color: colors.meeting.mutedText,
   },
 });

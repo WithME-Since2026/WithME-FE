@@ -10,6 +10,9 @@ import { NameInputScreen } from '@/domain/auth/screens/NameInputScreen';
 import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
+import { CreateMeetingCompleteScreen } from '@/domain/meeting/screens/CreateMeetingCompleteScreen';
+import { CreateMeetingScreen } from '@/domain/meeting/screens/CreateMeetingScreen';
+import { MeetingDetailScreen } from '@/domain/meeting/screens/MeetingDetailScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
 
 export type RootStackParamList = {
@@ -22,6 +25,9 @@ export type RootStackParamList = {
   ResetPassword: { loginId: string; email: string; code: string };
   Onboarding: undefined;
   Main: undefined;
+  MeetingDetail: { meetingId: number };
+  CreateMeeting: undefined;
+  CreateMeetingComplete: { meetingId: number; title: string; inviteLink: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -40,6 +46,13 @@ export function RootNavigator() {
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Main" component={MainTabNavigator} />
+        <Stack.Screen name="MeetingDetail" component={MeetingDetailScreen} />
+        <Stack.Screen
+          name="CreateMeeting"
+          component={CreateMeetingScreen}
+          options={{ presentation: 'modal' }}
+        />
+        <Stack.Screen name="CreateMeetingComplete" component={CreateMeetingCompleteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

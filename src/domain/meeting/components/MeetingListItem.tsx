@@ -14,7 +14,7 @@ type MeetingListItemProps = {
 };
 
 export function MeetingListItem({ meeting, onPress }: MeetingListItemProps) {
-  const accentColor = getMeetingStatusColors(meeting.statusLabel).text;
+  const accentColor = getMeetingStatusColors(meeting.statusLabel).accent;
 
   return (
     <Pressable
