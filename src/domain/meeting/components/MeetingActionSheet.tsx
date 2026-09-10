@@ -1,6 +1,11 @@
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+
+import { Animated, Dimensions, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const ANIMATION_DURATION = 220;
 
 type MeetingActionSheetProps = {
   visible: boolean;
@@ -25,56 +30,107 @@ export function MeetingActionSheet({
   onLeave,
   onDelete,
 }: MeetingActionSheetProps) {
+  // Modal 기본 slide 애니메이션은 배경(오버레이)까지 시트와 함께 밀려 올라오는 문제가 있어,
+  // 배경은 즉시 나타나게(fade) 하고 시트만 아래에서 올라오도록(translateY) 따로 애니메이션함
+  const [isMounted, setIsMounted] = useState(visible);
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setIsMounted(true);
+      Animated.parallel([
+        Animated.timing(backdropOpacity, {
+          toValue: 1,
+          duration: ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+        Animated.timing(sheetTranslateY, {
+          toValue: 0,
+          duration: ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(backdropOpacity, {
+          toValue: 0,
+          duration: ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+        Animated.timing(sheetTranslateY, {
+          toValue: SCREEN_HEIGHT,
+          duration: ANIMATION_DURATION,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setIsMounted(false));
+    }
+  }, [visible, backdropOpacity, sheetTranslateY]);
+
+  if (!isMounted) {
+    return null;
+  }
+
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} />
+    <Modal transparent visible animationType="none" onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <Animated.View
+          style={[styles.backdrop, { opacity: backdropOpacity }]}
+          pointerEvents={visible ? 'auto' : 'none'}
+        >
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        </Animated.View>
 
-      <View style={styles.sheet}>
-        <View style={styles.handle} />
-        <Text style={styles.title}>{title}</Text>
+        <Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }] }]}>
+          <View style={styles.handle} />
+          <Text style={styles.title}>{title}</Text>
 
-        {isOperator && (
-          <Pressable style={styles.row} onPress={onReschedule}>
-            <Text style={styles.rowLabel}>일정 변경</Text>
+          {isOperator && (
+            <Pressable style={styles.row} onPress={onReschedule}>
+              <Text style={styles.rowLabel}>일정 변경</Text>
+            </Pressable>
+          )}
+          {isOperator && (
+            <Pressable style={styles.row} onPress={onEditInfo}>
+              <Text style={styles.rowLabel}>모임 정보 수정</Text>
+            </Pressable>
+          )}
+
+          <Pressable style={styles.row} onPress={onNotificationSettings}>
+            <Text style={styles.rowLabel}>알림 설정</Text>
           </Pressable>
-        )}
-        {isOperator && (
-          <Pressable style={styles.row} onPress={onEditInfo}>
-            <Text style={styles.rowLabel}>모임 정보 수정</Text>
+
+          <Pressable style={styles.row} onPress={onLeave}>
+            <Text style={styles.rowLabelDanger}>모임 나가기</Text>
           </Pressable>
-        )}
 
-        <Pressable style={styles.row} onPress={onNotificationSettings}>
-          <Text style={styles.rowLabel}>알림 설정</Text>
-        </Pressable>
+          {isOperator && (
+            <Pressable style={[styles.row, styles.rowLast]} onPress={onDelete}>
+              <Text style={styles.rowLabelDanger}>모임 삭제</Text>
+            </Pressable>
+          )}
 
-        <Pressable style={styles.row} onPress={onLeave}>
-          <Text style={styles.rowLabelDanger}>모임 나가기</Text>
-        </Pressable>
-
-        {isOperator && (
-          <Pressable style={[styles.row, styles.rowLast]} onPress={onDelete}>
-            <Text style={styles.rowLabelDanger}>모임 삭제</Text>
+          <Pressable style={styles.cancelButton} onPress={onClose}>
+            <Text style={styles.cancelLabel}>취소</Text>
           </Pressable>
-        )}
-
-        <Pressable style={styles.cancelButton} onPress={onClose}>
-          <Text style={styles.cancelLabel}>취소</Text>
-        </Pressable>
+        </Animated.View>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
+  overlay: {
     flex: 1,
+    justifyContent: 'flex-end',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.overlay,
   },
   sheet: {
     backgroundColor: colors.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderRadius: 20,
     overflow: 'hidden',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
