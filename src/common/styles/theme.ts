@@ -1,5 +1,5 @@
 export const colors = {
-  primary: '#4A90FA',
+  primary: '#162a56',
   secondary: '#7C3AED',
   background: '#FFFFFF',
   surface: '#F9FAFB',
@@ -11,9 +11,13 @@ export const colors = {
   error: '#EB4747',
   success: '#33B96B',
   border: '#E5E7EB',
+  borderStrong: '#9CA3AF',
+  divider: 'rgba(0, 0, 0, 0.08)',
+  weekend: '#cc4d4da3',
   // 카카오 브랜드 가이드 고정 컬러
   kakao: '#FEE500',
   kakaoText: '#191919',
+  overlay: 'rgba(0, 0, 0, 0.4)',
   // 모임 홈/상세/생성 플로우 전용 팔레트 (Figma "모임" 섹션 고정 컬러)
   meeting: {
     primary: '#1A73E8',

@@ -29,6 +29,7 @@ export type CheckLoginIdResponse = {
 export type SignUpRequest = {
   loginId: string;
   password: string;
+  email: string;
   agreeMarketing: boolean;
 };
 

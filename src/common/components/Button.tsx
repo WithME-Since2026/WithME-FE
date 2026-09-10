@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   base: {
     height: 52,
     paddingHorizontal: spacing.lg,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -93,7 +93,7 @@ const variantStyles = StyleSheet.create({
   outline: {
     backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderStrong,
   },
   kakao: {
     backgroundColor: colors.kakao,

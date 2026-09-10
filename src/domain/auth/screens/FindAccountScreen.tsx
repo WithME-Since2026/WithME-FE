@@ -32,7 +32,8 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
   const [activeTab, setActiveTab] = useState<FindTab>(route.params?.initialTab ?? 'ID');
   const [name, setName] = useState('');
   const [loginId, setLoginId] = useState('');
-  const [email, setEmail] = useState('');
+  const [emailLocal, setEmailLocal] = useState('');
+  const [emailDomain, setEmailDomain] = useState('');
   const [code, setCode] = useState('');
   const [hasSentCode, setHasSentCode] = useState(false);
   const [codeErrorMessage, setCodeErrorMessage] = useState<string>();
@@ -47,6 +48,7 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
   const checkEmailCodeMutation = useCheckEmailCodeMutation();
   const findLoginIdMutation = useFindLoginIdMutation();
 
+  const email = emailLocal && emailDomain ? `${emailLocal}@${emailDomain}` : '';
   const isEmailFormatValid = email.length === 0 || isValidEmail(email);
   const isCodeExpired = hasSentCode && remainingSeconds <= 0;
 
@@ -61,7 +63,8 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
 
   const handleTabChange = (tab: FindTab) => {
     setActiveTab(tab);
-    setEmail('');
+    setEmailLocal('');
+    setEmailDomain('');
     setCode('');
     setHasSentCode(false);
     setCodeErrorMessage(undefined);
@@ -163,8 +166,11 @@ export function FindAccountScreen({ navigation, route }: FindAccountScreenProps)
             )}
 
             <EmailVerificationField
+              emailLocal={emailLocal}
+              onEmailLocalChange={setEmailLocal}
+              emailDomain={emailDomain}
+              onEmailDomainChange={setEmailDomain}
               email={email}
-              onEmailChange={setEmail}
               emailErrorMessage={!isEmailFormatValid ? '올바른 이메일 형식이 아닙니다.' : undefined}
               isSendDisabled={!isEmailFormatValid}
               hasSentCode={hasSentCode}
