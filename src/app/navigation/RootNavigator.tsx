@@ -1,6 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { MainTabNavigator } from './MainTabNavigator';
+
 import { FindAccountScreen } from '@/domain/auth/screens/FindAccountScreen';
 import { FindIdResultScreen } from '@/domain/auth/screens/FindIdResultScreen';
 import { LoginScreen } from '@/domain/auth/screens/LoginScreen';
@@ -8,7 +10,9 @@ import { NameInputScreen } from '@/domain/auth/screens/NameInputScreen';
 import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
-import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
+import { CreateMeetingCompleteScreen } from '@/domain/meeting/screens/CreateMeetingCompleteScreen';
+import { CreateMeetingScreen } from '@/domain/meeting/screens/CreateMeetingScreen';
+import { MeetingDetailScreen } from '@/domain/meeting/screens/MeetingDetailScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
 
 export type RootStackParamList = {
@@ -20,7 +24,10 @@ export type RootStackParamList = {
   FindIdResult: { loginId: string };
   ResetPassword: { loginId: string; email: string; code: string };
   Onboarding: undefined;
-  Calendar: undefined;
+  Main: undefined;
+  MeetingDetail: { meetingId: number };
+  CreateMeeting: undefined;
+  CreateMeetingComplete: { meetingId: number; title: string; inviteLink: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -38,7 +45,14 @@ export function RootNavigator() {
         <Stack.Screen name="FindIdResult" component={FindIdResultScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Calendar" component={CalendarScreen} />
+        <Stack.Screen name="Main" component={MainTabNavigator} />
+        <Stack.Screen name="MeetingDetail" component={MeetingDetailScreen} />
+        <Stack.Screen
+          name="CreateMeeting"
+          component={CreateMeetingScreen}
+          options={{ presentation: 'modal' }}
+        />
+        <Stack.Screen name="CreateMeetingComplete" component={CreateMeetingCompleteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
