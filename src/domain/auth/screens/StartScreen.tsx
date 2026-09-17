@@ -27,8 +27,8 @@ export function StartScreen({ navigation }: StartScreenProps) {
     navigation.navigate('SignUp');
   };
 
-  // 로그인 없이도 새로 만든 프리미엄 구독/결제수단 등록 화면을 바로 확인할 수 있도록 하는 개발용 진입 버튼
-  const handleDevSubscriptionPress = () => navigation.navigate('Subscription');
+  // 로그인 없이도 새로 만든 회원 탈퇴(1~3단계) 플로우를 바로 확인할 수 있도록 하는 개발용 진입 버튼
+  const handleDevWithdrawPress = () => navigation.navigate('Withdraw');
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -68,9 +68,9 @@ export function StartScreen({ navigation }: StartScreenProps) {
           {__DEV__ && (
             <View style={styles.devSection}>
               <Button
-                label="[dev] 프리미엄 구독 화면 바로가기"
+                label="[dev] 회원 탈퇴 화면 바로가기"
                 variant="outline"
-                onPress={handleDevSubscriptionPress}
+                onPress={handleDevWithdrawPress}
               />
             </View>
           )}

@@ -12,6 +12,10 @@ import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
 import { MyPageScreen } from '@/domain/mypage/screens/MyPageScreen';
 import { NotificationSettingsScreen } from '@/domain/mypage/screens/NotificationSettingsScreen';
 import { ProfileEditScreen } from '@/domain/mypage/screens/ProfileEditScreen';
+import { WithdrawCompleteScreen } from '@/domain/mypage/screens/WithdrawCompleteScreen';
+import { WithdrawConfirmScreen } from '@/domain/mypage/screens/WithdrawConfirmScreen';
+import { WithdrawReasonScreen } from '@/domain/mypage/screens/WithdrawReasonScreen';
+import { WithdrawScreen } from '@/domain/mypage/screens/WithdrawScreen';
 import { NotificationScreen } from '@/domain/notification/screens/NotificationScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
 import { PaymentCompleteScreen } from '@/domain/subscription/screens/PaymentCompleteScreen';
@@ -32,6 +36,10 @@ export type RootStackParamList = {
   MyPage: undefined;
   ProfileEdit: undefined;
   NotificationSettings: undefined;
+  Withdraw: undefined;
+  WithdrawReason: undefined;
+  WithdrawConfirm: { reason?: string; detail?: string } | undefined;
+  WithdrawComplete: undefined;
   Subscription: undefined;
   PaymentMethod: undefined;
   PaymentComplete: undefined;
@@ -57,6 +65,10 @@ export function RootNavigator() {
         <Stack.Screen name="MyPage" component={MyPageScreen} />
         <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
         <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+        <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+        <Stack.Screen name="WithdrawReason" component={WithdrawReasonScreen} />
+        <Stack.Screen name="WithdrawConfirm" component={WithdrawConfirmScreen} />
+        <Stack.Screen name="WithdrawComplete" component={WithdrawCompleteScreen} />
         <Stack.Screen name="Subscription" component={SubscriptionScreen} />
         <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen} />
         <Stack.Screen name="PaymentComplete" component={PaymentCompleteScreen} />

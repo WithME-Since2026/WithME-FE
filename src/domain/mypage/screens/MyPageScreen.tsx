@@ -42,33 +42,26 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
   const logoutMutation = useLogoutMutation();
   const { data: notifications } = useNotificationsQuery();
   const { data: groups } = useMyGroupsQuery();
-  // 로그아웃/탈퇴 확인 모달에서 어느 액션을 확인 중인지 (Figma node 761:17659)
-  const [pendingExitAction, setPendingExitAction] = useState<'logout' | 'withdraw' | null>(null);
+  // 로그아웃 확인 모달 표시 여부 (Figma node 761:17659). 회원 탈퇴는 별도 3단계 플로우(Withdraw*)로 분리됨
+  const [isLogoutConfirmVisible, setIsLogoutConfirmVisible] = useState(false);
 
   const isLoading = isProfileLoading || isAttendanceLoading;
   const isError = isProfileError || isAttendanceError;
   const hasUnreadNotifications =
     notifications?.some((notification) => !notification.isRead) ?? false;
 
-  // TODO: 회원 탈퇴 API가 아직 명세되지 않아 우선 자리만 만들어 둠
-  const handleWithdraw = () => {};
-
-  const handleConfirmExit = () => {
-    if (pendingExitAction === 'logout') {
-      logoutMutation.mutate(undefined, {
-        onSuccess: () => {
-          navigation.reset({ index: 0, routes: [{ name: 'Start' }] });
-        },
-      });
-    } else if (pendingExitAction === 'withdraw') {
-      handleWithdraw();
-    }
-
-    setPendingExitAction(null);
+  const handleConfirmLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        navigation.reset({ index: 0, routes: [{ name: 'Start' }] });
+      },
+    });
+    setIsLogoutConfirmVisible(false);
   };
 
   const handleNotificationSettingsPress = () => navigation.navigate('NotificationSettings');
   const handleEditProfilePress = () => navigation.navigate('ProfileEdit');
+  const handleWithdrawPress = () => navigation.navigate('Withdraw');
 
   // TODO: 내 모임 관리/결제수단 등록/문제 신고/프리미엄 화면이 아직 없어 우선 자리만 만들어 둠
   const noop = () => {};
@@ -135,10 +128,10 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
           </View>
 
           <View style={styles.exitRow}>
-            <Pressable onPress={() => setPendingExitAction('logout')} hitSlop={8}>
+            <Pressable onPress={() => setIsLogoutConfirmVisible(true)} hitSlop={8}>
               <Text style={styles.logoutLabel}>로그아웃</Text>
             </Pressable>
-            <Pressable onPress={() => setPendingExitAction('withdraw')} hitSlop={8}>
+            <Pressable onPress={handleWithdrawPress} hitSlop={8}>
               <Text style={styles.withdrawLabel}>회원 탈퇴</Text>
             </Pressable>
           </View>
@@ -146,11 +139,10 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
       )}
 
       <ConfirmModal
-        visible={pendingExitAction !== null}
-        // 로그아웃 문구만 확정 반영. 탈퇴 문구는 아직 그대로 둠(추후 별도 요청 시 변경)
-        message={pendingExitAction === 'logout' ? '정말 로그아웃 하시겠어요?' : '정말 떠나시나요?'}
-        onCancel={() => setPendingExitAction(null)}
-        onConfirm={handleConfirmExit}
+        visible={isLogoutConfirmVisible}
+        message="정말 로그아웃 하시겠어요?"
+        onCancel={() => setIsLogoutConfirmVisible(false)}
+        onConfirm={handleConfirmLogout}
       />
 
       {/* TODO: 하단 탭바(홈/캘린더/마이)는 다른 팀원이 작업 중 — 완료되면 여기에 연결 */}
