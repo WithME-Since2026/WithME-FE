@@ -38,5 +38,10 @@ export function createDefaultCustomRecurrence(dueDateKey: string): TodoRecurrenc
 export function formatRecurrenceSummary(rule: TodoRecurrenceRule) {
   const unitLabel = UNIT_LABELS[rule.unit];
 
-  return rule.interval <= 1 ? `매${unitLabel}` : `${rule.interval}${unitLabel}마다`;
+  if (rule.interval <= 1) {
+    // "매" + "개월"은 "매개월"이 되어 어색하다 — 매달을 뜻하는 자연스러운 표현은 "매월"
+    return rule.unit === 'MONTH' ? '매월' : `매${unitLabel}`;
+  }
+
+  return `${rule.interval}${unitLabel}마다`;
 }

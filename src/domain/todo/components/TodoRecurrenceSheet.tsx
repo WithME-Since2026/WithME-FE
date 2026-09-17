@@ -107,7 +107,9 @@ export function TodoRecurrenceSheet({
   }
 
   const isWeekly = unit === 'WEEK';
-  const isSaveDisabled = isWeekly && weekdays.length === 0;
+  // dateKey가 'YYYY-MM-DD' 0-padded 형식이라 문자열 비교로도 날짜 순서 비교가 가능하다
+  const isEndDateBeforeDueDate = endType === 'ON_DATE' && endDate < dueDateKey;
+  const isSaveDisabled = (isWeekly && weekdays.length === 0) || isEndDateBeforeDueDate;
 
   const handleToggleWeekday = (day: number) => {
     setWeekdays((prev) =>
@@ -255,13 +257,18 @@ export function TodoRecurrenceSheet({
                 </View>
 
                 {endType === 'ON_DATE' && (
-                  <Pressable
-                    style={styles.endDetailRow}
-                    onPress={() => setIsEndDatePickerOpen(true)}
-                  >
-                    <Text style={styles.endDetailValue}>{formatEndDateLabel(endDate)}</Text>
-                    <Ionicons name="chevron-forward" size={16} color={colors.text.secondary} />
-                  </Pressable>
+                  <>
+                    <Pressable
+                      style={styles.endDetailRow}
+                      onPress={() => setIsEndDatePickerOpen(true)}
+                    >
+                      <Text style={styles.endDetailValue}>{formatEndDateLabel(endDate)}</Text>
+                      <Ionicons name="chevron-forward" size={16} color={colors.text.secondary} />
+                    </Pressable>
+                    {isEndDateBeforeDueDate && (
+                      <Text style={styles.errorText}>종료일은 할 일 날짜 이후여야 해요</Text>
+                    )}
+                  </>
                 )}
 
                 {endType === 'AFTER_COUNT' && (
@@ -483,6 +490,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: colors.text.primary,
+  },
+  errorText: {
+    ...typography.caption,
+    color: colors.error,
   },
   // 반복 주기 행(intervalRow)의 -/+ 스테퍼와 같은 형태: 왼쪽 -, 가운데 숫자 입력창, 오른쪽 +
   countStepperRow: {
