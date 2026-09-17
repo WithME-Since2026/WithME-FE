@@ -59,6 +59,9 @@ export function CalendarScreen(_props: CalendarScreenProps) {
   const [isLayerModalOpen, setIsLayerModalOpen] = useState(false);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isTodoCreateSheetOpen, setIsTodoCreateSheetOpen] = useState(false);
+  // DayDetailSheet를 닫으면 selectedDateKey도 함께 비워지므로, TodoCreateSheet에 넘길 날짜는
+  // 시트를 닫기 직전에 따로 저장해둔다 (그렇지 않으면 오늘 날짜로 잘못 열린다)
+  const [todoCreateDateKey, setTodoCreateDateKey] = useState<string | null>(null);
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
   const [quickActionTodoId, setQuickActionTodoId] = useState<number | null>(null);
   const [isCategoryManageOpen, setIsCategoryManageOpen] = useState(false);
@@ -254,21 +257,28 @@ export function CalendarScreen(_props: CalendarScreenProps) {
         dateLabel={selectedDateKey ? formatDayDetailLabel(parseDateKey(selectedDateKey)) : ''}
         events={selectedDayEvents}
         onClose={() => setSelectedDateKey(null)}
-        onAddTodo={() => setIsTodoCreateSheetOpen(true)}
+        onAddTodo={() => {
+          // 시트를 닫기 전에 선택 날짜를 별도 상태로 옮겨둔 뒤 DayDetailSheet를 닫는다
+          setTodoCreateDateKey(selectedDateKey);
+          setSelectedDateKey(null);
+          setIsTodoCreateSheetOpen(true);
+        }}
         onOpenTodoActions={handleOpenTodoActions}
         onToggleTodoComplete={handleToggleTodoComplete}
       />
 
       <TodoCreateSheet
         visible={isTodoCreateSheetOpen}
+        obscured={isCategoryManageOpen}
         categories={categories ?? []}
-        initialDateKey={selectedDateKey ?? formatDateKey(today)}
+        initialDateKey={todoCreateDateKey ?? formatDateKey(today)}
         onClose={() => setIsTodoCreateSheetOpen(false)}
         onAddCategory={() => setIsCategoryManageOpen(true)}
       />
 
       <TodoEditSheet
         visible={editingTodoId !== null}
+        obscured={isCategoryManageOpen}
         todo={editingTodo}
         categories={categories ?? []}
         onClose={() => setEditingTodoId(null)}

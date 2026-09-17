@@ -58,5 +58,10 @@ export function updateMockCategory(request: UpdateCategoryRequest): CategoryResp
 
 // TODO: BE에 카테고리 삭제 엔드포인트가 아직 없음(계획 문서에도 없음) — mock으로만 지원
 export function deleteMockCategory(categoryId: number): void {
-  mockCategories = mockCategories.filter((category) => category.categoryId !== categoryId);
+  // createMockCategory가 다음 sortOrder를 배열 길이로 계산하므로, 삭제로 생긴 빈자리를 그대로 두면
+  // 이후 추가되는 카테고리가 기존 sortOrder와 중복될 수 있어 남은 카테고리를 0부터 다시 채운다
+  mockCategories = mockCategories
+    .filter((category) => category.categoryId !== categoryId)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((category, index) => ({ ...category, sortOrder: index }));
 }

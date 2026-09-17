@@ -25,6 +25,9 @@ type TodoEditSheetProps = {
   // "+" 칩을 눌렀을 때 카테고리 생성 화면으로 이동시키기 위한 콜백 (내비게이션은 화면 쪽에서 담당).
   // 카테고리 생성 화면이 아직 없어 전달하지 않으면 "+" 칩 자체를 숨긴다
   onAddCategory?: () => void;
+  // CategoryManageSheet가 이 위에서 열려있는 동안 Modal만 잠깐 숨긴다. visible을 false로 바꾸면
+  // 컴포넌트가 언마운트되어 편집 중이던 제목/카테고리/날짜 등이 초기화되므로 이 방식으로 상태를 보존한다
+  obscured?: boolean;
 };
 
 function formatDateRowLabel(dateKey: string) {
@@ -41,6 +44,7 @@ export function TodoEditSheet({
   categories,
   onClose,
   onAddCategory,
+  obscured = false,
 }: TodoEditSheetProps) {
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -115,10 +119,10 @@ export function TodoEditSheet({
 
   return (
     <>
-      {/* "맞춤 반복" 시트가 열려 있는 동안엔 이 Modal을 잠깐 숨긴다. 두 개의 <Modal>이 동시에 떠 있으면
-          위(TodoRecurrenceSheet)의 TextInput(횟수 입력)이 포커스를 못 잡는 문제가 있다 */}
+      {/* "맞춤 반복" 시트나 카테고리 관리 시트가 열려 있는 동안엔 이 Modal을 잠깐 숨긴다. 두 개의
+          <Modal>이 동시에 떠 있으면 위 시트의 TextInput이 포커스를 못 잡는 문제가 있다 */}
       <Modal
-        visible={visible && !isRecurrenceSheetOpen}
+        visible={visible && !isRecurrenceSheetOpen && !obscured}
         transparent
         animationType="fade"
         onRequestClose={onClose}
