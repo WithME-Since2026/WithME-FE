@@ -2,81 +2,60 @@ import { useEffect } from 'react';
 
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-// 화면 하단에 잠깐 떴다 사라지는 공용 토스트 (Figma 784-23480). 별도 Modal로 띄우지 않고 호출한 화면의
-// 레이아웃 안에 절대 위치로 렌더링해 "그 화면 위에 뜨는" 형태를 그대로 재현한다
+import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
+
 type ToastProps = {
-  visible: boolean;
   message: string;
-  onClose: () => void;
-  autoHideDurationMs?: number;
+  onDismiss: () => void;
+  // 자동으로 사라지기까지 걸리는 시간(ms)
+  duration?: number;
 };
 
-// 이 토스트(Figma 784-23480)만의 다크 톤 컬러. 앱 전역 theme에는 없어 로컬로 정의함
-const TOAST_BG = '#313033';
-const TOAST_TEXT = '#FFFFFF';
-const TOAST_CLOSE_TEXT = '#DBE9FD';
-
-export function Toast({ visible, message, onClose, autoHideDurationMs = 2500 }: ToastProps) {
+// 액션 완료를 알려주는 화면 하단 토스트 배너 (예: 알림 화면의 참가 신청 거절 피드백)
+export function Toast({ message, onDismiss, duration = 3000 }: ToastProps) {
   useEffect(() => {
-    if (!visible) {
-      return;
-    }
-
-    const timer = setTimeout(onClose, autoHideDurationMs);
-
+    const timer = setTimeout(onDismiss, duration);
     return () => clearTimeout(timer);
-  }, [visible, autoHideDurationMs, onClose]);
-
-  if (!visible) {
-    return null;
-  }
+  }, [onDismiss, duration]);
 
   return (
-    <View style={styles.wrapper} pointerEvents="box-none">
-      <View style={styles.toast}>
-        <Text style={styles.message}>{message}</Text>
-        <Pressable style={styles.closeButton} onPress={onClose} hitSlop={8}>
-          <Text style={styles.closeLabel}>닫기</Text>
-        </Pressable>
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.message}>{message}</Text>
+      <Pressable onPress={onDismiss} hitSlop={8}>
+        <Text style={styles.dismissLabel}>닫기</Text>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  container: {
     position: 'absolute',
-    left: 14,
-    right: 14,
-    // 화면 하단 탭바 자리(CalendarScreen의 paddingBottom: 64)보다 살짝 위, Figma 784-23480 기준
-    bottom: 78,
-  },
-  toast: {
+    left: spacing.md,
+    right: spacing.md,
+    bottom: spacing.xl,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: TOAST_BG,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
+    backgroundColor: colors.toastBackground,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 4,
+    shadowColor: '#000',
     shadowOpacity: 0.4,
     shadowRadius: 6,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
   message: {
-    fontSize: 14,
-    lineHeight: 21,
-    color: TOAST_TEXT,
+    ...typography.body2,
+    color: colors.background,
+    flexShrink: 1,
   },
-  closeButton: {
-    paddingLeft: 12,
-  },
-  closeLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    lineHeight: 21,
-    color: TOAST_CLOSE_TEXT,
+  dismissLabel: {
+    ...typography.body2,
+    fontWeight: '600',
+    color: colors.notifJoinBg,
+    marginLeft: spacing.md,
   },
 });

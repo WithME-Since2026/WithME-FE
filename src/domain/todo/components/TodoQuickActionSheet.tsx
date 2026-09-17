@@ -152,11 +152,7 @@ export function TodoQuickActionSheet({
         </Modal>
       )}
 
-      <Toast
-        visible={toastMessage !== null}
-        message={toastMessage ?? ''}
-        onClose={() => setToastMessage(null)}
-      />
+      {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
 
       <ConfirmModal
         visible={isDeleteConfirmVisible}
