@@ -4,8 +4,14 @@ import type { CalendarLayerConfig } from '@/domain/calendar/types';
 
 export const CALENDAR_LAYER_COLORS = {
   GROUP: colors.primary,
-  TODO: '#477ae7',
-  HOLIDAY: colors.weekend,
+  TODO: '#D97706',
+  HOLIDAY: '#DC2626',
+} as const;
+
+// 캘린더 메인뷰 리디자인(Figma 784-18087)에서 도입된 색상. 앱 전역 theme에는 아직 없어 캘린더 화면 범위로 로컬 정의함
+export const CALENDAR_DESIGN_COLORS = {
+  weekdayNeutral: '#49454F',
+  todayBadgeBg: `${colors.primary}1A`,
 } as const;
 
 export const CALENDAR_LAYERS: CalendarLayerConfig[] = [
