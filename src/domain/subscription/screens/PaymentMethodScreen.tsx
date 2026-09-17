@@ -12,13 +12,13 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 
 import type { RootStackParamList } from '@/app/navigation';
 
-import { useSubscriptionStore } from '@/domain/subscription/store/subscriptionStore';
+import { useActivatePremium } from '@/domain/subscription/hooks/useActivatePremium';
 
 type PaymentMethodScreenProps = NativeStackScreenProps<RootStackParamList, 'PaymentMethod'>;
 
 // 프리미엄 구독 결제수단 등록 화면 (Figma node 311:2)
 export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
-  const activatePremium = useSubscriptionStore((state) => state.activatePremium);
+  const activatePremium = useActivatePremium();
 
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -54,13 +54,8 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
     navigation.reset({ index: 0, routes: [{ name: 'PaymentComplete' }] });
   };
 
+  // TODO: 카카오페이 결제(PG) API가 아직 명세되지 않아 연동 전까지 자리만 만들어 둠
   const handleKakaoPayPress = () => {};
-
-  // 결제(PG) 연동 전까지, 실제 결제 성공 핸들러가 할 일을 그대로 시뮬레이션 (폼 입력 없이 바로 확인용)
-  const handleDevActivatePress = () => {
-    activatePremium();
-    navigation.reset({ index: 0, routes: [{ name: 'PaymentComplete' }] });
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -188,15 +183,6 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
         />
 
         <Text style={styles.disclaimer}>첫 달 이후 매월 2,990원이 이 수단으로 자동 결제됩니다</Text>
-
-        {__DEV__ && (
-          <Button
-            label="[dev] 결제 없이 프리미엄 활성화"
-            variant="outline"
-            onPress={handleDevActivatePress}
-            style={styles.devButton}
-          />
-        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -358,8 +344,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.text.secondary,
     marginTop: spacing.sm,
-  },
-  devButton: {
-    marginTop: spacing.md,
   },
 });
