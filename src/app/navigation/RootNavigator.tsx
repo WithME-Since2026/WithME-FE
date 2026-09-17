@@ -9,7 +9,12 @@ import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
+import { MyPageScreen } from '@/domain/mypage/screens/MyPageScreen';
+import { NotificationSettingsScreen } from '@/domain/mypage/screens/NotificationSettingsScreen';
+import { ProfileEditScreen } from '@/domain/mypage/screens/ProfileEditScreen';
+import { NotificationScreen } from '@/domain/notification/screens/NotificationScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
+import { SubscriptionScreen } from '@/domain/subscription/screens/SubscriptionScreen';
 
 export type RootStackParamList = {
   Start: undefined;
@@ -21,6 +26,11 @@ export type RootStackParamList = {
   ResetPassword: { loginId: string; email: string; code: string };
   Onboarding: undefined;
   Calendar: undefined;
+  Notification: undefined;
+  MyPage: undefined;
+  ProfileEdit: undefined;
+  NotificationSettings: undefined;
+  Subscription: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -39,6 +49,11 @@ export function RootNavigator() {
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Calendar" component={CalendarScreen} />
+        <Stack.Screen name="Notification" component={NotificationScreen} />
+        <Stack.Screen name="MyPage" component={MyPageScreen} />
+        <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+        <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+        <Stack.Screen name="Subscription" component={SubscriptionScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,5 +1,5 @@
-// yooze.withme.common.response.ApiResponse 기준. 필드명이 success인 boolean이라 Lombok @Getter가
-// isSuccess()를 생성하지만, Jackson이 실제로 내려주는 JSON 키는 (getter 규칙에 따라) "success"다
+// 서버 응답 필드명은 임의 변경하지 않음 — 백엔드 ApiResponse(boolean success)가 Jackson으로 직렬화될 때
+// 실제 JSON 필드명은 "success"이다 (isSuccess가 아님)
 export type ApiResponse<T> = {
   success: boolean;
   code: string;
