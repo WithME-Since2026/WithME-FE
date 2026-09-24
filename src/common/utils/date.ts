@@ -97,6 +97,8 @@ export function parseKoreanTimeToMinutes(time: string | null) {
   const hour = (Number(hourText) % 12) + (period === '오후' ? 12 : 0);
 
   return hour * 60 + Number(minuteText);
+}
+
 // 알림 목록 등에서 쓰는 상대 시간 표기 ('방금', 'N분 전', 'N시간 전', '어제', 'M월 D일')
 export function formatRelativeTimeKo(isoDateTime: string) {
   const target = new Date(isoDateTime);
