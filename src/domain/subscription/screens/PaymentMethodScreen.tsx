@@ -18,6 +18,13 @@ type PaymentMethodScreenProps = NativeStackScreenProps<RootStackParamList, 'Paym
 // 연동되면 true로 바꾸고, 승인/검증 성공 이후에만 프리미엄 활성화·완료 화면 이동을 처리할 것
 const IS_PAYMENT_ENABLED = false;
 
+// 카드번호·CVC 등이 OS 자동완성/키체인 제안 대상이 되지 않도록 명시적으로 제외
+const NO_AUTOFILL_PROPS = {
+  autoComplete: 'off',
+  textContentType: 'none',
+  importantForAutofill: 'no',
+} as const;
+
 // 프리미엄 구독 결제수단 등록 화면 (Figma node 311:2)
 export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
   // 카드 원본 값(번호/CVC/비밀번호 앞자리/생년월일)은 폼 검증(isFormComplete)에만 쓰입니다.
@@ -99,6 +106,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
           label="카드 번호"
           placeholder="0000 0000 0000 0000"
           keyboardType="number-pad"
+          {...NO_AUTOFILL_PROPS}
           maxLength={19}
           value={cardNumber}
           onChangeText={handleCardNumberChange}
@@ -112,6 +120,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
               label="유효기간"
               placeholder="MM/YY"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={5}
               value={expiry}
               onChangeText={handleExpiryChange}
@@ -123,6 +132,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
             <TextField
               label="CVC"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={3}
               secureEntry
               value={cvc}
@@ -138,6 +148,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
             <TextField
               label="카드 비밀번호 앞 2자리"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={2}
               secureEntry
               value={cardPinPrefix}
@@ -151,6 +162,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
               label="생년월일"
               placeholder="YYMMDD"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={6}
               value={birthDate}
               onChangeText={setBirthDate}
