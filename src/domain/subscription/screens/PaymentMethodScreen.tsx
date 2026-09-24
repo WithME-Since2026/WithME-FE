@@ -226,12 +226,11 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     ...typography.body1,
-    fontSize: 16,
     fontWeight: '700',
     color: colors.text.primary,
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.gutter,
     paddingTop: spacing.md,
     paddingBottom: spacing.xl,
   },
@@ -242,8 +241,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.premiumCardBg,
     borderWidth: 1,
     borderColor: colors.premiumInputBorder,
-    // Figma 실제 값 (rounded-12, height 62)
-    borderRadius: 12,
+    // Figma 실제 값 (height 62)
+    borderRadius: borderRadius.card,
     height: 62,
     paddingHorizontal: spacing.md,
   },
@@ -257,7 +256,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   planDesc: {
-    fontSize: 12,
+    ...typography.caption,
     lineHeight: 16,
     color: colors.text.secondary,
   },
@@ -266,14 +265,13 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 4,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: borderRadius.badge,
     backgroundColor: colors.premiumTitleText,
     alignItems: 'center',
     justifyContent: 'center',
   },
   proBadgeLabel: {
-    fontSize: 9,
-    fontWeight: '700',
+    ...typography.badge,
     color: colors.premiumGold,
   },
   sectionLabel: {
@@ -317,8 +315,7 @@ const styles = StyleSheet.create({
     height: 46,
   },
   inputLabel: {
-    // Figma 실제 값
-    fontSize: 12,
+    fontSize: typography.caption.fontSize,
   },
   agreementRow: {
     flexDirection: 'row',
@@ -340,8 +337,7 @@ const styles = StyleSheet.create({
     borderColor: colors.premiumTitleText,
   },
   agreementLabel: {
-    ...typography.caption,
-    fontSize: 13,
+    ...typography.captionLarge,
     color: colors.text.primary,
   },
   agreementRequired: {

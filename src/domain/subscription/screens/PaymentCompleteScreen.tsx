@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   noticeBox: {
     alignSelf: 'stretch',
     backgroundColor: colors.premiumInfoBg,
-    borderRadius: 12,
+    borderRadius: borderRadius.card,
     padding: spacing.md,
     gap: spacing.sm,
     marginTop: spacing.xl,
