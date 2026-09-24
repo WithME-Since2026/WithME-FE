@@ -4,10 +4,12 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
+import { Toast } from '@/common/components/Toast';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
@@ -19,6 +21,20 @@ import { useUpdateMyPageProfileMutation } from '@/domain/mypage/hooks/useUpdateM
 
 type ProfileEditScreenProps = NativeStackScreenProps<RootStackParamList, 'ProfileEdit'>;
 
+// 백엔드 UpdateNicknameRequest의 @Size(max = 20)과 동일한 제한. TextInput의 maxLength로 입력 단계에서부터 막음
+const NAME_MAX_LENGTH = 20;
+
+function getSaveErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const message = (error.response?.data as { message?: string } | undefined)?.message;
+    if (message) {
+      return message;
+    }
+  }
+
+  return '프로필 저장에 실패했어요. 잠시 후 다시 시도해 주세요.';
+}
+
 // 프로필(사진/닉네임/연결 계정)을 관리하는 화면 (Figma node 698:4976).
 // 알림 설정은 이 화면이 아니라 마이페이지 설정 목록에서 바로 펼쳐지는 인라인 패널로 분리되어 있다.
 export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
@@ -26,6 +42,7 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
   const updateProfileMutation = useUpdateMyPageProfileMutation();
 
   const [name, setName] = useState(profile?.nickname ?? '');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // TODO: 이미지 업로드 API/이미지 피커 라이브러리가 아직 없어 우선 자리만 만들어 둠
   const handleChangePhoto = () => {};
@@ -38,7 +55,10 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
 
     updateProfileMutation.mutate(
       { nickname: trimmedName },
-      { onSuccess: () => navigation.navigate('MyPage') },
+      {
+        onSuccess: () => navigation.navigate('MyPage'),
+        onError: (error) => setErrorMessage(getSaveErrorMessage(error)),
+      },
     );
   };
 
@@ -49,6 +69,7 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
           onPress={() => navigation.navigate('MyPage')}
           hitSlop={8}
           style={styles.backButton}
+          accessibilityLabel="뒤로 가기"
         >
           <Ionicons name="chevron-back" size={22} color={colors.text.primary} />
         </Pressable>
@@ -90,7 +111,7 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
               style={styles.nameFieldInput}
               defaultValue={name}
               onChangeText={setName}
-              maxLength={20}
+              maxLength={NAME_MAX_LENGTH}
               placeholderTextColor={colors.text.disabled}
             />
           </View>
@@ -114,6 +135,8 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
           )}
         </ScrollView>
       )}
+
+      {errorMessage && <Toast message={errorMessage} onDismiss={() => setErrorMessage(null)} />}
     </SafeAreaView>
   );
 }

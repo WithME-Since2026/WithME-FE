@@ -36,7 +36,11 @@ export function NotificationSettingsPanel({ toggles, onToggle }: NotificationSet
             <Text style={styles.label}>{item.label}</Text>
             <Text style={styles.hint}>{item.hint}</Text>
           </View>
-          <ToggleSwitch value={toggles[item.key]} onValueChange={() => onToggle(item.key)} />
+          <ToggleSwitch
+            value={toggles[item.key]}
+            onValueChange={() => onToggle(item.key)}
+            accessibilityLabel={item.label}
+          />
         </View>
       ))}
     </View>

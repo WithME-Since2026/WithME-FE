@@ -29,7 +29,7 @@ export function SubscriptionScreen({ navigation }: SubscriptionScreenProps) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={8}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={8} accessibilityLabel="닫기">
           <Ionicons name="close" size={22} color={colors.text.primary} />
         </Pressable>
         <Pressable onPress={handleRestorePress} hitSlop={8}>

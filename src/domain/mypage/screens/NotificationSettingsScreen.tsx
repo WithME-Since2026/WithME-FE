@@ -54,7 +54,12 @@ export function NotificationSettingsScreen({ navigation }: NotificationSettingsS
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={8} style={styles.backButton}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          hitSlop={8}
+          style={styles.backButton}
+          accessibilityLabel="뒤로 가기"
+        >
           <Ionicons name="chevron-back" size={22} color={colors.text.primary} />
         </Pressable>
         <Text style={styles.title}>알림 설정</Text>
@@ -75,6 +80,7 @@ export function NotificationSettingsScreen({ navigation }: NotificationSettingsS
               <ToggleSwitch
                 value={notificationSettings.notifyAgree}
                 onValueChange={handleTogglePushAll}
+                accessibilityLabel="푸시 알림 전체"
               />
             </View>
           </View>

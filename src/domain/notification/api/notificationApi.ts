@@ -1,7 +1,11 @@
 import { apiClient } from '@/common/api/apiClient';
 import type { ApiResponse } from '@/common/types/api';
 
-import { getMockNotifications } from '@/domain/notification/api/mockNotificationData';
+import {
+  getMockNotifications,
+  markAllMockNotificationsRead,
+  markMockNotificationRead,
+} from '@/domain/notification/api/mockNotificationData';
 import type { NotificationResponse } from '@/domain/notification/types';
 
 export async function getNotifications() {
@@ -19,6 +23,7 @@ export async function getNotifications() {
 export async function readNotification(notificationId: number) {
   // TODO: 백엔드 단일 알림 읽음 처리 API(PATCH /api/v1/notifications/{notification_id}/read) 연동 전까지 mock 처리
   if (__DEV__) {
+    markMockNotificationRead(notificationId);
     return;
   }
 
@@ -28,6 +33,7 @@ export async function readNotification(notificationId: number) {
 export async function readAllNotifications() {
   // TODO: 백엔드 알림 전체 읽음 처리 API(PATCH /api/v1/notifications/read) 연동 전까지 mock 처리
   if (__DEV__) {
+    markAllMockNotificationsRead();
     return;
   }
 
