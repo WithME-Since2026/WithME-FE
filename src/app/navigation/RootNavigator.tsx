@@ -14,6 +14,8 @@ import { NotificationSettingsScreen } from '@/domain/mypage/screens/Notification
 import { ProfileEditScreen } from '@/domain/mypage/screens/ProfileEditScreen';
 import { NotificationScreen } from '@/domain/notification/screens/NotificationScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
+import { PaymentCompleteScreen } from '@/domain/subscription/screens/PaymentCompleteScreen';
+import { PaymentMethodScreen } from '@/domain/subscription/screens/PaymentMethodScreen';
 import { SubscriptionScreen } from '@/domain/subscription/screens/SubscriptionScreen';
 
 export type RootStackParamList = {
@@ -31,6 +33,8 @@ export type RootStackParamList = {
   ProfileEdit: undefined;
   NotificationSettings: undefined;
   Subscription: undefined;
+  PaymentMethod: undefined;
+  PaymentComplete: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -54,6 +58,8 @@ export function RootNavigator() {
         <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
         <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
         <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+        <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen} />
+        <Stack.Screen name="PaymentComplete" component={PaymentCompleteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
