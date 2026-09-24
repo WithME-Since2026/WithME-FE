@@ -12,14 +12,14 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 
 import type { RootStackParamList } from '@/app/navigation';
 
-import { useActivatePremium } from '@/domain/subscription/hooks/useActivatePremium';
-
 type PaymentMethodScreenProps = NativeStackScreenProps<RootStackParamList, 'PaymentMethod'>;
+
+// PG 결제 승인 + 서버 영수증 검증이 연동되기 전까지 결제 버튼을 막아 둠.
+// 연동되면 true로 바꾸고, 승인/검증 성공 이후에만 프리미엄 활성화·완료 화면 이동을 처리할 것
+const IS_PAYMENT_ENABLED = false;
 
 // 프리미엄 구독 결제수단 등록 화면 (Figma node 311:2)
 export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
-  const activatePremium = useActivatePremium();
-
   // 카드 원본 값(번호/CVC/비밀번호 앞자리/생년월일)은 폼 검증(isFormComplete)에만 쓰입니다.
   // PG(카카오페이/토스페이먼츠 등) SDK 연동 전까지는 이 값들을 자체 백엔드로 전송하면 안 되며,
   // 실제 결제 연동 시에는 이 입력 폼 자체를 PG 위젯/SDK로 교체해 카드 데이터가 서버를 거치지 않게 해야 합니다.
@@ -51,12 +51,10 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
     setExpiry(digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits);
   };
 
-  // TODO: 결제(PG) API가 아직 명세되지 않아, 연동 전까지 결제 성공 시 처리를 그대로 시뮬레이션.
-  // 실제 연동 시 activatePremium()은 PG 콜백/영수증 검증 등 서버 판정 결과를 받은 뒤에만 호출해야 함
-  const handlePayPress = () => {
-    activatePremium();
-    navigation.reset({ index: 0, routes: [{ name: 'PaymentComplete' }] });
-  };
+  // TODO: 결제(PG) API가 아직 명세되지 않아 버튼이 비활성화된 상태(IS_PAYMENT_ENABLED).
+  // 연동 시 PG 승인 + 서버 영수증 검증 결과를 받은 뒤에만 activatePremium() 호출 및
+  // PaymentComplete 이동을 처리해야 함
+  const handlePayPress = () => {};
 
   // TODO: 카카오페이 결제(PG) API가 아직 명세되지 않아 연동 전까지 자리만 만들어 둠
   const handleKakaoPayPress = () => {};
@@ -182,7 +180,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
           label="₩100 결제하고 시작하기"
           variant="primary"
           onPress={handlePayPress}
-          disabled={!isFormComplete}
+          disabled={!IS_PAYMENT_ENABLED || !isFormComplete}
           style={styles.payButton}
         />
 
