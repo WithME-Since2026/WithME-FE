@@ -1,6 +1,16 @@
 import { ReactNode, useState } from 'react';
 
-import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import {
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
@@ -8,16 +18,25 @@ type TextFieldProps = {
   label: string;
   // true이면 비밀번호 표시/숨김 토글을 함께 렌더링
   secureToggle?: boolean;
+  // CVC/카드 비밀번호처럼 토글 없이 항상 마스킹만 필요할 때 사용 (secureToggle과 동시 사용 X)
+  secureEntry?: boolean;
   // 인증코드 만료 타이머처럼 입력창 오른쪽에 추가 요소가 필요할 때 사용 (secureToggle과 동시 사용 X)
   rightElement?: ReactNode;
   errorMessage?: string;
+  // 결제수단 등록 화면처럼 화면별로 입력창 배경/테두리색을 기본값과 다르게 써야 할 때만 전달
+  containerStyle?: StyleProp<ViewStyle>;
+  // 결제수단 등록 화면처럼 라벨 폰트 크기를 기본값과 다르게 써야 할 때만 전달
+  labelStyle?: StyleProp<TextStyle>;
 } & Omit<TextInputProps, 'secureTextEntry'>;
 
 export function TextField({
   label,
   secureToggle = false,
+  secureEntry = false,
   rightElement,
   errorMessage,
+  containerStyle,
+  labelStyle,
   ...inputProps
 }: TextFieldProps) {
   // secureToggle이 true인 필드(비밀번호)만 초기값을 가려진 상태로 시작
@@ -26,10 +45,11 @@ export function TextField({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, labelStyle]}>{label}</Text>
       <View
         style={[
           styles.inputRow,
+          containerStyle,
           isFocused && styles.inputRowFocused,
           errorMessage && styles.inputRowError,
         ]}
@@ -39,7 +59,7 @@ export function TextField({
           placeholderTextColor={colors.text.disabled}
           autoCapitalize="none"
           {...inputProps}
-          secureTextEntry={isSecure}
+          secureTextEntry={secureEntry || isSecure}
           onFocus={(event) => {
             setIsFocused(true);
             inputProps.onFocus?.(event);

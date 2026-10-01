@@ -29,6 +29,19 @@ export const colors = {
   attendanceTrack: '#EFECE8',
   // 프리미엄 업그레이드 배너 테두리/PRO 배지에 쓰이는 골드
   premiumGold: '#C8A84B',
+  // 프리미엄 구독/결제수단 등록 화면 배경 (Figma 실제 값, surface보다 살짝 밝은 톤)
+  premiumScreenBg: '#F6F7F9',
+  // 프리미엄 구독 화면의 체크 아이콘 배경·특가 카드 배경 (Figma 실제 값, linkBlueSoft와는 톤이 다름)
+  premiumAccentSoft: '#DBEAFF',
+  // 프리미엄 구독 화면의 혜택 목록 카드 배경 (Figma 실제 값)
+  premiumFeatureCardBg: '#DEE0E8',
+  // 결제수단 등록 화면의 구독 상품 요약 카드 배경 (Figma 실제 값)
+  premiumCardBg: '#F7F7F7',
+  // 결제수단 등록 화면의 카드/구분선 테두리색 (Figma 실제 값)
+  premiumInputBorder: '#E0DED6',
+  // 결제 완료 화면의 안내 박스 배경/텍스트 (Figma 실제 값)
+  premiumInfoBg: '#F5F5FA',
+  premiumInfoText: '#737373',
   weekend: '#cc4d4da3',
   // 알림 유형별 아바타 배경/아이콘 색상 (Figma node 761:15618 실제 값)
   notifJoinBg: '#D3E3FD',
@@ -77,6 +90,8 @@ export const spacing = {
   xs: 4,
   sm: 8,
   md: 16,
+  // 프리미엄 구독/결제수단 등록 화면의 좌우 여백 (Figma 실제 값)
+  gutter: 20,
   lg: 24,
   xl: 32,
   xxl: 48,
@@ -89,11 +104,19 @@ export const typography = {
   body1: { fontSize: 16, fontWeight: '400' as const, lineHeight: 24 },
   body2: { fontSize: 14, fontWeight: '400' as const, lineHeight: 22 },
   caption: { fontSize: 12, fontWeight: '400' as const, lineHeight: 18 },
+  // caption보다 한 단계 큰 보조 텍스트 (프리미엄 화면 Figma 실제 값)
+  captionLarge: { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
+  // PRO/특가 뱃지 안의 라벨 (색상은 사용처에서 지정)
+  badge: { fontSize: 9, fontWeight: '700' as const },
 };
 
 export const borderRadius = {
   sm: 4,
+  // PRO 뱃지 (Figma 실제 값)
+  badge: 6,
   md: 8,
+  // 안내/요약 카드 (Figma 실제 값)
+  card: 12,
   lg: 16,
   full: 9999,
 };
