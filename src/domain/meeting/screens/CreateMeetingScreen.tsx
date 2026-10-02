@@ -67,7 +67,8 @@ export function CreateMeetingScreen({ navigation }: CreateMeetingScreenProps) {
 
   const isStep1Valid = basicInfo.title.trim().length > 0;
   const isStep2Valid = scheduleInfo.firstMeetingDate.trim().length > 0;
-  const isNextDisabled = (step === 1 && !isStep1Valid) || (step === 2 && !isStep2Valid) || isPending;
+  const isNextDisabled =
+    (step === 1 && !isStep1Valid) || (step === 2 && !isStep2Valid) || isPending;
 
   const handleClose = () => {
     navigation.goBack();
@@ -117,7 +118,9 @@ export function CreateMeetingScreen({ navigation }: CreateMeetingScreenProps) {
   };
 
   const invitedIds = new Set(invitedMembers.map((member) => member.memberId));
-  const searchSuggestions = (searchResults ?? []).filter((contact) => !invitedIds.has(contact.memberId));
+  const searchSuggestions = (searchResults ?? []).filter(
+    (contact) => !invitedIds.has(contact.memberId),
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -261,11 +264,10 @@ export function CreateMeetingScreen({ navigation }: CreateMeetingScreenProps) {
 
             <Text style={styles.invitedTitle}>초대된 멤버 ({invitedMembers.length}명)</Text>
 
-            {invitedMembers.map((member, index) => (
+            {invitedMembers.map((member) => (
               <InviteMemberRow
                 key={member.memberId}
                 member={member}
-                avatarColorIndex={index}
                 onRemove={() => handleRemoveMember(member.memberId)}
               />
             ))}

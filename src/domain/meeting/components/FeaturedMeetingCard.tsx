@@ -43,13 +43,27 @@ export function FeaturedMeetingCard({
       </Text>
 
       <View style={styles.progressTrack}>
-        <View style={{ flex: attendance.attending, backgroundColor: colors.meeting.primary }} />
-        <View style={{ flex: attendance.notAttending, backgroundColor: colors.meeting.notAttending }} />
+        {attendance.attending > 0 && (
+          <View style={{ flex: attendance.attending, backgroundColor: colors.meeting.primary }} />
+        )}
+        {attendance.notAttending > 0 && (
+          <View
+            style={{ flex: attendance.notAttending, backgroundColor: colors.meeting.notAttending }}
+          />
+        )}
+        {attendance.pending > 0 && (
+          <View
+            style={{ flex: attendance.pending, backgroundColor: colors.meeting.progressTrack }}
+          />
+        )}
       </View>
 
       <View style={styles.summaryRow}>
         <Text style={styles.summaryText}>
-          참석 <Text style={[styles.summaryValue, { color: colors.meeting.primary }]}>{attendance.attending}</Text>
+          참석{' '}
+          <Text style={[styles.summaryValue, { color: colors.meeting.primary }]}>
+            {attendance.attending}
+          </Text>
         </Text>
         <Text style={styles.summaryText}>
           불참{' '}
@@ -73,7 +87,10 @@ export function FeaturedMeetingCard({
           >
             <Text style={styles.actionLabelPrimary}>현황 보기</Text>
           </Pressable>
-          <Pressable style={[styles.actionButton, styles.actionButtonOutline]} onPress={onRemindPress}>
+          <Pressable
+            style={[styles.actionButton, styles.actionButtonOutline]}
+            onPress={onRemindPress}
+          >
             <Text style={styles.actionLabelOutline}>리마인더</Text>
           </Pressable>
         </View>
@@ -85,10 +102,16 @@ export function FeaturedMeetingCard({
           >
             <Text style={styles.actionLabelPrimary}>참석</Text>
           </Pressable>
-          <Pressable style={[styles.actionButton, styles.actionButtonOutline]} onPress={onUndecidedPress}>
+          <Pressable
+            style={[styles.actionButton, styles.actionButtonOutline]}
+            onPress={onUndecidedPress}
+          >
             <Text style={styles.actionLabelOutline}>미정</Text>
           </Pressable>
-          <Pressable style={[styles.actionButton, styles.actionButtonOutline]} onPress={onDeclinePress}>
+          <Pressable
+            style={[styles.actionButton, styles.actionButtonOutline]}
+            onPress={onDeclinePress}
+          >
             <Text style={styles.actionLabelOutline}>불참</Text>
           </Pressable>
         </View>

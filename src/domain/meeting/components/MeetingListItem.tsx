@@ -28,7 +28,9 @@ export function MeetingListItem({ meeting, onPress }: MeetingListItemProps) {
         <Text style={styles.schedule}>{meeting.scheduleText}</Text>
       </View>
 
-      <MeetingStatusBadge label={meeting.statusLabel} />
+      <View style={styles.status}>
+        <MeetingStatusBadge label={meeting.statusLabel} />
+      </View>
     </Pressable>
   );
 }
@@ -39,8 +41,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background,
     borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -53,11 +54,12 @@ const styles = StyleSheet.create({
   accent: {
     width: 4,
     alignSelf: 'stretch',
-    borderRadius: 2,
   },
   info: {
     flex: 1,
     gap: 4,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.md,
   },
   title: {
     ...typography.body1,
@@ -67,5 +69,8 @@ const styles = StyleSheet.create({
   schedule: {
     ...typography.caption,
     color: colors.text.secondary,
+  },
+  status: {
+    paddingRight: spacing.md,
   },
 });

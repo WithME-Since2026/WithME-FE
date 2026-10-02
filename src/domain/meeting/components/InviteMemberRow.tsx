@@ -9,14 +9,13 @@ import { getAvatarColor } from '@/domain/meeting/utils/avatarColor';
 
 type InviteMemberRowProps = {
   member: InvitedMemberResponse;
-  avatarColorIndex: number;
   onRemove: () => void;
 };
 
-export function InviteMemberRow({ member, avatarColorIndex, onRemove }: InviteMemberRowProps) {
+export function InviteMemberRow({ member, onRemove }: InviteMemberRowProps) {
   return (
     <View style={styles.row}>
-      <View style={[styles.avatar, { backgroundColor: getAvatarColor(avatarColorIndex) }]}>
+      <View style={[styles.avatar, { backgroundColor: getAvatarColor(member.memberId) }]}>
         <Text style={styles.avatarLabel}>{member.initial}</Text>
       </View>
 

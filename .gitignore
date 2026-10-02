@@ -50,3 +50,6 @@ ios/
 # OMC / Claude
 .omc/
 .claude/
+
+# Local handoff notes
+HANDOFF.md

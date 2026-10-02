@@ -73,7 +73,8 @@ const styles = StyleSheet.create({
     color: colors.meeting.pendingText,
   },
   underline: {
-    marginTop: spacing.sm,
+    position: 'absolute',
+    bottom: -1.5,
     height: 2.5,
     width: '70%',
     borderRadius: 1.5,

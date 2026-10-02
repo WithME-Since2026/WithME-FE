@@ -13,9 +13,9 @@ type MemberListCardProps = {
 export function MemberListCard({ attendees }: MemberListCardProps) {
   return (
     <View style={styles.list}>
-      {attendees.map((attendee, index) => (
+      {attendees.map((attendee) => (
         <View key={attendee.memberId} style={styles.row}>
-          <View style={[styles.avatar, { backgroundColor: getAvatarColor(index) }]}>
+          <View style={[styles.avatar, { backgroundColor: getAvatarColor(attendee.memberId) }]}>
             <Text style={styles.avatarLabel}>{attendee.initial}</Text>
           </View>
           <Text style={styles.name}>{attendee.name}</Text>

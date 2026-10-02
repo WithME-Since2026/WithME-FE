@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -23,6 +24,7 @@ import { LoadingView } from '@/common/components/LoadingView';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
 import type { MainTabParamList, RootStackParamList } from '@/app/navigation';
+import profileImage from '@/assets/images/profile.png';
 
 import { FeaturedMeetingCard } from '@/domain/meeting/components/FeaturedMeetingCard';
 import { MeetingListItem } from '@/domain/meeting/components/MeetingListItem';
@@ -98,9 +100,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
               <View style={styles.notificationDot} />
             </Pressable>
 
-            <View style={styles.avatar}>
-              <Ionicons name="person" size={18} color={colors.text.secondary} />
-            </View>
+            <Image source={profileImage} style={styles.avatar} />
           </View>
         </View>
 
@@ -231,9 +231,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   featuredPage: {
     paddingHorizontal: spacing.lg,
