@@ -14,6 +14,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(2),
       time: '오전 10:00',
       badgeLabel: '모임',
+      location: '강남 스터디룸 3층',
+      color: null,
+      completed: false,
     },
     {
       eventId: 2,
@@ -22,6 +25,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(7),
       time: null,
       badgeLabel: 'Todo',
+      location: null,
+      color: null,
+      completed: false,
     },
     {
       eventId: 3,
@@ -30,6 +36,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(8),
       time: '오후 7:00',
       badgeLabel: '모임',
+      location: '홍대 스타벅스 2층',
+      color: null,
+      completed: false,
     },
     {
       eventId: 4,
@@ -38,6 +47,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(8),
       time: '오전 7:00',
       badgeLabel: '모임',
+      location: '한강공원 뚝섬지구',
+      color: null,
+      completed: false,
     },
     {
       eventId: 5,
@@ -46,6 +58,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(11),
       time: '오전 10:00',
       badgeLabel: '모임',
+      location: '강남 스터디룸 3층',
+      color: null,
+      completed: false,
     },
     {
       eventId: 6,
@@ -54,6 +69,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(11),
       time: '오후 2:00',
       badgeLabel: 'Todo',
+      location: null,
+      color: null,
+      completed: false,
     },
     {
       eventId: 7,
@@ -62,6 +80,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(11),
       time: '오후 4:00',
       badgeLabel: '모임',
+      location: '온라인 (Zoom)',
+      color: null,
+      completed: false,
     },
     {
       eventId: 8,
@@ -70,6 +91,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(15),
       time: '오후 8:00',
       badgeLabel: '모임',
+      location: '홍대 스타벅스 2층',
+      color: null,
+      completed: false,
     },
     {
       eventId: 9,
@@ -78,6 +102,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(15),
       time: '오후 3:00',
       badgeLabel: '모임',
+      location: '신촌 보드게임 카페',
+      color: null,
+      completed: false,
     },
     {
       eventId: 10,
@@ -86,6 +113,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(15),
       time: '오전 9:00',
       badgeLabel: '모임',
+      location: '북한산 등산로 입구',
+      color: null,
+      completed: false,
     },
     {
       eventId: 11,
@@ -94,6 +124,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(16),
       time: null,
       badgeLabel: 'Todo',
+      location: null,
+      color: null,
+      completed: false,
     },
     {
       eventId: 12,
@@ -102,6 +135,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(20),
       time: '오후 6:00',
       badgeLabel: '모임',
+      location: 'CGV 강남',
+      color: null,
+      completed: false,
     },
     {
       eventId: 13,
@@ -110,6 +146,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(22),
       time: '오전 11:00',
       badgeLabel: '모임',
+      location: '을지로 커피집',
+      color: null,
+      completed: false,
     },
     {
       eventId: 14,
@@ -118,6 +157,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(22),
       time: '오후 7:30',
       badgeLabel: '모임',
+      location: '요가스튜디오 잠실점',
+      color: null,
+      completed: false,
     },
     {
       eventId: 15,
@@ -126,6 +168,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(25),
       time: null,
       badgeLabel: 'Todo',
+      location: null,
+      color: null,
+      completed: false,
     },
     {
       eventId: 16,
@@ -134,6 +179,9 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       date: day(28),
       time: '오후 1:00',
       badgeLabel: '모임',
+      location: '경복궁 입구',
+      color: null,
+      completed: false,
     },
     // TODO: 공휴일 API 연동 전까지 레이어 토글 확인용으로 매달 3일에 고정 노출
     {
@@ -142,7 +190,10 @@ export function getMockCalendarMonth(year: number, month: number): CalendarMonth
       title: '샘플 공휴일',
       date: day(3),
       time: null,
-      badgeLabel: '공휴일',
+      badgeLabel: '법정 공휴일',
+      location: null,
+      color: null,
+      completed: false,
     },
   ];
 

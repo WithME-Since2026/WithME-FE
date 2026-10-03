@@ -10,10 +10,18 @@ import { NameInputScreen } from '@/domain/auth/screens/NameInputScreen';
 import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
+import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
 import { CreateMeetingCompleteScreen } from '@/domain/meeting/screens/CreateMeetingCompleteScreen';
 import { CreateMeetingScreen } from '@/domain/meeting/screens/CreateMeetingScreen';
 import { MeetingDetailScreen } from '@/domain/meeting/screens/MeetingDetailScreen';
+import { MyPageScreen } from '@/domain/mypage/screens/MyPageScreen';
+import { NotificationSettingsScreen } from '@/domain/mypage/screens/NotificationSettingsScreen';
+import { ProfileEditScreen } from '@/domain/mypage/screens/ProfileEditScreen';
+import { NotificationScreen } from '@/domain/notification/screens/NotificationScreen';
 import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
+import { PaymentCompleteScreen } from '@/domain/subscription/screens/PaymentCompleteScreen';
+import { PaymentMethodScreen } from '@/domain/subscription/screens/PaymentMethodScreen';
+import { SubscriptionScreen } from '@/domain/subscription/screens/SubscriptionScreen';
 
 export type RootStackParamList = {
   Start: undefined;
@@ -28,6 +36,14 @@ export type RootStackParamList = {
   MeetingDetail: { meetingId: number };
   CreateMeeting: undefined;
   CreateMeetingComplete: { meetingId: number; title: string; inviteLink: string };
+  Calendar: undefined;
+  Notification: undefined;
+  MyPage: undefined;
+  ProfileEdit: undefined;
+  NotificationSettings: undefined;
+  Subscription: undefined;
+  PaymentMethod: undefined;
+  PaymentComplete: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,6 +69,14 @@ export function RootNavigator() {
           options={{ presentation: 'modal' }}
         />
         <Stack.Screen name="CreateMeetingComplete" component={CreateMeetingCompleteScreen} />
+        <Stack.Screen name="Calendar" component={CalendarScreen} />
+        <Stack.Screen name="Notification" component={NotificationScreen} />
+        <Stack.Screen name="MyPage" component={MyPageScreen} />
+        <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+        <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+        <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+        <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen} />
+        <Stack.Screen name="PaymentComplete" component={PaymentCompleteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
