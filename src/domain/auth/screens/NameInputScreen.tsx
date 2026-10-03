@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +18,7 @@ import { TextField } from '@/common/components/TextField';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
 import type { RootStackParamList } from '@/app/navigation';
+import profileImage from '@/assets/images/profile.png';
 
 import { useUpdateProfileMutation } from '@/domain/user/hooks/useUpdateProfileMutation';
 
@@ -63,7 +72,7 @@ export function NameInputScreen({ navigation, route }: NameInputScreenProps) {
           <Text style={styles.helperText}>나중에 마이페이지에서 언제든 수정할 수 있어요</Text>
 
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{name.trim() ? name.trim()[0] : '?'}</Text>
+            <Image source={profileImage} style={styles.avatarImage} />
             <View style={styles.avatarBadge}>
               <Text style={styles.avatarBadgeIcon}>✎</Text>
             </View>
@@ -137,14 +146,12 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: spacing.xl,
   },
-  avatarText: {
-    ...typography.heading1,
-    color: colors.background,
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: borderRadius.full,
   },
   avatarBadge: {
     position: 'absolute',
