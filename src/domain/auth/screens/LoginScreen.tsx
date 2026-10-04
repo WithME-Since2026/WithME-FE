@@ -35,7 +35,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
   const isSubmitDisabled = !loginId || !password;
 
   const handleLoginPress = () => {
-    login({ loginId, password });
+    login({ loginId, password }, { onSuccess: () => navigation.replace('Main') });
   };
 
   const handleKakaoLogin = () => {
