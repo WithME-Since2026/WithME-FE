@@ -1,7 +1,12 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { useEffect } from 'react';
+
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { setOnSessionExpired } from '@/common/api/apiClient';
+
 import { MainTabNavigator } from './MainTabNavigator';
+
 
 import { FindAccountScreen } from '@/domain/auth/screens/FindAccountScreen';
 import { FindIdResultScreen } from '@/domain/auth/screens/FindIdResultScreen';
@@ -10,6 +15,7 @@ import { NameInputScreen } from '@/domain/auth/screens/NameInputScreen';
 import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
+import { useAuthStore } from '@/domain/auth/store/authStore';
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
 import { CreateMeetingCompleteScreen } from '@/domain/meeting/screens/CreateMeetingCompleteScreen';
 import { CreateMeetingScreen } from '@/domain/meeting/screens/CreateMeetingScreen';
@@ -48,11 +54,27 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export function RootNavigator() {
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+type RootNavigatorProps = {
+  initialRouteName: 'Start' | 'Main';
+};
+
+export function RootNavigator({ initialRouteName }: RootNavigatorProps) {
+  // 토큰 재발급까지 실패하면 로그인 상태를 해제하고 시작 화면으로 되돌림
+  useEffect(() => {
+    setOnSessionExpired(() => {
+      useAuthStore.getState().clearAuth();
+      if (navigationRef.isReady()) {
+        navigationRef.reset({ index: 0, routes: [{ name: 'Start' }] });
+      }
+    });
+  }, []);
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       {/* 시작/로그인 화면 모두 기본 헤더 없는 풀스크린 디자인 */}
-      <Stack.Navigator initialRouteName="Start" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Start" component={StartScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
