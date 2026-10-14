@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } fr
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getApiErrorMessage } from '@/common/api/apiError';
 import { Button } from '@/common/components/Button';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
@@ -72,7 +73,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const handleCheckDuplicate = () => {
     const requestedLoginId = loginId;
     checkLoginIdMutation.mutate(
-      { loginId: requestedLoginId },
+      { localId: requestedLoginId },
       {
         onSuccess: (data) =>
           setDuplicateCheckResult({ loginId: requestedLoginId, isDuplicated: data.isDuplicated }),
@@ -89,18 +90,31 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
 
   const handleSignUpPress = () => {
     signUpMutation.mutate(
-      { loginId, password, email, agreeMarketing },
+      {
+        localId: loginId,
+        password,
+        passwordConfirm,
+        email,
+        serviceTermsAgreed: agreeTerms,
+        privacyPolicyAgreed: agreePrivacy,
+        marketingAgreed: agreeMarketing,
+      },
       {
         onSuccess: () => navigation.replace('Onboarding'),
       },
     );
   };
 
-  // 중복확인 API 자체는 성공(200)했지만 isDuplicated: true인 경우도 에러로 취급
-  const loginIdErrorMessage =
-    duplicateCheckResult?.loginId === loginId && duplicateCheckResult.isDuplicated
-      ? '이미 사용 중인 아이디입니다.'
-      : undefined;
+  // 중복(409)은 authApi에서 isDuplicated: true로 변환되고, 형식 오류(400) 등은 서버 message를 노출
+  let loginIdErrorMessage: string | undefined;
+  if (duplicateCheckResult?.loginId === loginId && duplicateCheckResult.isDuplicated) {
+    loginIdErrorMessage = '이미 사용 중인 아이디입니다.';
+  } else if (checkLoginIdMutation.isError) {
+    loginIdErrorMessage = getApiErrorMessage(
+      checkLoginIdMutation.error,
+      '중복확인에 실패했습니다.',
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -199,6 +213,11 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
         </ScrollView>
 
         <View style={styles.footer}>
+          {signUpMutation.isError && (
+            <Text style={styles.errorText}>
+              {getApiErrorMessage(signUpMutation.error, '회원가입에 실패했습니다.')}
+            </Text>
+          )}
           <Button
             label="가입하기"
             onPress={handleSignUpPress}
@@ -246,6 +265,11 @@ const styles = StyleSheet.create({
     color: colors.success,
     marginTop: -spacing.sm,
     marginBottom: spacing.md,
+  },
+  errorText: {
+    ...typography.caption,
+    color: colors.error,
+    marginBottom: spacing.sm,
   },
   agreements: {
     marginBottom: spacing.xl,

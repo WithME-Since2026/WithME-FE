@@ -19,7 +19,7 @@ export type ReissueResponse = {
 };
 
 export type CheckLoginIdRequest = {
-  loginId: string;
+  localId: string;
 };
 
 export type CheckLoginIdResponse = {
@@ -27,14 +27,20 @@ export type CheckLoginIdResponse = {
 };
 
 export type SignUpRequest = {
-  loginId: string;
+  localId: string;
   password: string;
+  passwordConfirm: string;
   email: string;
-  agreeMarketing: boolean;
+  serviceTermsAgreed: boolean;
+  privacyPolicyAgreed: boolean;
+  marketingAgreed: boolean;
 };
 
 export type SignUpResponse = {
   userId: number;
+  nickname: string;
+  accessToken: string;
+  refreshToken: string;
 };
 
 export type SendEmailCodeRequest = {
