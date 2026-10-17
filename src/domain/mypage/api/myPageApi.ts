@@ -95,11 +95,7 @@ export async function updateNotificationSettings(request: UpdateNotificationSett
   return response.data.data;
 }
 
+// TODO: FCM 연동 후 deviceId를 body로 보내면 서버가 해당 기기 FCM 토큰도 삭제함
 export async function logout() {
-  // TODO: 백엔드 로그아웃 API(POST /api/v1/my-page/logout) 연동 전까지 mock 처리
-  if (__DEV__) {
-    return;
-  }
-
-  await apiClient.post<ApiResponse<void>>('/api/v1/my-page/logout');
+  await apiClient.post<ApiResponse<void>>('/api/v1/auth/logout');
 }

@@ -52,7 +52,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
 
   const handleConfirmExit = () => {
     logoutMutation.mutate(undefined, {
-      onSuccess: () => {
+      onSettled: () => {
         navigation.reset({ index: 0, routes: [{ name: 'Start' }] });
       },
     });

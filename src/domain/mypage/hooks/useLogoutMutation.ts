@@ -13,7 +13,8 @@ export function useLogoutMutation() {
 
   return useMutation({
     mutationFn: logout,
-    onSuccess: async () => {
+    // 서버 요청이 실패해도(네트워크 오류, 토큰 만료 등) 기기에서는 로그아웃되어야 함
+    onSettled: async () => {
       await tokenManager.clearTokens();
       clearAuth();
       clearSubscription();
