@@ -56,8 +56,9 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
 
   const isLastPage = activeIndex === LAST_PAGE_INDEX;
 
+  // 회원가입 시 이미 토큰 저장 + 로그인 처리됨. 뒤로가기로 가입/시작 화면에 돌아가지 않도록 스택 초기화
   const handleFinish = () => {
-    navigation.replace('Login');
+    navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
   };
 
   const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {

@@ -34,6 +34,7 @@ export type SignUpRequest = {
   serviceTermsAgreed: boolean;
   privacyPolicyAgreed: boolean;
   marketingAgreed: boolean;
+  nickname: string;
 };
 
 export type SignUpResponse = {

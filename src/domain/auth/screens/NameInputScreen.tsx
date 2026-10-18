@@ -13,6 +13,7 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getApiErrorMessage } from '@/common/api/apiError';
 import { Button } from '@/common/components/Button';
 import { TextField } from '@/common/components/TextField';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
@@ -20,17 +21,17 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 import type { RootStackParamList } from '@/app/navigation';
 import profileImage from '@/assets/images/profile.png';
 
-import { useUpdateProfileMutation } from '@/domain/user/hooks/useUpdateProfileMutation';
+import { useSignUpMutation } from '@/domain/auth/hooks/useSignUpMutation';
 
 const NAME_MAX_LENGTH = 20;
 
 type NameInputScreenProps = NativeStackScreenProps<RootStackParamList, 'NameInput'>;
 
-// 최초 로그인 후 카카오 프로필 이름을 확인/입력하는 화면
+// 회원가입 마지막 단계: 이름을 입력받아 앞 화면의 가입 정보와 함께 회원가입 API 호출
 export function NameInputScreen({ navigation, route }: NameInputScreenProps) {
-  const [name, setName] = useState(route.params?.nickname ?? '');
+  const [name, setName] = useState('');
 
-  const updateProfileMutation = useUpdateProfileMutation();
+  const signUpMutation = useSignUpMutation();
 
   // "value"로 완전히 controlled하면 매 keystroke마다 네이티브 입력 버퍼를 React가
   // 다시 덮어써서, iOS에서는 빠른 타이핑 시 글자가 씹히고 안드로이드에서는 한글 조합
@@ -44,17 +45,10 @@ export function NameInputScreen({ navigation, route }: NameInputScreenProps) {
       return;
     }
 
-    updateProfileMutation.mutate(
-      {
-        nickname: trimmedName,
-        residence: '', // TODO: 거주지 입력 화면 추가 시 수정
-      },
-      {
-        onSuccess: () => {
-          // TODO: 프로필 업데이트 후 이동할 메인 화면 추가 시 수정 (현재는 임시로 Login으로 이동)
-          navigation.replace('Login');
-        },
-      },
+    signUpMutation.mutate(
+      { ...route.params.signUpRequest, nickname: trimmedName },
+      // 가입 완료 후 가입 폼/이름 입력으로 뒤로가기 할 수 없도록 스택 초기화
+      { onSuccess: () => navigation.reset({ index: 0, routes: [{ name: 'Onboarding' }] }) },
     );
   };
 
@@ -68,7 +62,7 @@ export function NameInputScreen({ navigation, route }: NameInputScreenProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>반가워요! 카카오 프로필을{'\n'}확인해주세요</Text>
+          <Text style={styles.title}>반가워요! 사용할 이름을{'\n'}입력해주세요</Text>
           <Text style={styles.helperText}>나중에 마이페이지에서 언제든 수정할 수 있어요</Text>
 
           <View style={styles.avatar}>
@@ -87,15 +81,17 @@ export function NameInputScreen({ navigation, route }: NameInputScreenProps) {
           <Text style={[styles.counter, isNameTooLong && styles.counterError]}>
             {name.length}/{NAME_MAX_LENGTH}
           </Text>
-          <Text style={styles.autoFillNotice}>
-            카카오 닉네임으로 자동 입력했어요. 원하는 이름으로 수정하세요.
-          </Text>
+          {signUpMutation.isError && (
+            <Text style={styles.errorText}>
+              {getApiErrorMessage(signUpMutation.error, '회원가입에 실패했습니다.')}
+            </Text>
+          )}
 
           <View style={styles.footer}>
             <Button
               label="완료"
               onPress={handleComplete}
-              loading={updateProfileMutation.isPending}
+              loading={signUpMutation.isPending}
               disabled={!name.trim() || isNameTooLong}
             />
           </View>
@@ -180,9 +176,9 @@ const styles = StyleSheet.create({
   counterError: {
     color: colors.error,
   },
-  autoFillNotice: {
+  errorText: {
     ...typography.caption,
-    color: colors.text.secondary,
+    color: colors.error,
     marginBottom: spacing.xl,
   },
 });

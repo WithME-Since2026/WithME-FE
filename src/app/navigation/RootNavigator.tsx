@@ -1,11 +1,15 @@
 import { useEffect } from 'react';
 
-import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  type NavigatorScreenParams,
+  createNavigationContainerRef,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { setOnSessionExpired } from '@/common/api/apiClient';
 
-import { MainTabNavigator } from './MainTabNavigator';
+import { MainTabNavigator, type MainTabParamList } from './MainTabNavigator';
 
 
 import { FindAccountScreen } from '@/domain/auth/screens/FindAccountScreen';
@@ -16,11 +20,11 @@ import { ResetPasswordScreen } from '@/domain/auth/screens/ResetPasswordScreen';
 import { SignUpScreen } from '@/domain/auth/screens/SignUpScreen';
 import { StartScreen } from '@/domain/auth/screens/StartScreen';
 import { useAuthStore } from '@/domain/auth/store/authStore';
+import type { SignUpRequest } from '@/domain/auth/types';
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
 import { CreateMeetingCompleteScreen } from '@/domain/meeting/screens/CreateMeetingCompleteScreen';
 import { CreateMeetingScreen } from '@/domain/meeting/screens/CreateMeetingScreen';
 import { MeetingDetailScreen } from '@/domain/meeting/screens/MeetingDetailScreen';
-import { MyPageScreen } from '@/domain/mypage/screens/MyPageScreen';
 import { NotificationSettingsScreen } from '@/domain/mypage/screens/NotificationSettingsScreen';
 import { ProfileEditScreen } from '@/domain/mypage/screens/ProfileEditScreen';
 import { NotificationScreen } from '@/domain/notification/screens/NotificationScreen';
@@ -33,18 +37,18 @@ export type RootStackParamList = {
   Start: undefined;
   Login: undefined;
   SignUp: undefined;
-  NameInput: { nickname?: string } | undefined;
+  // 회원가입 폼 입력값을 들고 이름 입력 화면으로 넘어가 nickname과 함께 가입 API 호출
+  NameInput: { signUpRequest: Omit<SignUpRequest, 'nickname'> };
   FindAccount: { initialTab?: 'ID' | 'PASSWORD' } | undefined;
   FindIdResult: { loginId: string };
   ResetPassword: { loginId: string; email: string; code: string };
   Onboarding: undefined;
-  Main: undefined;
+  Main: NavigatorScreenParams<MainTabParamList> | undefined;
   MeetingDetail: { meetingId: number };
   CreateMeeting: undefined;
   CreateMeetingComplete: { meetingId: number; title: string; inviteLink: string };
   Calendar: undefined;
   Notification: undefined;
-  MyPage: undefined;
   ProfileEdit: undefined;
   NotificationSettings: undefined;
   Subscription: undefined;
@@ -93,7 +97,6 @@ export function RootNavigator({ initialRouteName }: RootNavigatorProps) {
         <Stack.Screen name="CreateMeetingComplete" component={CreateMeetingCompleteScreen} />
         <Stack.Screen name="Calendar" component={CalendarScreen} />
         <Stack.Screen name="Notification" component={NotificationScreen} />
-        <Stack.Screen name="MyPage" component={MyPageScreen} />
         <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
         <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
         <Stack.Screen name="Subscription" component={SubscriptionScreen} />

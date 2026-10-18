@@ -19,11 +19,10 @@ import { EmailDomainField } from '@/domain/auth/components/EmailDomainField';
 import { PasswordRequirementList } from '@/domain/auth/components/PasswordRequirementList';
 import { SignUpStepIndicator } from '@/domain/auth/components/SignUpStepIndicator';
 import { useCheckLoginIdMutation } from '@/domain/auth/hooks/useCheckLoginIdMutation';
-import { useSignUpMutation } from '@/domain/auth/hooks/useSignUpMutation';
 
 type SignUpScreenProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
-// 아이디 중복확인 → 비밀번호 입력 → 약관 동의 → 가입하기 순서의 단일 화면 회원가입 폼
+// 아이디 중복확인 → 비밀번호 입력 → 약관 동의 후 이름 입력 화면으로 넘어가는 회원가입 폼 (가입 API는 이름 입력 화면에서 호출)
 export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
@@ -40,7 +39,6 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [agreeMarketing, setAgreeMarketing] = useState(false);
 
   const checkLoginIdMutation = useCheckLoginIdMutation();
-  const signUpMutation = useSignUpMutation();
 
   const isLoginIdAvailable =
     duplicateCheckResult?.loginId === loginId && !duplicateCheckResult.isDuplicated;
@@ -59,8 +57,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
     password !== passwordConfirm ||
     !email ||
     !isEmailFormatValid ||
-    !isRequiredAgreed ||
-    signUpMutation.isPending;
+    !isRequiredAgreed;
 
   const handleLoginIdChange = (value: string) => {
     setLoginId(value);
@@ -88,9 +85,10 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
     setAgreeMarketing(next);
   };
 
-  const handleSignUpPress = () => {
-    signUpMutation.mutate(
-      {
+  // 이메일 중복 등 가입 API 에러가 나면 뒤로 돌아와 수정할 수 있도록 replace가 아닌 navigate
+  const handleNextPress = () => {
+    navigation.navigate('NameInput', {
+      signUpRequest: {
         localId: loginId,
         password,
         passwordConfirm,
@@ -99,10 +97,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
         privacyPolicyAgreed: agreePrivacy,
         marketingAgreed: agreeMarketing,
       },
-      {
-        onSuccess: () => navigation.replace('Onboarding'),
-      },
-    );
+    });
   };
 
   // 중복(409)은 authApi에서 isDuplicated: true로 변환되고, 형식 오류(400) 등은 서버 message를 노출
@@ -213,17 +208,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
         </ScrollView>
 
         <View style={styles.footer}>
-          {signUpMutation.isError && (
-            <Text style={styles.errorText}>
-              {getApiErrorMessage(signUpMutation.error, '회원가입에 실패했습니다.')}
-            </Text>
-          )}
-          <Button
-            label="가입하기"
-            onPress={handleSignUpPress}
-            loading={signUpMutation.isPending}
-            disabled={isSignUpDisabled}
-          />
+          <Button label="다음" onPress={handleNextPress} disabled={isSignUpDisabled} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -265,11 +250,6 @@ const styles = StyleSheet.create({
     color: colors.success,
     marginTop: -spacing.sm,
     marginBottom: spacing.md,
-  },
-  errorText: {
-    ...typography.caption,
-    color: colors.error,
-    marginBottom: spacing.sm,
   },
   agreements: {
     marginBottom: spacing.xl,

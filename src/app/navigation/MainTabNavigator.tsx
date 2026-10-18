@@ -7,7 +7,7 @@ import { colors, spacing, typography } from '@/common/styles/theme';
 
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
 import { HomeScreen } from '@/domain/meeting/screens/HomeScreen';
-import { MyScreen } from '@/domain/user/screens/MyScreen';
+import { MyPageScreen } from '@/domain/mypage/screens/MyPageScreen';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -43,7 +43,7 @@ export function MainTabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: '홈' }} />
       <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarLabel: '캘린더' }} />
-      <Tab.Screen name="My" component={MyScreen} options={{ tabBarLabel: '마이' }} />
+      <Tab.Screen name="My" component={MyPageScreen} options={{ tabBarLabel: '마이' }} />
     </Tab.Navigator>
   );
 }

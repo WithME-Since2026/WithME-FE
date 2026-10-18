@@ -11,7 +11,7 @@ export function useSignUpMutation() {
 
   return useMutation({
     mutationFn: (request: SignUpRequest) => signUp(request),
-    // 가입 응답에 토큰이 포함되어 바로 로그인 상태가 됨 (이후 이름 입력 API가 인증 필요)
+    // 가입 응답에 토큰이 포함되어 바로 로그인 상태가 됨
     onSuccess: async (data) => {
       await tokenManager.setTokens(data.accessToken, data.refreshToken);
       setAuth(data.userId);
