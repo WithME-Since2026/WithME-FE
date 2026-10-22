@@ -56,7 +56,7 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
     updateProfileMutation.mutate(
       { nickname: trimmedName },
       {
-        onSuccess: () => navigation.navigate('MyPage'),
+        onSuccess: () => navigation.goBack(),
         onError: (error) => setErrorMessage(getSaveErrorMessage(error)),
       },
     );
@@ -66,7 +66,7 @@ export function ProfileEditScreen({ navigation }: ProfileEditScreenProps) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => navigation.navigate('MyPage')}
+          onPress={() => navigation.goBack()}
           hitSlop={8}
           style={styles.backButton}
           accessibilityLabel="뒤로 가기"

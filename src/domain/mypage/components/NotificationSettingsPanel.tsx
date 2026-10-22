@@ -3,26 +3,19 @@ import { StyleSheet, Text, View } from 'react-native';
 import { ToggleSwitch } from '@/common/components/ToggleSwitch';
 import { colors, spacing, typography } from '@/common/styles/theme';
 
-export type NotificationToggleKey = 'groupReminder' | 'todoDeadline' | 'newGroupInvite';
+import type { NotificationSettingsResponse } from '@/domain/mypage/types';
 
-export type NotificationToggles = Record<NotificationToggleKey, boolean>;
-
-// TODO: 카테고리별 알림 설정 API가 아직 없어(백엔드엔 notifyAgree 하나만 존재) 로컬 상태로만 관리.
-// 카테고리별 API가 추가되면 useNotificationSettingsQuery 등 실제 값으로 교체할 것
-export const INITIAL_NOTIFICATION_TOGGLES: NotificationToggles = {
-  groupReminder: true,
-  todoDeadline: true,
-  newGroupInvite: false,
-};
+// 토글 key = 백엔드 알림 설정 필드명
+export type NotificationToggleKey = keyof NotificationSettingsResponse;
 
 const TOGGLE_ITEMS: { key: NotificationToggleKey; label: string; hint: string }[] = [
-  { key: 'groupReminder', label: '모임 리마인드 알림', hint: '모임 1시간 전 알림' },
-  { key: 'todoDeadline', label: '할 일 마감 알림', hint: '마감 당일 오전 9시' },
-  { key: 'newGroupInvite', label: '새 모임 초대 알림', hint: '초대받을 때 즉시' },
+  { key: 'notifyGroupRemind', label: '모임 리마인드 알림', hint: '모임 1시간 전 알림' },
+  { key: 'notifyTodoDeadline', label: '할 일 마감 알림', hint: '마감 당일 오전 9시' },
+  { key: 'notifyGroupInvite', label: '새 모임 초대 알림', hint: '초대받을 때 즉시' },
 ];
 
 type NotificationSettingsPanelProps = {
-  toggles: NotificationToggles;
+  toggles: NotificationSettingsResponse;
   onToggle: (key: NotificationToggleKey) => void;
 };
 

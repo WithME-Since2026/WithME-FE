@@ -19,7 +19,7 @@ const NOTICES = [
 
 // 프리미엄 구독 결제 완료 화면 (Figma node 883:96 "탈퇴 완료" 레이아웃을 재사용, 문구만 결제 완료 맥락으로 변경)
 export function PaymentCompleteScreen({ navigation }: PaymentCompleteScreenProps) {
-  const handleGoHomePress = () => navigation.reset({ index: 0, routes: [{ name: 'MyPage' }] });
+  const handleGoHomePress = () => navigation.reset({ index: 0, routes: [{ name: 'Main', params: { screen: 'My' } }] });
 
   return (
     <SafeAreaView style={styles.safeArea}>
