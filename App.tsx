@@ -19,12 +19,16 @@ export default function App() {
 
   // 저장된 토큰이 있으면 로그인 상태 복원. 액세스 토큰이 만료됐어도 첫 API 401에서 재발급됨
   useEffect(() => {
-    tokenManager.getRefreshToken().then((token) => {
-      if (token) {
-        useAuthStore.getState().setAuth();
-      }
-      setHasToken(!!token);
-    });
+    tokenManager
+      .getRefreshToken()
+      .then((token) => {
+        if (token) {
+          useAuthStore.getState().setAuth();
+        }
+        setHasToken(!!token);
+      })
+      // 저장소 읽기 실패 시 로딩에 갇히지 않도록 비로그인 상태로 시작
+      .catch(() => setHasToken(false));
   }, []);
 
   if (!fontsLoaded || hasToken === null) {
