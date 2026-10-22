@@ -19,7 +19,6 @@ import { KakaoIcon } from '@/domain/auth/components/KakaoIcon';
 import { AttendanceStatsCard } from '@/domain/mypage/components/AttendanceStatsCard';
 import { ProfileCard } from '@/domain/mypage/components/ProfileCard';
 import { SettingsListItem } from '@/domain/mypage/components/SettingsListItem';
-import { WeeklyAttendanceChart } from '@/domain/mypage/components/WeeklyAttendanceChart';
 import { useLogoutMutation } from '@/domain/mypage/hooks/useLogoutMutation';
 import { useMyGroupsQuery } from '@/domain/mypage/hooks/useMyGroupsQuery';
 import { useMyPageAttendanceQuery } from '@/domain/mypage/hooks/useMyPageAttendanceQuery';
@@ -94,15 +93,12 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
           <ProfileCard profile={profile} onEditPress={handleEditProfilePress} />
 
           <AttendanceStatsCard
-            groupCount={attendance.groupCount}
-            monthlyAttendCount={attendance.monthlyAttendCount}
-            averageAttendanceRate={attendance.averageAttendanceRate}
+            groupCount={groups?.length ?? 0}
+            attendCount={attendance.attendCount}
+            attendanceRate={attendance.attendanceRate}
           />
 
-          <WeeklyAttendanceChart
-            averageAttendanceRate={attendance.averageAttendanceRate}
-            weeks={attendance.recentWeeks}
-          />
+          {/* TODO: 주차별 참석률 API가 없어 WeeklyAttendanceChart(최근 6주 참석)는 API 추가 후 다시 노출 */}
 
           <Pressable style={styles.premiumBanner} onPress={noop}>
             <KakaoIcon size={36} background />

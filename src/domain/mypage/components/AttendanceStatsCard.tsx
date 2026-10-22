@@ -4,14 +4,14 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 
 type AttendanceStatsCardProps = {
   groupCount: number;
-  monthlyAttendCount: number;
-  averageAttendanceRate: number;
+  attendCount: number;
+  attendanceRate: number;
 };
 
 export function AttendanceStatsCard({
   groupCount,
-  monthlyAttendCount,
-  averageAttendanceRate,
+  attendCount,
+  attendanceRate,
 }: AttendanceStatsCardProps) {
   return (
     <View style={styles.card}>
@@ -23,17 +23,17 @@ export function AttendanceStatsCard({
       <View style={styles.divider} />
 
       <View style={styles.stat}>
-        <Text style={styles.value}>{monthlyAttendCount}</Text>
-        <Text style={styles.label}>이번달 참석</Text>
+        <Text style={styles.value}>{attendCount}</Text>
+        <Text style={styles.label}>참석 횟수</Text>
       </View>
 
       <View style={styles.divider} />
 
       <View style={styles.stat}>
         <Text style={[styles.value, styles.valueHighlight]}>
-          {Math.round(averageAttendanceRate * 100)}%
+          {Math.round(attendanceRate * 100)}%
         </Text>
-        <Text style={styles.label}>평균 참석률</Text>
+        <Text style={styles.label}>참석률</Text>
       </View>
     </View>
   );
