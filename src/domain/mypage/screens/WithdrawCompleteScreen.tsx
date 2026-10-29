@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -19,14 +19,11 @@ export function WithdrawCompleteScreen({ navigation }: WithdrawCompleteScreenPro
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
         <View style={styles.badge}>
-          <Ionicons name="checkmark" size={48} color={colors.primary} />
+          <MaterialCommunityIcons name="check" size={56} color={colors.primary} />
         </View>
 
         <Text style={styles.title}>탈퇴가 완료되었습니다</Text>
-        <Text style={styles.subtitle}>
-          그동안 WithME를 이용해 주셔서{'\n'}감사합니다{' '}
-          <FontAwesome5 name="pray" size={13} color={colors.text.secondary} solid />
-        </Text>
+        <Text style={styles.subtitle}>그동안 WithME를 이용해 주셔서{'\n'}감사합니다</Text>
 
         <View style={styles.noticeBox}>
           <Text style={styles.noticeItem}>· 데이터는 30일 후 완전히 삭제됩니다</Text>
