@@ -23,6 +23,8 @@ const WITHDRAW_REASONS = [
   '기타',
 ];
 
+const DETAIL_MAX_LENGTH = 100;
+
 // 회원 탈퇴 2/3: 탈퇴 이유를 선택(선택 사항)하고 추가 의견을 남기는 화면 (Figma node 884:20)
 export function WithdrawReasonScreen({ navigation }: WithdrawReasonScreenProps) {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -69,10 +71,11 @@ export function WithdrawReasonScreen({ navigation }: WithdrawReasonScreenProps) 
 
         <TextInput
           style={styles.detailInput}
-          placeholder="더 하고 싶은 말이 있다면 적어주세요 (선택)"
+          placeholder="더 하고 싶은 말이 있다면 적어주세요 (선택, 100자 이내)"
           placeholderTextColor={colors.text.disabled}
           value={detail}
           onChangeText={setDetail}
+          maxLength={DETAIL_MAX_LENGTH}
           multiline
         />
 
