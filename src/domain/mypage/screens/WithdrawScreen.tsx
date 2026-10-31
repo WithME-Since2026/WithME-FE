@@ -71,7 +71,7 @@ export function WithdrawScreen({ navigation }: WithdrawScreenProps) {
               icon="stats-chart-outline"
               label="참석 기록·참석률"
               description="복구할 수 없습니다"
-              value={`${attendance.monthlyAttendCount}건`}
+              value={`이번 달 ${attendance.monthlyAttendCount}건`}
             />
             <WithdrawDataRow
               icon="sparkles-outline"
@@ -82,7 +82,7 @@ export function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             <WithdrawDataRow
               icon="card-outline"
               label="등록된 결제 수단"
-              description="카드 · 1234"
+              description="결제 수단 정보가 즉시 삭제됩니다"
               value="삭제"
               showDivider={false}
             />

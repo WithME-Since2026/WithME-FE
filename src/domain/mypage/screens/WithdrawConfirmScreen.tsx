@@ -73,8 +73,8 @@ export function WithdrawConfirmScreen({ navigation }: WithdrawConfirmScreenProps
               style={styles.checkboxIcon}
             />
             <Text style={styles.checkboxLabel}>
-              참여 모임 {groups.length}개, 참석 기록 {attendance.monthlyAttendCount}건, 프리미엄
-              구독이 복구되지 않는다는 점을 확인했습니다.
+              참여 모임 {groups.length}개, 이번 달 참석 기록 {attendance.monthlyAttendCount}건,
+              프리미엄 구독이 복구되지 않는다는 점을 확인했습니다.
             </Text>
           </Pressable>
 
