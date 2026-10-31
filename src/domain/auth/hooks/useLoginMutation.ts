@@ -14,7 +14,7 @@ export function useLoginMutation() {
     onSuccess: async (data) => {
       // 토큰을 먼저 저장해야 이후 화면의 API 요청에 Authorization 헤더가 바로 실림
       await tokenManager.setTokens(data.accessToken, data.refreshToken);
-      setAuth(data.userId);
+      setAuth();
     },
   });
 }

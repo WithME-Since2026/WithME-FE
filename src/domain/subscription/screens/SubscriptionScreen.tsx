@@ -29,7 +29,7 @@ export function SubscriptionScreen({ navigation }: SubscriptionScreenProps) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={8}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={8} accessibilityLabel="닫기">
           <Ionicons name="close" size={22} color={colors.text.primary} />
         </Pressable>
         <Pressable onPress={handleRestorePress} hitSlop={8}>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.gutter,
     paddingBottom: spacing.xl,
   },
   hero: {
@@ -126,14 +126,13 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 4,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: borderRadius.badge,
     backgroundColor: colors.premiumTitleText,
     alignItems: 'center',
     justifyContent: 'center',
   },
   proBadgeLabel: {
-    fontSize: 9,
-    fontWeight: '700',
+    ...typography.badge,
     color: colors.premiumGold,
   },
   title: {
@@ -142,8 +141,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   subtitle: {
-    ...typography.caption,
-    fontSize: 13,
+    ...typography.captionLarge,
     lineHeight: 20,
     textAlign: 'center',
     color: colors.text.secondary,
@@ -171,8 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   featureText: {
-    ...typography.caption,
-    fontSize: 13,
+    ...typography.captionLarge,
     color: colors.text.primary,
   },
   priceCard: {
@@ -197,8 +194,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   priceBadgeLabel: {
-    fontSize: 9,
-    fontWeight: '700',
+    ...typography.badge,
     color: colors.background,
   },
   priceRow: {

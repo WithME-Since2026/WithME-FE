@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import { apiClient } from '@/common/api/apiClient';
 import type { ApiResponse } from '@/common/types/api';
 
@@ -21,26 +23,31 @@ import type {
 export async function loginLocal(request: LoginRequest) {
   // apiClient의 baseURL은 호스트까지만 포함하므로 버전 prefix는 각 API에서 직접 명시
   const response = await apiClient.post<ApiResponse<LoginResponse>>(
-    '/api/v1/auth/login/local',
+    '/api/v1/auth/login',
     request,
   );
 
   return response.data.data;
 }
 
-export async function checkLoginIdDuplicate(request: CheckLoginIdRequest) {
-  const response = await apiClient.post<ApiResponse<CheckLoginIdResponse>>(
-    '/api/v1/auth/id/dup-check',
-    request,
-  );
-
-  return response.data.data;
+// 서버는 사용 가능하면 200, 중복이면 409로만 구분하고 바디에 결과 필드가 없음
+export async function checkLoginIdDuplicate(
+  request: CheckLoginIdRequest,
+): Promise<CheckLoginIdResponse> {
+  try {
+    await apiClient.get<ApiResponse<null>>('/api/v1/auth/id-check', { params: request });
+    return { isDuplicated: false };
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 409) {
+      return { isDuplicated: true };
+    }
+    throw error;
+  }
 }
 
 export async function signUp(request: SignUpRequest) {
-  // API 명세상 회원가입 엔드포인트명이 sign-in으로 되어 있어 그대로 사용
   const response = await apiClient.post<ApiResponse<SignUpResponse>>(
-    '/api/v1/auth/sign-in',
+    '/api/v1/auth/sign-up',
     request,
   );
 

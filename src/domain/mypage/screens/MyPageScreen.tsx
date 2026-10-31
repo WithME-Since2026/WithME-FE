@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,23 +13,25 @@ import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
 import { borderRadius, colors, spacing, typography } from '@/common/styles/theme';
 
-import type { RootStackParamList } from '@/app/navigation';
+import type { MainTabParamList, RootStackParamList } from '@/app/navigation';
 
 import { KakaoIcon } from '@/domain/auth/components/KakaoIcon';
 import { AttendanceStatsCard } from '@/domain/mypage/components/AttendanceStatsCard';
 import { ProfileCard } from '@/domain/mypage/components/ProfileCard';
 import { SettingsListItem } from '@/domain/mypage/components/SettingsListItem';
-import { WeeklyAttendanceChart } from '@/domain/mypage/components/WeeklyAttendanceChart';
 import { useLogoutMutation } from '@/domain/mypage/hooks/useLogoutMutation';
 import { useMyGroupsQuery } from '@/domain/mypage/hooks/useMyGroupsQuery';
 import { useMyPageAttendanceQuery } from '@/domain/mypage/hooks/useMyPageAttendanceQuery';
 import { useMyPageProfileQuery } from '@/domain/mypage/hooks/useMyPageProfileQuery';
 import { useNotificationsQuery } from '@/domain/notification/hooks/useNotificationsQuery';
 
-type MyPageScreenProps = NativeStackScreenProps<RootStackParamList, 'MyPage'>;
+type MyPageScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, 'My'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
 
 // 프로필/참여율 통계/설정 메뉴를 모아 보여주는 마이페이지 화면
-// 하단 탭바는 다른 팀원이 별도로 작업 중이라 여기서는 자리만 비워둠 (충돌 방지)
+// 하단 탭의 '마이' 탭 화면
 export function MyPageScreen({ navigation }: MyPageScreenProps) {
   const {
     data: profile,
@@ -42,28 +46,30 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
   const logoutMutation = useLogoutMutation();
   const { data: notifications } = useNotificationsQuery();
   const { data: groups } = useMyGroupsQuery();
-  // 로그아웃 확인 모달 표시 여부 (Figma node 761:17659). 회원 탈퇴는 별도 3단계 플로우(Withdraw*)로 분리됨
-  const [isLogoutConfirmVisible, setIsLogoutConfirmVisible] = useState(false);
+  // 로그아웃 확인 모달 표시 여부 (Figma node 761:17659)
+  const [pendingExitAction, setPendingExitAction] = useState<'logout' | null>(null);
 
   const isLoading = isProfileLoading || isAttendanceLoading;
   const isError = isProfileError || isAttendanceError;
   const hasUnreadNotifications =
     notifications?.some((notification) => !notification.isRead) ?? false;
 
-  const handleConfirmLogout = () => {
+  const handleConfirmExit = () => {
     logoutMutation.mutate(undefined, {
-      onSuccess: () => {
-        navigation.reset({ index: 0, routes: [{ name: 'Start' }] });
+      onSettled: () => {
+        // 탭 내부가 아닌 최상위 스택을 초기화해야 시작 화면으로 이동함
+        navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Start' }] });
       },
     });
-    setIsLogoutConfirmVisible(false);
+
+    setPendingExitAction(null);
   };
 
   const handleNotificationSettingsPress = () => navigation.navigate('NotificationSettings');
   const handleEditProfilePress = () => navigation.navigate('ProfileEdit');
   const handleWithdrawPress = () => navigation.navigate('Withdraw');
 
-  // TODO: 내 모임 관리/결제수단 등록/문제 신고/프리미엄 화면이 아직 없어 우선 자리만 만들어 둠
+  // TODO: 내 모임 관리/결제수단 등록/문제 신고/프리미엄/회원 탈퇴 화면(API)이 아직 없어 우선 자리만 만들어 둠
   const noop = () => {};
 
   return (
@@ -88,15 +94,12 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
           <ProfileCard profile={profile} onEditPress={handleEditProfilePress} />
 
           <AttendanceStatsCard
-            groupCount={attendance.groupCount}
-            monthlyAttendCount={attendance.monthlyAttendCount}
-            averageAttendanceRate={attendance.averageAttendanceRate}
+            groupCount={groups?.length ?? 0}
+            attendCount={attendance.attendCount}
+            attendanceRate={attendance.attendanceRate}
           />
 
-          <WeeklyAttendanceChart
-            averageAttendanceRate={attendance.averageAttendanceRate}
-            weeks={attendance.recentWeeks}
-          />
+          {/* TODO: 주차별 참석률 API가 없어 WeeklyAttendanceChart(최근 6주 참석)는 API 추가 후 다시 노출 */}
 
           <Pressable style={styles.premiumBanner} onPress={noop}>
             <KakaoIcon size={36} background />
@@ -128,7 +131,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
           </View>
 
           <View style={styles.exitRow}>
-            <Pressable onPress={() => setIsLogoutConfirmVisible(true)} hitSlop={8}>
+            <Pressable onPress={() => setPendingExitAction('logout')} hitSlop={8}>
               <Text style={styles.logoutLabel}>로그아웃</Text>
             </Pressable>
             <Pressable onPress={handleWithdrawPress} hitSlop={8}>
@@ -144,8 +147,6 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
         onCancel={() => setIsLogoutConfirmVisible(false)}
         onConfirm={handleConfirmLogout}
       />
-
-      {/* TODO: 하단 탭바(홈/캘린더/마이)는 다른 팀원이 작업 중 — 완료되면 여기에 연결 */}
     </SafeAreaView>
   );
 }

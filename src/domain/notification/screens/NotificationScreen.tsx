@@ -104,7 +104,12 @@ export function NotificationScreen({ navigation }: NotificationScreenProps) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={8} style={styles.backButton}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          hitSlop={8}
+          style={styles.backButton}
+          accessibilityLabel="뒤로 가기"
+        >
           <Ionicons name="chevron-back" size={22} color={colors.text.primary} />
         </Pressable>
         <Text style={styles.title}>알림</Text>

@@ -1,12 +1,12 @@
 export type LoginRequest = {
-  loginId: string;
+  localId: string;
   password: string;
 };
 
+// 로그인 응답에는 userId가 없음 (회원가입 응답과 다름)
 export type LoginResponse = {
   accessToken: string;
   refreshToken: string;
-  userId: number;
 };
 
 export type ReissueRequest = {
@@ -19,7 +19,7 @@ export type ReissueResponse = {
 };
 
 export type CheckLoginIdRequest = {
-  loginId: string;
+  localId: string;
 };
 
 export type CheckLoginIdResponse = {
@@ -27,14 +27,21 @@ export type CheckLoginIdResponse = {
 };
 
 export type SignUpRequest = {
-  loginId: string;
+  localId: string;
   password: string;
+  passwordConfirm: string;
   email: string;
-  agreeMarketing: boolean;
+  serviceTermsAgreed: boolean;
+  privacyPolicyAgreed: boolean;
+  marketingAgreed: boolean;
+  nickname: string;
 };
 
 export type SignUpResponse = {
   userId: number;
+  nickname: string;
+  accessToken: string;
+  refreshToken: string;
 };
 
 export type SendEmailCodeRequest = {

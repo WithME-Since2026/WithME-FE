@@ -12,14 +12,21 @@ import { borderRadius, colors, spacing, typography } from '@/common/styles/theme
 
 import type { RootStackParamList } from '@/app/navigation';
 
-import { useActivatePremium } from '@/domain/subscription/hooks/useActivatePremium';
-
 type PaymentMethodScreenProps = NativeStackScreenProps<RootStackParamList, 'PaymentMethod'>;
+
+// PG 결제 승인 + 서버 영수증 검증이 연동되기 전까지 결제 버튼을 막아 둠.
+// 연동되면 true로 바꾸고, 승인/검증 성공 이후에만 프리미엄 활성화·완료 화면 이동을 처리할 것
+const IS_PAYMENT_ENABLED = false;
+
+// 카드번호·CVC 등이 OS 자동완성/키체인 제안 대상이 되지 않도록 명시적으로 제외
+const NO_AUTOFILL_PROPS = {
+  autoComplete: 'off',
+  textContentType: 'none',
+  importantForAutofill: 'no',
+} as const;
 
 // 프리미엄 구독 결제수단 등록 화면 (Figma node 311:2)
 export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
-  const activatePremium = useActivatePremium();
-
   // 카드 원본 값(번호/CVC/비밀번호 앞자리/생년월일)은 폼 검증(isFormComplete)에만 쓰입니다.
   // PG(카카오페이/토스페이먼츠 등) SDK 연동 전까지는 이 값들을 자체 백엔드로 전송하면 안 되며,
   // 실제 결제 연동 시에는 이 입력 폼 자체를 PG 위젯/SDK로 교체해 카드 데이터가 서버를 거치지 않게 해야 합니다.
@@ -51,12 +58,10 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
     setExpiry(digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits);
   };
 
-  // TODO: 결제(PG) API가 아직 명세되지 않아, 연동 전까지 결제 성공 시 처리를 그대로 시뮬레이션.
-  // 실제 연동 시 activatePremium()은 PG 콜백/영수증 검증 등 서버 판정 결과를 받은 뒤에만 호출해야 함
-  const handlePayPress = () => {
-    activatePremium();
-    navigation.reset({ index: 0, routes: [{ name: 'PaymentComplete' }] });
-  };
+  // TODO: 결제(PG) API가 아직 명세되지 않아 버튼이 비활성화된 상태(IS_PAYMENT_ENABLED).
+  // 연동 시 PG 승인 + 서버 영수증 검증 결과를 받은 뒤에만 activatePremium() 호출 및
+  // PaymentComplete 이동을 처리해야 함
+  const handlePayPress = () => {};
 
   // TODO: 카카오페이 결제(PG) API가 아직 명세되지 않아 연동 전까지 자리만 만들어 둠
   const handleKakaoPayPress = () => {};
@@ -101,6 +106,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
           label="카드 번호"
           placeholder="0000 0000 0000 0000"
           keyboardType="number-pad"
+          {...NO_AUTOFILL_PROPS}
           maxLength={19}
           value={cardNumber}
           onChangeText={handleCardNumberChange}
@@ -114,6 +120,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
               label="유효기간"
               placeholder="MM/YY"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={5}
               value={expiry}
               onChangeText={handleExpiryChange}
@@ -125,6 +132,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
             <TextField
               label="CVC"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={3}
               secureEntry
               value={cvc}
@@ -140,6 +148,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
             <TextField
               label="카드 비밀번호 앞 2자리"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={2}
               secureEntry
               value={cardPinPrefix}
@@ -153,6 +162,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
               label="생년월일"
               placeholder="YYMMDD"
               keyboardType="number-pad"
+              {...NO_AUTOFILL_PROPS}
               maxLength={6}
               value={birthDate}
               onChangeText={setBirthDate}
@@ -182,7 +192,7 @@ export function PaymentMethodScreen({ navigation }: PaymentMethodScreenProps) {
           label="₩100 결제하고 시작하기"
           variant="primary"
           onPress={handlePayPress}
-          disabled={!isFormComplete}
+          disabled={!IS_PAYMENT_ENABLED || !isFormComplete}
           style={styles.payButton}
         />
 
@@ -216,12 +226,11 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     ...typography.body1,
-    fontSize: 16,
     fontWeight: '700',
     color: colors.text.primary,
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.gutter,
     paddingTop: spacing.md,
     paddingBottom: spacing.xl,
   },
@@ -232,8 +241,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.premiumCardBg,
     borderWidth: 1,
     borderColor: colors.premiumInputBorder,
-    // Figma 실제 값 (rounded-12, height 62)
-    borderRadius: 12,
+    // Figma 실제 값 (height 62)
+    borderRadius: borderRadius.card,
     height: 62,
     paddingHorizontal: spacing.md,
   },
@@ -247,7 +256,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   planDesc: {
-    fontSize: 12,
+    ...typography.caption,
     lineHeight: 16,
     color: colors.text.secondary,
   },
@@ -256,14 +265,13 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 4,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: borderRadius.badge,
     backgroundColor: colors.premiumTitleText,
     alignItems: 'center',
     justifyContent: 'center',
   },
   proBadgeLabel: {
-    fontSize: 9,
-    fontWeight: '700',
+    ...typography.badge,
     color: colors.premiumGold,
   },
   sectionLabel: {
@@ -307,8 +315,7 @@ const styles = StyleSheet.create({
     height: 46,
   },
   inputLabel: {
-    // Figma 실제 값
-    fontSize: 12,
+    fontSize: typography.caption.fontSize,
   },
   agreementRow: {
     flexDirection: 'row',
@@ -330,8 +337,7 @@ const styles = StyleSheet.create({
     borderColor: colors.premiumTitleText,
   },
   agreementLabel: {
-    ...typography.caption,
-    fontSize: 13,
+    ...typography.captionLarge,
     color: colors.text.primary,
   },
   agreementRequired: {

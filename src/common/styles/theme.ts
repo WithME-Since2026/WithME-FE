@@ -84,12 +84,53 @@ export const colors = {
   // 마이페이지 회원 탈퇴 등 파괴적 액션 텍스트 (Figma 실제 값, error 토큰과는 별개 톤)
   destructiveText: '#DC2626',
   overlay: 'rgba(0, 0, 0, 0.4)',
+  // 모임 홈/상세/생성 플로우 전용 팔레트 (Figma "모임" 섹션 고정 컬러)
+  meeting: {
+    primary: '#1A73E8',
+    badgeBackground: '#D3E3FD',
+    participantCardBorder: '#C9CCE0',
+    outlineBorder: '#E8E0F0',
+    mutedText: '#49454F',
+    strongText: '#1C1B1F',
+    progressTrack: '#E7E0EC',
+    notAttending: '#DC2626',
+    pendingText: '#CAC4D0',
+    dotInactive: '#D1D5DB',
+    statusInProgressBackground: '#D3E3FD',
+    statusInProgressText: '#1A73E8',
+    statusDoneBackground: '#F3F4F6',
+    statusDoneText: '#9CA3AF',
+    statusAttendingBorder: '#16A34A',
+    statusAttendingBackground: '#DCFCE7',
+    statusAttendingText: '#16A34A',
+    statusWaitingBackground: '#FFF0CC',
+    statusWaitingText: '#D97706',
+    stepCompleted: '#1F9D6B',
+    inputBackground: '#F5F5F7',
+    inputBorder: '#E5E7EA',
+    placeholderText: '#B8B8BF',
+    stepNavPrevBackground: '#F6F6F6',
+    stepNavPrevBorder: '#D9D9D9',
+    stepNavPrevText: '#737373',
+  },
+  // 모임 상세(밝은 배경) 화면의 참석 현황 배지/진행바 전용 팔레트
+  attendanceStatus: {
+    attending: '#05966A',
+    attendingBackground: '#D0F5E4',
+    notAttending: '#DC2626',
+    notAttendingBackground: '#FCDEDE',
+    pending: '#6B7280',
+    pendingBackground: '#EBEBED',
+    progressPending: '#D1D1D9',
+  },
 };
 
 export const spacing = {
   xs: 4,
   sm: 8,
   md: 16,
+  // 프리미엄 구독/결제수단 등록 화면의 좌우 여백 (Figma 실제 값)
+  gutter: 20,
   lg: 24,
   xl: 32,
   xxl: 48,
@@ -102,11 +143,19 @@ export const typography = {
   body1: { fontSize: 16, fontWeight: '400' as const, lineHeight: 24 },
   body2: { fontSize: 14, fontWeight: '400' as const, lineHeight: 22 },
   caption: { fontSize: 12, fontWeight: '400' as const, lineHeight: 18 },
+  // caption보다 한 단계 큰 보조 텍스트 (프리미엄 화면 Figma 실제 값)
+  captionLarge: { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
+  // PRO/특가 뱃지 안의 라벨 (색상은 사용처에서 지정)
+  badge: { fontSize: 9, fontWeight: '700' as const },
 };
 
 export const borderRadius = {
   sm: 4,
+  // PRO 뱃지 (Figma 실제 값)
+  badge: 6,
   md: 8,
+  // 안내/요약 카드 (Figma 실제 값)
+  card: 12,
   lg: 16,
   full: 9999,
 };

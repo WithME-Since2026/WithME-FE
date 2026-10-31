@@ -3,7 +3,7 @@
 export type MyPageProfileResponse = {
   userId: number;
   nickname: string;
-  isKakaoLinked: boolean;
+  isKakaoLinked?: boolean;
   profileImg: string | null;
 };
 
@@ -13,24 +13,22 @@ export type WeeklyAttendanceResponse = {
   attendanceRate: number;
 };
 
-// TODO: 실제 백엔드 AttendanceRateResponse는 { attendCount, absentCount, attendanceRate }만 반환함.
-// groupCount/monthlyAttendCount/recentWeeks(주차별 통계)는 아직 대응하는 API가 없어 프론트에서 먼저 만들어 둔 형태 — 백엔드 명세 확정 시 다시 맞출 것
+// GET /api/v1/users/me/attendance 실제 백엔드 DTO(AttendanceRateResponse)와 동일한 필드명
 export type MyPageAttendanceResponse = {
-  groupCount: number;
-  monthlyAttendCount: number;
-  // 0~1 사이의 평균 참석률
-  averageAttendanceRate: number;
-  recentWeeks: WeeklyAttendanceResponse[];
+  attendCount: number;
+  absentCount: number;
+  // 0~1 사이의 참석률 (응답한 회차 중 ATTEND 비율)
+  attendanceRate: number;
 };
 
 // GET/PATCH /api/v1/users/me/notifications 실제 백엔드 DTO(NotificationSettingsResponse)와 동일한 필드명
 export type NotificationSettingsResponse = {
-  notifyAgree: boolean;
+  notifyGroupRemind: boolean;
+  notifyTodoDeadline: boolean;
+  notifyGroupInvite: boolean;
 };
 
-export type UpdateNotificationSettingsRequest = {
-  notifyAgree: boolean;
-};
+export type UpdateNotificationSettingsRequest = NotificationSettingsResponse;
 
 // PATCH /api/v1/users/me/profile 실제 백엔드 요청 DTO(UpdateNicknameRequest)와 동일한 필드명 — 닉네임만 수정 가능
 export type UpdateNicknameRequest = {

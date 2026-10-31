@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } fr
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getApiErrorMessage } from '@/common/api/apiError';
 import { Button } from '@/common/components/Button';
 import { ScreenHeader } from '@/common/components/ScreenHeader';
 import { TextField } from '@/common/components/TextField';
@@ -18,11 +19,10 @@ import { EmailDomainField } from '@/domain/auth/components/EmailDomainField';
 import { PasswordRequirementList } from '@/domain/auth/components/PasswordRequirementList';
 import { SignUpStepIndicator } from '@/domain/auth/components/SignUpStepIndicator';
 import { useCheckLoginIdMutation } from '@/domain/auth/hooks/useCheckLoginIdMutation';
-import { useSignUpMutation } from '@/domain/auth/hooks/useSignUpMutation';
 
 type SignUpScreenProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
-// 아이디 중복확인 → 비밀번호 입력 → 약관 동의 → 가입하기 순서의 단일 화면 회원가입 폼
+// 아이디 중복확인 → 비밀번호 입력 → 약관 동의 후 이름 입력 화면으로 넘어가는 회원가입 폼 (가입 API는 이름 입력 화면에서 호출)
 export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
@@ -39,7 +39,6 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [agreeMarketing, setAgreeMarketing] = useState(false);
 
   const checkLoginIdMutation = useCheckLoginIdMutation();
-  const signUpMutation = useSignUpMutation();
 
   const isLoginIdAvailable =
     duplicateCheckResult?.loginId === loginId && !duplicateCheckResult.isDuplicated;
@@ -58,8 +57,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
     password !== passwordConfirm ||
     !email ||
     !isEmailFormatValid ||
-    !isRequiredAgreed ||
-    signUpMutation.isPending;
+    !isRequiredAgreed;
 
   const handleLoginIdChange = (value: string) => {
     setLoginId(value);
@@ -72,7 +70,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
   const handleCheckDuplicate = () => {
     const requestedLoginId = loginId;
     checkLoginIdMutation.mutate(
-      { loginId: requestedLoginId },
+      { localId: requestedLoginId },
       {
         onSuccess: (data) =>
           setDuplicateCheckResult({ loginId: requestedLoginId, isDuplicated: data.isDuplicated }),
@@ -87,20 +85,31 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
     setAgreeMarketing(next);
   };
 
-  const handleSignUpPress = () => {
-    signUpMutation.mutate(
-      { loginId, password, email, agreeMarketing },
-      {
-        onSuccess: () => navigation.replace('Onboarding'),
+  // 이메일 중복 등 가입 API 에러가 나면 뒤로 돌아와 수정할 수 있도록 replace가 아닌 navigate
+  const handleNextPress = () => {
+    navigation.navigate('NameInput', {
+      signUpRequest: {
+        localId: loginId,
+        password,
+        passwordConfirm,
+        email,
+        serviceTermsAgreed: agreeTerms,
+        privacyPolicyAgreed: agreePrivacy,
+        marketingAgreed: agreeMarketing,
       },
-    );
+    });
   };
 
-  // 중복확인 API 자체는 성공(200)했지만 isDuplicated: true인 경우도 에러로 취급
-  const loginIdErrorMessage =
-    duplicateCheckResult?.loginId === loginId && duplicateCheckResult.isDuplicated
-      ? '이미 사용 중인 아이디입니다.'
-      : undefined;
+  // 중복(409)은 authApi에서 isDuplicated: true로 변환되고, 형식 오류(400) 등은 서버 message를 노출
+  let loginIdErrorMessage: string | undefined;
+  if (duplicateCheckResult?.loginId === loginId && duplicateCheckResult.isDuplicated) {
+    loginIdErrorMessage = '이미 사용 중인 아이디입니다.';
+  } else if (checkLoginIdMutation.isError) {
+    loginIdErrorMessage = getApiErrorMessage(
+      checkLoginIdMutation.error,
+      '중복확인에 실패했습니다.',
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -199,12 +208,7 @@ export function SignUpScreen({ navigation }: SignUpScreenProps) {
         </ScrollView>
 
         <View style={styles.footer}>
-          <Button
-            label="가입하기"
-            onPress={handleSignUpPress}
-            loading={signUpMutation.isPending}
-            disabled={isSignUpDisabled}
-          />
+          <Button label="다음" onPress={handleNextPress} disabled={isSignUpDisabled} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

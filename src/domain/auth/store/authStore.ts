@@ -3,7 +3,7 @@ import { create } from 'zustand';
 type AuthState = {
   isLoggedIn: boolean;
   userId: number | null;
-  setAuth: (userId: number) => void;
+  setAuth: (userId?: number) => void;
   clearAuth: () => void;
 };
 
@@ -11,6 +11,6 @@ type AuthState = {
 export const useAuthStore = create<AuthState>()((set) => ({
   isLoggedIn: false,
   userId: null,
-  setAuth: (userId) => set({ isLoggedIn: true, userId }),
+  setAuth: (userId) => set({ isLoggedIn: true, userId: userId ?? null }),
   clearAuth: () => set({ isLoggedIn: false, userId: null }),
 }));

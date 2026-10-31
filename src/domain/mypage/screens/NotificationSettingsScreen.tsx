@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -15,10 +13,7 @@ import type { RootStackParamList } from '@/app/navigation';
 
 import { KakaoIcon } from '@/domain/auth/components/KakaoIcon';
 import type { NotificationToggleKey } from '@/domain/mypage/components/NotificationSettingsPanel';
-import {
-  INITIAL_NOTIFICATION_TOGGLES,
-  NotificationSettingsPanel,
-} from '@/domain/mypage/components/NotificationSettingsPanel';
+import { NotificationSettingsPanel } from '@/domain/mypage/components/NotificationSettingsPanel';
 import { useNotificationSettingsQuery } from '@/domain/mypage/hooks/useNotificationSettingsQuery';
 import { useUpdateNotificationSettingsMutation } from '@/domain/mypage/hooks/useUpdateNotificationSettingsMutation';
 
@@ -32,20 +27,29 @@ export function NotificationSettingsScreen({ navigation }: NotificationSettingsS
   const { data: notificationSettings, isLoading, isError } = useNotificationSettingsQuery();
   const updateNotificationSettingsMutation = useUpdateNotificationSettingsMutation();
 
-  // TODO: 모임별 알림 카테고리 API가 아직 없어(백엔드엔 notifyAgree 하나만 존재) 로컬 상태로만 관리.
-  // 카테고리별 API가 추가되면 실제 값으로 교체할 것
-  const [groupToggles, setGroupToggles] = useState(INITIAL_NOTIFICATION_TOGGLES);
+  // 서버엔 "전체" 필드가 없어 개별 알림 중 하나라도 켜져 있으면 켜짐으로 표시하고, 전체 토글은 세 값을 한 번에 변경
+  const isPushAllOn = notificationSettings
+    ? Object.values(notificationSettings).some(Boolean)
+    : false;
 
   const handleTogglePushAll = () => {
+    const next = !isPushAllOn;
+    updateNotificationSettingsMutation.mutate({
+      notifyGroupRemind: next,
+      notifyTodoDeadline: next,
+      notifyGroupInvite: next,
+    });
+  };
+
+  const handleToggleGroupNotification = (key: NotificationToggleKey) => {
     if (!notificationSettings) {
       return;
     }
 
-    updateNotificationSettingsMutation.mutate({ notifyAgree: !notificationSettings.notifyAgree });
-  };
-
-  const handleToggleGroupNotification = (key: NotificationToggleKey) => {
-    setGroupToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+    updateNotificationSettingsMutation.mutate({
+      ...notificationSettings,
+      [key]: !notificationSettings[key],
+    });
   };
 
   // TODO: 카카오 알림톡 구독 화면이 아직 없어 자리만 만들어 둠
@@ -54,7 +58,12 @@ export function NotificationSettingsScreen({ navigation }: NotificationSettingsS
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={8} style={styles.backButton}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          hitSlop={8}
+          style={styles.backButton}
+          accessibilityLabel="뒤로 가기"
+        >
           <Ionicons name="chevron-back" size={22} color={colors.text.primary} />
         </Pressable>
         <Text style={styles.title}>알림 설정</Text>
@@ -73,8 +82,9 @@ export function NotificationSettingsScreen({ navigation }: NotificationSettingsS
                 <Text style={styles.hint}>끄면 아래 모든 알림이 발송되지 않습니다</Text>
               </View>
               <ToggleSwitch
-                value={notificationSettings.notifyAgree}
+                value={isPushAllOn}
                 onValueChange={handleTogglePushAll}
+                accessibilityLabel="푸시 알림 전체"
               />
             </View>
           </View>
@@ -90,7 +100,7 @@ export function NotificationSettingsScreen({ navigation }: NotificationSettingsS
           <Text style={styles.sectionLabel}>모임 알림</Text>
           <View style={styles.card}>
             <NotificationSettingsPanel
-              toggles={groupToggles}
+              toggles={notificationSettings}
               onToggle={handleToggleGroupNotification}
             />
           </View>
