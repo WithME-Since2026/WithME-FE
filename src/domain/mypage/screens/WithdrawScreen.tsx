@@ -71,7 +71,7 @@ export function WithdrawScreen({ navigation }: WithdrawScreenProps) {
               icon="stats-chart-outline"
               label="참석 기록·참석률"
               description="복구할 수 없습니다"
-              value={`이번 달 ${attendance.monthlyAttendCount}건`}
+              value={`${attendance.attendCount}건`}
             />
             <WithdrawDataRow
               icon="sparkles-outline"

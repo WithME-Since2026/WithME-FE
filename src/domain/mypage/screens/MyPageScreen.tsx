@@ -142,10 +142,10 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
       )}
 
       <ConfirmModal
-        visible={isLogoutConfirmVisible}
+        visible={pendingExitAction === 'logout'}
         message="정말 로그아웃 하시겠어요?"
-        onCancel={() => setIsLogoutConfirmVisible(false)}
-        onConfirm={handleConfirmLogout}
+        onCancel={() => setPendingExitAction(null)}
+        onConfirm={handleConfirmExit}
       />
     </SafeAreaView>
   );
