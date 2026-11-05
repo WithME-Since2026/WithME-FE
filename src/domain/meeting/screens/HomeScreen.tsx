@@ -182,6 +182,16 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             ))
           )}
         </View>
+        {__DEV__ && (
+          <Pressable
+            style={styles.attendancePreview}
+            onPress={() =>
+              navigation.navigate('AttendanceOverview', { meetingId: 1, title: '주간 팀 미팅' })
+            }
+          >
+            <Text style={styles.attendancePreviewLabel}>참석 현황 화면 미리보기</Text>
+          </Pressable>
+        )}
       </ScrollView>
 
       <Pressable
@@ -282,6 +292,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     gap: spacing.sm,
   },
+  attendancePreview: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    paddingVertical: spacing.sm,
+    alignItems: 'center',
+  },
+  attendancePreviewLabel: { ...typography.caption, color: colors.meeting.primary },
   fab: {
     position: 'absolute',
     right: spacing.lg,

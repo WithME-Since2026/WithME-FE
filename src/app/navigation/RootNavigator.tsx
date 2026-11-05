@@ -9,9 +9,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { setOnSessionExpired } from '@/common/api/apiClient';
 
-import { MainTabNavigator, type MainTabParamList } from './MainTabNavigator';
-
-
 import { FindAccountScreen } from '@/domain/auth/screens/FindAccountScreen';
 import { FindIdResultScreen } from '@/domain/auth/screens/FindIdResultScreen';
 import { LoginScreen } from '@/domain/auth/screens/LoginScreen';
@@ -22,6 +19,7 @@ import { StartScreen } from '@/domain/auth/screens/StartScreen';
 import { useAuthStore } from '@/domain/auth/store/authStore';
 import type { SignUpRequest } from '@/domain/auth/types';
 import { CalendarScreen } from '@/domain/calendar/screens/CalendarScreen';
+import { AttendanceOverviewScreen } from '@/domain/meeting/screens/AttendanceOverviewScreen';
 import { CreateMeetingCompleteScreen } from '@/domain/meeting/screens/CreateMeetingCompleteScreen';
 import { CreateMeetingScreen } from '@/domain/meeting/screens/CreateMeetingScreen';
 import { MeetingDetailScreen } from '@/domain/meeting/screens/MeetingDetailScreen';
@@ -32,6 +30,8 @@ import { OnboardingScreen } from '@/domain/onboarding/screens/OnboardingScreen';
 import { PaymentCompleteScreen } from '@/domain/subscription/screens/PaymentCompleteScreen';
 import { PaymentMethodScreen } from '@/domain/subscription/screens/PaymentMethodScreen';
 import { SubscriptionScreen } from '@/domain/subscription/screens/SubscriptionScreen';
+
+import { MainTabNavigator, type MainTabParamList } from './MainTabNavigator';
 
 export type RootStackParamList = {
   Start: undefined;
@@ -45,6 +45,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
   MeetingDetail: { meetingId: number };
+  AttendanceOverview: { meetingId: number; title?: string };
   CreateMeeting: undefined;
   CreateMeetingComplete: { meetingId: number; title: string; inviteLink: string };
   Calendar: undefined;
@@ -89,6 +90,7 @@ export function RootNavigator({ initialRouteName }: RootNavigatorProps) {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Main" component={MainTabNavigator} />
         <Stack.Screen name="MeetingDetail" component={MeetingDetailScreen} />
+        <Stack.Screen name="AttendanceOverview" component={AttendanceOverviewScreen} />
         <Stack.Screen
           name="CreateMeeting"
           component={CreateMeetingScreen}

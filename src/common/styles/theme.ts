@@ -87,6 +87,7 @@ export const colors = {
   // 모임 홈/상세/생성 플로우 전용 팔레트 (Figma "모임" 섹션 고정 컬러)
   meeting: {
     primary: '#1A73E8',
+    overviewBackground: '#F6F7F9',
     badgeBackground: '#D3E3FD',
     participantCardBorder: '#C9CCE0',
     outlineBorder: '#E8E0F0',

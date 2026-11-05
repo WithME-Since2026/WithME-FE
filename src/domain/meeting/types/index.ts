@@ -8,6 +8,29 @@ export type MeetingAttendanceSummary = {
   pending: number;
 };
 
+export type AttendanceOverviewStatus = 'PENDING' | 'ATTENDING' | 'NOT_ATTENDING';
+
+export type AttendanceOverviewMemberResponse = {
+  memberId: number;
+  name: string;
+  status: AttendanceOverviewStatus;
+  absenceReason: string | null;
+};
+
+export type AttendanceOverviewRoundResponse = {
+  roundId: number;
+  label: string;
+  dateText: string;
+  isClosed: boolean;
+  members: AttendanceOverviewMemberResponse[];
+};
+
+export type AttendanceOverviewResponse = {
+  meetingId: number;
+  title: string;
+  rounds: AttendanceOverviewRoundResponse[];
+};
+
 export type FeaturedMeetingResponse = {
   meetingId: number;
   role: MeetingRole;

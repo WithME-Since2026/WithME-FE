@@ -91,7 +91,11 @@ export function MeetingDetailScreen({ route, navigation }: MeetingDetailScreenPr
   const currentAttendanceStatus = myAttendanceStatus ?? meeting.myAttendanceStatus;
   const displayedAttendance =
     myAttendanceStatus && myAttendanceStatus !== meeting.myAttendanceStatus
-      ? applyMyAttendanceAdjustment(meeting.attendance, meeting.myAttendanceStatus, myAttendanceStatus)
+      ? applyMyAttendanceAdjustment(
+          meeting.attendance,
+          meeting.myAttendanceStatus,
+          myAttendanceStatus,
+        )
       : meeting.attendance;
 
   return (
@@ -114,7 +118,11 @@ export function MeetingDetailScreen({ route, navigation }: MeetingDetailScreenPr
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.meeting.primary} />
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={colors.meeting.primary}
+          />
         }
       >
         <MeetingDetailInfoCard
@@ -149,7 +157,12 @@ export function MeetingDetailScreen({ route, navigation }: MeetingDetailScreenPr
 
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>참석 멤버</Text>
-              <Pressable onPress={handlePendingAction} hitSlop={8}>
+              <Pressable
+                onPress={() =>
+                  navigation.navigate('AttendanceOverview', { meetingId, title: meeting.title })
+                }
+                hitSlop={8}
+              >
                 <Text style={styles.sectionLink}>전체보기 →</Text>
               </Pressable>
             </View>

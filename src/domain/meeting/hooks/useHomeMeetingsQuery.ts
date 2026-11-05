@@ -6,6 +6,8 @@ export const meetingQueryKeys = {
   all: ['meeting'] as const,
   home: () => [...meetingQueryKeys.all, 'home'] as const,
   detail: (meetingId: number) => [...meetingQueryKeys.all, 'detail', meetingId] as const,
+  attendanceOverview: (meetingId: number) =>
+    [...meetingQueryKeys.all, 'attendance-overview', meetingId] as const,
   contacts: (query: string) => [...meetingQueryKeys.all, 'contacts', query] as const,
 };
 
