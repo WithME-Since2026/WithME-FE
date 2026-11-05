@@ -14,7 +14,9 @@ type MeetingListItemProps = {
 };
 
 export function MeetingListItem({ meeting, onPress }: MeetingListItemProps) {
-  const accentColor = getMeetingStatusColors(meeting.statusLabel).accent;
+  const accentColor = meeting.statusLabel
+    ? getMeetingStatusColors(meeting.statusLabel).accent
+    : colors.meeting.primary;
 
   return (
     <Pressable
@@ -25,12 +27,14 @@ export function MeetingListItem({ meeting, onPress }: MeetingListItemProps) {
 
       <View style={styles.info}>
         <Text style={styles.title}>{meeting.title}</Text>
-        <Text style={styles.schedule}>{meeting.scheduleText}</Text>
+        {meeting.scheduleText && <Text style={styles.schedule}>{meeting.scheduleText}</Text>}
       </View>
 
-      <View style={styles.status}>
-        <MeetingStatusBadge label={meeting.statusLabel} />
-      </View>
+      {meeting.statusLabel && (
+        <View style={styles.status}>
+          <MeetingStatusBadge label={meeting.statusLabel} />
+        </View>
+      )}
     </Pressable>
   );
 }

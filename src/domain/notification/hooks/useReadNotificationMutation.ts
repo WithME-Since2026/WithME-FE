@@ -10,6 +10,7 @@ export function useReadNotificationMutation() {
   return useMutation({
     mutationFn: readNotification,
     onSuccess: (_data, notificationId) => {
+      queryClient.invalidateQueries({ queryKey: notificationQueryKeys.unreadCount() });
       queryClient.setQueryData<NotificationResponse[]>(notificationQueryKeys.all, (previous) =>
         previous?.map((notification) =>
           notification.notificationId === notificationId

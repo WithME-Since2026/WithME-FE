@@ -18,6 +18,7 @@ import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getApiErrorMessage } from '@/common/api/apiError';
 import { EmptyView } from '@/common/components/EmptyView';
 import { ErrorView } from '@/common/components/ErrorView';
 import { LoadingView } from '@/common/components/LoadingView';
@@ -31,6 +32,8 @@ import { MeetingListItem } from '@/domain/meeting/components/MeetingListItem';
 import type { MeetingRoleFilter } from '@/domain/meeting/components/MeetingRoleFilterTabs';
 import { MeetingRoleFilterTabs } from '@/domain/meeting/components/MeetingRoleFilterTabs';
 import { useHomeMeetingsQuery } from '@/domain/meeting/hooks/useHomeMeetingsQuery';
+import { useMyPageProfileQuery } from '@/domain/mypage/hooks/useMyPageProfileQuery';
+import { useUnreadNotificationCountQuery } from '@/domain/notification/hooks/useNotificationsQuery';
 
 const ROLE_FILTER_LABELS: { value: MeetingRoleFilter; label: string }[] = [
   { value: 'ALL', label: '전체' },
@@ -47,7 +50,9 @@ type HomeScreenProps = CompositeScreenProps<
 >;
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
-  const { data, isLoading, isError } = useHomeMeetingsQuery();
+  const { data, isLoading, isError, error } = useHomeMeetingsQuery();
+  const { data: profile } = useMyPageProfileQuery();
+  const { data: unreadCount } = useUnreadNotificationCountQuery();
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
   const [activeFeaturedIndex, setActiveFeaturedIndex] = useState(0);
@@ -58,7 +63,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   }
 
   if (isError || !data) {
-    return <ErrorView message="홈 정보를 불러오지 못했습니다." />;
+    return <ErrorView message={getApiErrorMessage(error, '홈 정보를 불러오지 못했습니다.')} />;
   }
 
   const { featuredMeetings, otherMeetings } = data;
@@ -95,18 +100,26 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           <Text style={styles.headerTitle}>내 모임</Text>
 
           <View style={styles.headerActions}>
-            <Pressable style={styles.iconButton} hitSlop={8}>
+            <Pressable
+              style={styles.iconButton}
+              hitSlop={8}
+              onPress={() => navigation.navigate('Notification')}
+            >
               <Ionicons name="notifications-outline" size={20} color={colors.text.primary} />
-              <View style={styles.notificationDot} />
+              {!!unreadCount?.count && <View style={styles.notificationDot} />}
             </Pressable>
 
-            <Image source={profileImage} style={styles.avatar} />
+            <Pressable hitSlop={8} onPress={() => navigation.navigate('My')}>
+              <Image
+                source={profile?.profileImg ? { uri: profile.profileImg } : profileImage}
+                style={styles.avatar}
+              />
+            </Pressable>
           </View>
         </View>
 
-        {featuredMeetings.length === 0 ? (
-          <EmptyView message="예정된 모임이 없습니다." />
-        ) : (
+        {allCount === 0 && <EmptyView message="모임이 없습니다." />}
+        {featuredMeetings.length > 0 && (
           <>
             <ScrollView
               ref={scrollRef}
@@ -154,10 +167,10 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         </View>
 
         <View style={styles.listHeader}>
-          <Text style={styles.listHeaderTitle}>그 외 모임 · {filteredOtherMeetings.length}</Text>
-          <Pressable hitSlop={8}>
-            <Text style={styles.sortLabel}>최근순 &gt;</Text>
-          </Pressable>
+          <Text style={styles.listHeaderTitle}>
+            {featuredMeetings.length > 0 ? '그 외 모임' : '내 모임'} ·{' '}
+            {filteredOtherMeetings.length}
+          </Text>
         </View>
 
         <View style={styles.list}>
@@ -165,11 +178,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             <EmptyView message="해당하는 모임이 없습니다." />
           ) : (
             filteredOtherMeetings.map((meeting) => (
-              <MeetingListItem
-                key={meeting.meetingId}
-                meeting={meeting}
-                onPress={() => handleViewMeetingDetail(meeting.meetingId)}
-              />
+              <MeetingListItem key={meeting.meetingId} meeting={meeting} />
             ))
           )}
         </View>
@@ -268,10 +277,6 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontWeight: '600',
     color: colors.meeting.mutedText,
-  },
-  sortLabel: {
-    ...typography.caption,
-    color: colors.meeting.primary,
   },
   list: {
     paddingHorizontal: spacing.lg,

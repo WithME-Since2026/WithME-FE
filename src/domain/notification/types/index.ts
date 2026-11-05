@@ -11,3 +11,7 @@ export type NotificationResponse = {
   createdAt: string;
   isRead: boolean;
 };
+
+export type UnreadNotificationCountResponse = {
+  count: number;
+};

@@ -10,6 +10,7 @@ export function useReadAllNotificationsMutation() {
   return useMutation({
     mutationFn: readAllNotifications,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: notificationQueryKeys.unreadCount() });
       queryClient.setQueryData<NotificationResponse[]>(notificationQueryKeys.all, (previous) =>
         previous?.map((notification) => ({ ...notification, isRead: true })),
       );

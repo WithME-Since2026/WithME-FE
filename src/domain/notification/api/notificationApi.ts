@@ -6,7 +6,18 @@ import {
   markAllMockNotificationsRead,
   markMockNotificationRead,
 } from '@/domain/notification/api/mockNotificationData';
-import type { NotificationResponse } from '@/domain/notification/types';
+import type {
+  NotificationResponse,
+  UnreadNotificationCountResponse,
+} from '@/domain/notification/types';
+
+export async function getUnreadNotificationCount() {
+  const response = await apiClient.get<ApiResponse<UnreadNotificationCountResponse>>(
+    '/api/v1/notifications/unread-count',
+  );
+
+  return response.data.data;
+}
 
 export async function getNotifications() {
   // TODO: 백엔드 알림 목록 조회 API(GET /api/v1/notifications) 연동 전까지 mock 데이터 사용

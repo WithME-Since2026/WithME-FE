@@ -24,8 +24,8 @@ export type MeetingSummaryResponse = {
   meetingId: number;
   role: MeetingRole;
   title: string;
-  scheduleText: string;
-  statusLabel: MeetingStatusLabel;
+  scheduleText: string | null;
+  statusLabel: MeetingStatusLabel | null;
 };
 
 export type HomeMeetingsResponse = {
