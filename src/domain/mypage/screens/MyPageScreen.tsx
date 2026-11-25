@@ -67,6 +67,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
 
   const handleNotificationSettingsPress = () => navigation.navigate('NotificationSettings');
   const handleEditProfilePress = () => navigation.navigate('ProfileEdit');
+  const handleWithdrawPress = () => navigation.navigate('Withdraw');
 
   // TODO: 내 모임 관리/결제수단 등록/문제 신고/프리미엄/회원 탈퇴 화면(API)이 아직 없어 우선 자리만 만들어 둠
   const noop = () => {};
@@ -133,7 +134,7 @@ export function MyPageScreen({ navigation }: MyPageScreenProps) {
             <Pressable onPress={() => setPendingExitAction('logout')} hitSlop={8}>
               <Text style={styles.logoutLabel}>로그아웃</Text>
             </Pressable>
-            <Pressable onPress={noop} hitSlop={8}>
+            <Pressable onPress={handleWithdrawPress} hitSlop={8}>
               <Text style={styles.withdrawLabel}>회원 탈퇴</Text>
             </Pressable>
           </View>
